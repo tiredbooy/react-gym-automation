@@ -15,7 +15,7 @@ export default function App() {
         <Sidebar />
 
         {/* Main content */}
-        <div className="flex-1 bg-[#F1EFEC]">
+        <div className="flex-1 bg-beige">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             {/* <Route path="/users" element={<UsersPage />} /> */}
