@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/reusables/Sidebar";
 import DashboardPage from "./pages/Dashboard";
-// import UsersPage from './pages/Users';
+import UsersPage from "./pages/Users";
 // import PaymentsPage from './pages/Payments';
 // import LockersPage from './pages/Lockers';
 // import LogsPage from './pages/Logs';
@@ -15,10 +15,10 @@ export default function App() {
         <Sidebar />
 
         {/* Main content */}
-        <div className="flex-1 bg-beige">
+        <div className="flex-1 bg-offWhite">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
-            {/* <Route path="/users" element={<UsersPage />} /> */}
+            <Route path="/users" element={<UsersPage />} />
             {/* <Route path="/payments" element={<PaymentsPage />} /> */}
             {/* <Route path="/lockers" element={<LockersPage />} /> */}
             {/* <Route path="/logs" element={<LogsPage />} /> */}
