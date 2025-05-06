@@ -3,6 +3,9 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Filter, Calendar, FileDown } from "lucide-react";
 import * as XLSX from "xlsx";
+import DatePicker from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 const PaymentTableHeader = () => (
   <thead className="bg-[#123458] text-[#F1EFEC]">
@@ -116,30 +119,45 @@ const GymPaymentLogsPage = () => {
       </header>
 
       {/* Filters Section */}
-      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-md p-4 flex flex-wrap gap-4 justify-between items-center">
-        <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-          <Calendar className="text-[#123458] w-5 h-5" />
-          <input
-            type="date"
-            placeholder="از تاریخ..."
-            className="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4C9BE]"
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-md p-4 flex flex-row gap-4 items-center">
+        <div className="relative w-full  text-darkBlue">
+          <DatePicker
+            calendar={persian}
+            locale={persian_fa}
+            calendarPosition="bottom-right"
+            placeholder="از تاریخ"
+            inputClass="p-2 rounded-xl border border-lightGray bg-offWhite text-right w-full pr-10"
+            format="YYYY/MM/DD"
+          />
+          <Calendar
+            size={18}
+            className="absolute right-2 top-2.5 text-darkBlue pointer-events-none"
+          />
+        </div>
+        <div className="relative w-full text-darkBlue">
+          <DatePicker
+            calendar={persian}
+            locale={persian_fa}
+            calendarPosition="bottom-right"
+            placeholder="تا تاریخ"
+            inputClass="p-2 rounded-xl border border-lightGray bg-offWhite text-right w-full pr-10"
+            format="YYYY/MM/DD"
+          />
+          <Calendar
+            size={18}
+            className="absolute right-2 top-2.5 text-darkBlue pointer-events-none"
           />
         </div>
         <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-          <Calendar className="text-[#123458] w-5 h-5" />
-          <input
-            type="date"
-            placeholder="تا تاریخ..."
-            className="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4C9BE]"
-          />
-        </div>
-        <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-          <Filter className="text-[#123458] w-5 h-5" />
-          <select className="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D4C9BE]">
+          <Filter className="text-darkBlue w-5 h-5" />
+          <motion.select
+            whileTap={{ scale: 0.95 }}
+            className="w-full bg-lightGray text-darkBlue p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-beige"
+          >
             <option>همه روش‌ها</option>
             <option>کارتخوان</option>
             <option>نقدی</option>
-          </select>
+          </motion.select>
         </div>
       </div>
 

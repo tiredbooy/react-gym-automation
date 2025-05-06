@@ -4,6 +4,8 @@ import DashboardPage from "./pages/Dashboard";
 import UsersPage from "./pages/Users";
 import { Payments } from "./pages/Payments";
 import LockerManagementPage from "./pages/LockerPage";
+import LogPage from "./pages/Logs";
+import SettingsPage from "./pages/Setting";
 // import LogsPage from './pages/Logs';
 // import SettingsPage from './pages/Settings';
 
@@ -21,8 +23,8 @@ export default function App() {
             <Route path="/users" element={<UsersPage />} />
             <Route path="/payments" element={<Payments />} />
             <Route path="/lockers" element={<LockerManagementPage />} />
-            {/* <Route path="/logs" element={<LogsPage />} /> */}
-            {/* <Route path="/settings" element={<SettingsPage />} /> */}
+            <Route path="/logs" element={<LogPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </div>
       </div>
