@@ -24,10 +24,9 @@ export default function UserPageHeader() {
           className="w-24 rounded-xl px-4 py-2 border border-darkBlue bg-offWhite text-darkBlue placeholder:text-darkBlue outline-none transition-all duration-300 focus:border-beige focus:ring-2 focus:ring-hoverBeige shadow-sm"
           placeholder="کد کاربر"
         />
-        <div className="relative w-full">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-darkBlue" />
+        <div className="relative w-full group">
+          <Search className="absolute right-3 top-1/2 z-50 -translate-y-1/2 text-darkBlue cursor-pointer transition-colors duration-300 group-focus-within:text-beige" />
           <motion.input
-            whileFocus={{ scale: 1.01 }}
             className="w-full rounded-2xl pr-12 pl-4 py-2 border border-darkBlue bg-offWhite text-darkBlue placeholder:text-darkBlue outline-none transition-all duration-300 focus:border-beige focus:ring-4 focus:ring-hoverBeige focus:ring-offset-0 shadow-sm focus:shadow-lg"
             placeholder="جستجوی کاربران"
           />

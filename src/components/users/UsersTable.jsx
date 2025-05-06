@@ -136,7 +136,7 @@ const userMocData = [
 
 export default function UserTable() {
   return (
-    <div className="max-h-96 overflow-y-auto bg-darkBlue rounded-lg">
+    <div className="h-[60vh] overflow-y-auto bg-darkBlue rounded-lg">
       <table className="table rounded-lg w-full">
         {/* head */}
         <thead className="bg-beige text-darkBlue sticky top-0 z-10">

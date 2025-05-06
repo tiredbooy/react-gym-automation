@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "./components/reusables/Sidebar";
 import DashboardPage from "./pages/Dashboard";
 import UsersPage from "./pages/Users";
-// import PaymentsPage from './pages/Payments';
-// import LockersPage from './pages/Lockers';
+import { Payments } from "./pages/Payments";
+import LockerManagementPage from "./pages/LockerPage";
 // import LogsPage from './pages/Logs';
 // import SettingsPage from './pages/Settings';
 
@@ -19,8 +19,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/users" element={<UsersPage />} />
-            {/* <Route path="/payments" element={<PaymentsPage />} /> */}
-            {/* <Route path="/lockers" element={<LockersPage />} /> */}
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/lockers" element={<LockerManagementPage />} />
             {/* <Route path="/logs" element={<LogsPage />} /> */}
             {/* <Route path="/settings" element={<SettingsPage />} /> */}
           </Routes>
