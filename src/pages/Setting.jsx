@@ -3,7 +3,10 @@ import SettingsNavbar from "../components/setting/SettingsNavbar";
 import SupportSettings from "../components/setting/SupportSetting";
 import ServiceSettings from "../components/setting/ServiceSettings";
 import LockerSettings from "../components/setting/LockerSettings.jsx";
-
+import AccessManagement from "../components/setting/AccessManagement.jsx";
+import DeviceManagement from "../components/setting/device-managment/DeviceManagement.jsx";
+// import DevicesPage from "../components/setting/device-managment/DevicePage.jsx";
+import SalonGatewaysPage from "../components/setting/salons/SalonGatewaysPage.jsx";
 export default function SettingsPage() {
   const [currentTab, setCurrentTab] = useState("support");
 
@@ -16,7 +19,12 @@ export default function SettingsPage() {
       // Future cases:
       case "lockers":
         return <LockerSettings />;
-      // case 'services': return <ServiceSettings />;
+      case "admin":
+        return <AccessManagement />;
+      case "devices":
+        return <DeviceManagement />;
+      case "gyms":
+        return <SalonGatewaysPage />;
       default:
         return <div>در حال توسعه...</div>;
     }

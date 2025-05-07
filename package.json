@@ -12,6 +12,7 @@
     "package": "electron-builder"
   },
   "dependencies": {
+    "electron-store": "^10.0.1",
     "framer-motion": "^12.9.4",
     "lucide-react": "^0.507.0",
     "net": "^1.0.2",
