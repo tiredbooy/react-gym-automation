@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import ActionButtons from "./device-managment/ActionButtons";
+import { motion } from "framer-motion";
+import Button from "../reusables/Button";
 
 export default function SupportSettings() {
   const [token, setToken] = useState("");
@@ -39,17 +41,43 @@ export default function SupportSettings() {
       </div>
 
       <div className="flex flex-wrap justify-center gap-3">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+          whileTap={{ scale: 1 }}
+          className="flex flex-col gap-3 bg-red-500 rounded-xl px-4 py-6 shadow-xl"
+        >
+          {/* Color boxes with hover effect or subtle scaling if needed */}
+          <div className="colorBox flex flex-row gap-2">
+            <div className="w-16 h-16 rounded-full bg-darkBlue opacity-75"></div>
+            <div className="w-16 h-16 rounded-full bg-beige opacity-75"></div>
+            <div className="w-16 h-16 rounded-full bg-nearBlack opacity-75"></div>
+            <div className="w-16 h-16 rounded-full bg-gray-600 opacity-75"></div>
+          </div>
 
-        <div className="theme colors box">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-
-        </div>
-
+          {/* Animated button */}
+          <motion.button
+            initial={{ width: "50%" }}
+            whileHover={{
+              width: "100%",
+              transition: {
+                duration: 0.3,
+                ease: "easeInOut",
+              },
+            }}
+            whileTap={{
+              width: "75%",
+              transition: { duration: 0.1, ease: "easeInOut" },
+            }}
+            whileFocus={{ outline: "none" }} // Remove default outline if desired
+            className="mx-auto px-4 py-2 rounded-xl bg-blue-500 font-bold text-white transition-transform duration-200"
+          >
+            انتخاب تم
+          </motion.button>
+        </motion.div>
       </div>
-
     </div>
   );
 }
