@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const tabs = [
   { id: "support", label: "تنظیمات امنیت و ظاهر" },
@@ -9,12 +10,13 @@ const tabs = [
   { id: "admin", label: "تنظیمات دسترسی و مدیریت" },
   { id: "devices", label: "اتصال و مدیریت دستگاه‌ها" },
   { id: "salons", label: "تنظیمات سالن و درگاه‌ها" },
+  { id: "coaches", label: "مدیریت مربی ها" },
 ];
 
 export default function SettingsNavbar({ currentTab, onChange }) {
   return (
     <div className="w-full overflow-x-auto mb-6">
-      <div className="flex gap-2 md:gap-4 rounded-xl bg-beige p-2 shadow-inner">
+      <div className="flex gap-2 w-max md:gap-4 rounded-xl bg-beige p-2 shadow-inner scroll-smooth">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -29,7 +31,7 @@ export default function SettingsNavbar({ currentTab, onChange }) {
               <motion.div
                 layoutId="activeTab"
                 className="absolute inset-0 rounded-xl bg-darkBlue -z-10"
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                transition={{ type: "spring", stiffness: 200, damping: 30 }}
               />
             )}
             {tab.label}

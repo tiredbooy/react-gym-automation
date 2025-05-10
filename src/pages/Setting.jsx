@@ -8,6 +8,7 @@ import DeviceManagement from "../components/setting/device-managment/DeviceManag
 // import DevicesPage from "../components/setting/device-managment/DevicePage.jsx";
 // import SalonGatewaysPage from "../components/setting/salons/SalonGatewaysPage.jsx";
 import SalonsManagment from "../components/setting/salons/SalonsManagment.jsx";
+import CoachesManagement from "../components/setting/coaches/CoachManagment.jsx";
 export default function SettingsPage() {
   const [currentTab, setCurrentTab] = useState("support");
 
@@ -26,6 +27,8 @@ export default function SettingsPage() {
         return <DeviceManagement />;
       case "salons":
         return <SalonsManagment />;
+      case "coaches":
+        return <CoachesManagement />;
       default:
         return <div>در حال توسعه...</div>;
     }
