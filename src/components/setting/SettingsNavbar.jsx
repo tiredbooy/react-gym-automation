@@ -8,7 +8,7 @@ const tabs = [
   { id: "services", label: "مدیریت خدمات و قیمت‌ها" },
   { id: "admin", label: "تنظیمات دسترسی و مدیریت" },
   { id: "devices", label: "اتصال و مدیریت دستگاه‌ها" },
-  { id: "gyms", label: "تنظیمات سالن و درگاه‌ها" },
+  { id: "salons", label: "تنظیمات سالن و درگاه‌ها" },
 ];
 
 export default function SettingsNavbar({ currentTab, onChange }) {
