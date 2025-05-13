@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Camera } from "lucide-react";
+import { motion } from "framer-motion";
 
 function UserProfilePicture() {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -117,8 +118,10 @@ function UserProfilePicture() {
   }, []);
 
   return (
-    <div
-      className={`bg-beige rounded-xl p-6 flex flex-col items-center justify-center ${
+    <motion.div
+      initial={{ y: -200, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className={`bg-beige rounded-xl p-6 flex flex-col items-center justify-center h-1/2 ${
         dragActive ? "ring-2 ring-darkBlue" : ""
       }`}
       onDragOver={handleDragOver}
@@ -137,22 +140,24 @@ function UserProfilePicture() {
         )}
       </div>
 
-      <label
-        htmlFor="profile-upload"
-        className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
-      >
-        <Camera size={16} />
-        <span>آپلود تصویر</span>
-      </label>
+      <div>
+        <label
+          htmlFor="profile-upload"
+          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
+        >
+          <Camera size={16} />
+          <span>آپلود تصویر</span>
+        </label>
 
-      <input
-        type="file"
-        id="profile-upload"
-        accept="image/*"
-        onClick={handleFileInputClick}
-        onChange={handleFileChange}
-        className="hidden"
-      />
+        <input
+          type="file"
+          id="profile-upload"
+          accept="image/*"
+          onClick={handleFileInputClick}
+          onChange={handleFileChange}
+          className="hidden"
+        />
+      </div>
 
       <p className="mt-3 text-center text-xs text-darkBlue opacity-70">
         فرمت‌های قابل قبول: JPG، PNG، GIF
@@ -188,7 +193,7 @@ function UserProfilePicture() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

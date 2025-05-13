@@ -11,8 +11,8 @@ export default function UsersItem({ users }) {
   return (
     <div className="bg-offWhite py-12 px-8 text-center">
       <UserPageHeader />
-      <UserTable users={users} />
-      {/* <AddUserModal isOpen={isOpen} onOpen={setIsOpen} /> */}
+      {/* <UserTable users={users} /> */}
+      <AddUserModal isOpen={isOpen} onOpen={setIsOpen} />
       <Pagination
         className="mt-5"
         currentPage={2}

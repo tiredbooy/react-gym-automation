@@ -24,7 +24,7 @@ function AddUserModal() {
           stiffness: 260,
           damping: 20,
         }}
-        className="bg-offWhite my-8 p-8 rounded-2xl shadow-2xl w-full max-w-7xl mx-auto fixed inset-0 m-auto z-50"
+        className="bg-offWhite my-8 p-8 overflow-auto rounded-2xl shadow-2xl w-full max-w-7xl mx-auto fixed inset-0 m-auto z-50"
       >
         <motion.header
           initial={{ x: 800 }}
@@ -40,7 +40,7 @@ function AddUserModal() {
           <h1 className="font-bold text-darkBlue text-3xl">افزودن کاربر</h1>
         </motion.header>
 
-        <div className="flex flex-row gap-3 items-center">
+        <div className="flex flex-row gap-3 mt-5 ">
           <AddUserForm />
           {/* <div className="bg-red-500 w-1/5">w</div> */}
           <UserProfilePicture />

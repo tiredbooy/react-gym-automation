@@ -6,6 +6,7 @@ export default function LogTable({ userData }){
       {/* head */}
       <thead className="bg-beige text-darkBlue sticky top-0 z-10">
         <tr>
+          <th>کد</th>
           <th>نام و نام خانوادگی</th>
           <th>رشته ورزشی</th>
           <th>پایان اشتراک</th>
@@ -20,6 +21,7 @@ export default function LogTable({ userData }){
             key={index}
             className="border-b border-beige hover:bg-[#2f5986] transition duration-150"
           >
+            <td className="py-4 px-2">1</td>
             <td className="py-4 px-2">
               <div className="flex items-center gap-3">
                 <div className="avatar">
