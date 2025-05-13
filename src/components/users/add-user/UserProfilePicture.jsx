@@ -151,19 +151,19 @@ function UserProfilePicture() {
         {/* Webcam button */}
         <button
           onClick={handleWebcamClick}
-          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
+          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
         >
-          <Camera size={16} />
-          <span>دوربین</span>
+          <Camera size={24} />
+          {/* <span className="">دوربین</span> */}
         </button>
 
         {/* File upload button */}
         <button
           onClick={handleFileButtonClick}
-          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
+          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
         >
-          <Upload size={16} />
-          <span>آپلود فایل</span>
+            <Upload size={24} />
+          {/* <span className="">آپلود فایل</span> */}
         </button>
 
         {/* Hidden file input */}
@@ -178,7 +178,7 @@ function UserProfilePicture() {
       </div>
 
       <p className="mt-3 text-center text-xs text-darkBlue opacity-70">
-        فرمت‌های قابل قبول: JPG، PNG، GIF
+        فرمت‌های قابل قبول: JPG، PNG، Avif , Webp
       </p>
 
       {/* Webcam Modal */}
