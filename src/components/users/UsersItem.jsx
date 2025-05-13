@@ -1,17 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Pagination from "../reusables/Pagination";
 import UserPageHeader from "./Header";
 import UserTable from "./UsersTable";
 import AddUserModal from "./add-user/AddUserModal";
 
-
-export default function UsersItem() {
-  const [isOpen , setIsOpen] = useState(false)
+export default function UsersItem({ users }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
 
   return (
     <div className="bg-offWhite py-12 px-8 text-center">
-      <UserPageHeader  />
-      <UserTable />
+      <UserPageHeader />
+      <UserTable users={users} />
       {/* <AddUserModal isOpen={isOpen} onOpen={setIsOpen} /> */}
       <Pagination
         className="mt-5"
