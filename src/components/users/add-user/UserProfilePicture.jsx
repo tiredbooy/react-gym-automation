@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Camera } from "lucide-react";
+import { Camera, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 
 function UserProfilePicture() {
@@ -10,6 +10,7 @@ function UserProfilePicture() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Start webcam with debugging
   const startWebcam = async () => {
@@ -58,10 +59,16 @@ function UserProfilePicture() {
     }
   };
 
-  // Handle file input click to open webcam
-  const handleFileInputClick = (e) => {
+  // Handle webcam button click
+  const handleWebcamClick = (e) => {
     e.preventDefault();
     startWebcam();
+  };
+
+  // Handle file input button click
+  const handleFileButtonClick = (e) => {
+    e.preventDefault();
+    fileInputRef.current.click();
   };
 
   // Handle file change for direct uploads
@@ -140,20 +147,31 @@ function UserProfilePicture() {
         )}
       </div>
 
-      <div>
-        <label
-          htmlFor="profile-upload"
+      <div className="flex gap-3">
+        {/* Webcam button */}
+        <button
+          onClick={handleWebcamClick}
           className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
         >
           <Camera size={16} />
-          <span>آپلود تصویر</span>
-        </label>
+          <span>دوربین</span>
+        </button>
 
+        {/* File upload button */}
+        <button
+          onClick={handleFileButtonClick}
+          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
+        >
+          <Upload size={16} />
+          <span>آپلود فایل</span>
+        </button>
+
+        {/* Hidden file input */}
         <input
           type="file"
+          ref={fileInputRef}
           id="profile-upload"
           accept="image/*"
-          onClick={handleFileInputClick}
           onChange={handleFileChange}
           className="hidden"
         />
