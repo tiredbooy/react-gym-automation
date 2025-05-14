@@ -24,7 +24,7 @@ export default function App() {
             <Route path="/payments" element={<Payments />} />
             <Route path="/lockers" element={<LockerManagementPage />} />
             <Route path="/logs" element={<LogPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/:tab" element={<SettingsPage />} />
           </Routes>
         </div>
       </div>

@@ -9,11 +9,17 @@ import DeviceManagement from "../components/setting/device-managment/DeviceManag
 // import SalonGatewaysPage from "../components/setting/salons/SalonGatewaysPage.jsx";
 import SalonsManagment from "../components/setting/salons/SalonsManagment.jsx";
 import CoachesManagement from "../components/setting/coaches/CoachManagment.jsx";
+import { useParams, Navigate } from "react-router-dom";
 export default function SettingsPage() {
-  const [currentTab, setCurrentTab] = useState("support");
+  // const [currentTab, setCurrentTab] = useState("support");
+  const { tab } = useParams();
+
+  if (!tab) {
+    return <Navigate to="/settings/support" replace />;
+  }
 
   const renderTabContent = () => {
-    switch (currentTab) {
+    switch (tab) {
       case "support":
         return <SupportSettings />;
       case "services":
@@ -36,12 +42,14 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-offWhite text-nearBlack p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full flex flex-col justify-center mx-auto">
         <h1 className="text-2xl md:text-4xl font-bold mb-4 text-darkBlue text-center md:text-right">
           تنظیمات سیستم
         </h1>
-
-        <SettingsNavbar currentTab={currentTab} onChange={setCurrentTab} />
+        <SettingsNavbar />
+      </div>
+      <div className="max-w-6xl mx-auto">
+        {/* currentTab={currentTab} onChange={setCurrentTab} */}
         {renderTabContent()}
       </div>
     </div>

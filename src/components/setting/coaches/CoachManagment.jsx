@@ -21,10 +21,10 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
   const [contact, setContact] = useState(coach?.contact || "");
   const [specialty, setSpecialty] = useState(coach?.specialty || "بدنسازی");
   const [priceProgram, setPriceProgram] = useState(
-    coach?.priceProgram || "200000"
+    coach?.priceProgram || null
   );
   const [pricePrivate, setPricePrivate] = useState(
-    coach?.pricePrivate || "500000"
+    coach?.pricePrivate || null
   );
   const [shift, setShift] = useState(coach?.shift || "صبح");
 
@@ -44,6 +44,13 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
       shift,
       clients: coach?.clients || [],
     });
+
+    setName("");
+    setContact("");
+    setSpecialty("");
+    setPriceProgram(null);
+    setPricePrivate(null)
+    setShift("صبح")
     onClose();
   };
 
@@ -94,9 +101,10 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
               onChange={(e) => setSpecialty(e.target.value)}
               className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack font-amiri transition-all"
             >
-              <option value="بدنسازی">بدنسازی</option>
-              <option value="یوگا">یوگا</option>
-              <option value="ماساژ">ماساژ</option>
+              <option value="bodyBuilding">بدنسازی</option>
+              <option value="yoga">یوگا</option>
+              <option value="crossfit">کراسفیت</option>
+              <option value="trx">تی ار ایکس</option>
             </select>
           </div>
           <div>
@@ -108,7 +116,7 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
               value={priceProgram}
               onChange={(e) => setPriceProgram(e.target.value)}
               className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 font-amiri transition-all"
-              placeholder="مثال: 200,000 تومان"
+              placeholder="مثال: 200,000"
             />
           </div>
           <div>
@@ -119,8 +127,8 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
               type="number"
               value={pricePrivate}
               onChange={(e) => setPricePrivate(e.target.value)}
-              className="w-full p-3 bg-white border border-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-lightGray font-amiri transition-all"
-              placeholder="مثال: 500,000 تومان"
+              className="w-full p-3 bg-white border border-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 font-amiri transition-all"
+              placeholder="مثال: 500,000 "
             />
           </div>
           <div>
@@ -132,9 +140,9 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
               onChange={(e) => setShift(e.target.value)}
               className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack font-amiri transition-all"
             >
-              <option value="صبح">صبح</option>
-              <option value="بعدازظهر">بعدازظهر</option>
-              <option value="عشاء">عشاء</option>
+              <option value="morning">صبح</option>
+              <option value="evening">بعدازظهر</option>
+              <option value="night">شب</option>
             </select>
           </div>
           <div className="flex justify-end space-x-3 space-x-reverse">
