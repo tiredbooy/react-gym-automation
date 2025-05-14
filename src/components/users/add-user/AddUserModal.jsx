@@ -1,9 +1,9 @@
 import { easeIn, easeInOut, motion } from "framer-motion";
-import { UserPlus } from "lucide-react";
+import { UserPlus, X } from "lucide-react";
 import AddUserForm from "./AddUserForm";
 import UserProfilePicture from "./UserProfilePicture";
 
-function AddUserModal() {
+function AddUserModal({ onOpen }) {
   return (
     <>
       {/* Background overlay */}
@@ -26,6 +26,13 @@ function AddUserModal() {
         }}
         className="bg-offWhite my-8 p-8 overflow-auto rounded-2xl shadow-2xl w-full max-w-7xl mx-auto fixed inset-0 m-auto z-50"
       >
+        <motion.span
+          onClick={() => onOpen((isOpen) => !isOpen)}
+          whileHover={{ scale: 1.5 }}
+          whileTap={{ scale: 0.5 }}
+        >
+          <X className="text-darkBlue text-right cursor-pointer hover:text-red-500 hover:scale-105 duration-150" />
+        </motion.span>
         <motion.header
           initial={{ x: 800 }}
           animate={{ x: 0 }}
@@ -41,7 +48,7 @@ function AddUserModal() {
         </motion.header>
 
         <div className="flex flex-row gap-3 mt-5 ">
-          <AddUserForm />
+          <AddUserForm onOpen={onOpen} />
           {/* <div className="bg-red-500 w-1/5">w</div> */}
           <UserProfilePicture />
         </div>

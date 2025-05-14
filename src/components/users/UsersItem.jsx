@@ -6,13 +6,12 @@ import AddUserModal from "./add-user/AddUserModal";
 
 export default function UsersItem({ users }) {
   const [isOpen, setIsOpen] = useState(false);
-  
 
   return (
     <div className="bg-offWhite py-12 px-8 text-center">
-      <UserPageHeader />
-      {/* <UserTable users={users} /> */}
-      <AddUserModal isOpen={isOpen} onOpen={setIsOpen} />
+      <UserPageHeader onAddUserModal={setIsOpen} />
+      {isOpen && <AddUserModal isOpen={isOpen} onOpen={setIsOpen} />}
+      <UserTable users={users} />
       <Pagination
         className="mt-5"
         currentPage={2}

@@ -3,18 +3,16 @@ import { motion } from "framer-motion";
 import Button from "../reusables/Button";
 import { UserRoundPlus, Search, User } from "lucide-react";
 
-export default function UserPageHeader() {
+export default function UserPageHeader({ onAddUserModal }) {
   return (
     <div className="flex flex-col gap-5 items-center py-4">
       <div className="w-full text-start">
         <h1 className="text-darkBlue font-bold text-4xl">کاربرها</h1>
       </div>
       <div className="w-full text-start">
-        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.99 }}>
-          <Button className={"flex flex-row gap-1"}>
-            <UserRoundPlus size={20} />
+        <motion.button whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.99 }} onClick={() => onAddUserModal(isOpen => !isOpen)} className="flex flex-row gap-1 bg-darkBlue rounded-xl px-4 py-2 font-bold text-beige">
+          <UserRoundPlus size={20} />
             افزودن کاربر
-          </Button>
         </motion.button>
       </div>
 

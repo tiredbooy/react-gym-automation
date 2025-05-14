@@ -10,7 +10,7 @@ import FormDataInputs from "./FormDataInputs";
 import InsuranceDataInputs from "./InsuranceDataInputs";
 import SubscriptionDataForm from "./SubscriptionDataForm";
 
-function AddUserForm() {
+function AddUserForm({ onOpen }) {
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -157,18 +157,29 @@ function AddUserForm() {
         <SubscriptionDataForm />
       </div>
 
-      <motion.button
-        type="submit"
-        className="mt-8 w-full sm:w-auto sm:ml-auto flex justify-center bg-darkBlue hover:bg-darkBlue/90 text-offWhite rounded-xl px-6 py-3"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 300 }}
-      >
-        ثبت نام کاربر
-      </motion.button>
+      <div className="flex flex-row gap-5 col-span-full">
+        <motion.button
+          onClick={() => onOpen(isOpen => !isOpen)}
+          type="button"
+          className="mt-8 w-full sm:w-auto flex justify-center bg-red-700 hover:bg-red-700/90 text-offWhite rounded-xl px-6 py-3"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          بازگشت
+        </motion.button>
+        <motion.button
+          type="submit"
+          className="mt-8 w-full sm:w-auto flex justify-center bg-darkBlue hover:bg-darkBlue/90 text-offWhite rounded-xl px-6 py-3"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          ثبت نام کاربر
+        </motion.button>
+      </div>
     </motion.form>
   );
 }
 
 export default AddUserForm;
-

@@ -735,16 +735,6 @@ export default function SubscriptionDataForm() {
           </div>
         </div>
       </div>
-
-      {/* Submit Button */}
-      <div className="mt-8 flex justify-center">
-        <button
-          type="submit"
-          className="bg-darkBlue text-offWhite px-8 py-3 rounded-xl hover:bg-opacity-90 transition-all duration-300 font-bold"
-        >
-          ثبت اشتراک
-        </button>
-      </div>
     </motion.form>
   );
 }
