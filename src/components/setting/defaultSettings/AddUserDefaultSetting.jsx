@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "../../reusables/Button";
+import { useTheme } from "../../../context/ThemeContext";
 
 const settingsList = [
   "کد ملی",
@@ -13,7 +14,10 @@ const settingsList = [
 ];
 
 function AddUserDefaultSetting() {
+  const { activeTheme, themes } = useTheme();
   const [checkedSettings, setCheckedSettings] = useState({});
+
+  const theme = themes[activeTheme];
 
   const toggleSetting = (label) => {
     setCheckedSettings((prev) => ({
@@ -24,7 +28,7 @@ function AddUserDefaultSetting() {
 
   return (
     <div className="bg-gradiant-to-t shadow-md w-full p-4 rounded-xl flex flex-col gap-6">
-      <h1 className="font-bold text-xl text-nearBlack">
+      <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>
         تنظیمات ثبت نام کاربر
       </h1>
 
@@ -36,14 +40,14 @@ function AddUserDefaultSetting() {
             <button
               key={label}
               onClick={() => toggleSetting(label)}
-              className="flex items-center gap-3 px-4 py-2 rounded-xl shadow-sm cursor-pointer hover:bg-hoverBeige transition font-bold"
+              className={`flex items-center gap-2 p-2 rounded-lg border-2 transition-colors duration-200`}
             >
               <div
                 className={`w-5 h-5 border-2 rounded-full flex items-center justify-center transition-colors duration-200 
                                 ${
                                   isChecked
-                                    ? "bg-darkBlue border-darkBlue"
-                                    : "border-nearBlack"
+                                    ? theme.colors.primary
+                                    : `border-${theme.colors.accent}`
                                 }`}
               >
                 <AnimatePresence>
@@ -63,7 +67,7 @@ function AddUserDefaultSetting() {
                   )}
                 </AnimatePresence>
               </div>
-              <span className="text-nearBlack text-sm">{label}</span>
+              <span className={`"text-${theme.colors.accent} text-sm"`}>{label}</span>
             </button>
           );
         })}

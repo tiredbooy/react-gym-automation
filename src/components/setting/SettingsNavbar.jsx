@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { NavLink } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 
 const tabs = [
   { id: "default", label: "تنظیمات پیش فرض" },
@@ -16,9 +17,14 @@ const tabs = [
 ];
 
 export default function SettingsNavbar() {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+
   return (
     <div className="overflow-x-auto mb-6 flex justify-center">
-      <div className="flex gap-2 w-max md:gap-4 rounded-xl bg-beige p-2 shadow-inner scroll-smooth">
+      <div
+        className={`flex gap-2 w-max md:gap-4 rounded-xl ${theme.colors.secondary} p-2 shadow-inner scroll-smooth`}
+      >
         {tabs.map((tab) => (
           <NavLink
             to={`/settings/${tab.id}`}
@@ -26,8 +32,8 @@ export default function SettingsNavbar() {
             className={({ isActive }) =>
               `relative px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
                 isActive
-                  ? "bg-darkBlue text-offWhite"
-                  : "text-darkBlue hover:bg-hoverBeige"
+                  ? `${theme.colors.primary} text-white`
+                  : `text-${theme.colors.accent} hover:bg-hoverBeige`
               }`
             }
           >
@@ -36,7 +42,7 @@ export default function SettingsNavbar() {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 rounded-xl bg-darkBlue -z-10"
+                    className={`absolute inset-0 rounded-xl ${theme.colors.primary} -z-10`}
                     transition={{ type: "spring", stiffness: 200, damping: 30 }}
                   />
                 )}

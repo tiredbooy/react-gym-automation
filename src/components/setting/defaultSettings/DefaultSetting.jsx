@@ -1,13 +1,20 @@
-import AddUserDefaultSetting from "./AddUserDefaultSetting"
-import ThemeSettings from "./ThemeSettings"
+import AddUserDefaultSetting from "./AddUserDefaultSetting";
+import ThemeSettings from "./ThemeSettings";
+import { useTheme } from "../../../context/ThemeContext";
 
 function DefaultSetting() {
-    return (
-        <div className="bg-gradient-to-t from-beige rounded-xl px-8 py-6">
-            <AddUserDefaultSetting />
-            <ThemeSettings />
-        </div>
-    )
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+
+    // need to fix the color
+  return (
+    <div
+      className={`bg-gradient-to-t from-${theme.gradientColors.from} to-${theme.gradientColors.to} mt-8 rounded-2xl p-8 shadow-xl`}
+    >
+      <AddUserDefaultSetting />
+      <ThemeSettings />
+    </div>
+  );
 }
 
-export default DefaultSetting
+export default DefaultSetting;

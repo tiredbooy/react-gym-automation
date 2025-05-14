@@ -1,61 +1,22 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useTheme } from "../../../context/ThemeContext";
 
 function ThemeSettings() {
-  const [activeTheme, setActiveTheme] = useState(0);
-
-  // Aesthetic themes for gym application with custom colors
-  const themes = [
-    {
-      name: "کلاسیک",
-      description: "تم رسمی و حرفه‌ای",
-      primary: "#123458", // darkBlue
-      secondary: "#D4C9BE", // beige
-      accent: "#030303", // nearBlack
-      background: "#F1EFEC", // offWhite
-      isDark: false,
-    },
-    {
-      name: "آتشین",
-      description: "انرژی و قدرت",
-      primary: "#E63946", // vibrant red
-      secondary: "#F9C74F", // golden yellow
-      accent: "#073B4C", // deep teal
-      background: "#F8F9FA", // light gray
-      isDark: false,
-    },
-    {
-      name: "شب",
-      description: "تم تاریک و مدرن",
-      primary: "#6C63FF", // bright purple
-      secondary: "#2A2A2A", // dark gray
-      accent: "#00F5D4", // neon teal
-      background: "#121212", // near black
-      isDark: true,
-    },
-    {
-      name: "طبیعت",
-      description: "الهام گرفته از طبیعت",
-      primary: "#2A9D8F", // forest green
-      secondary: "#E9C46A", // sand yellow
-      accent: "#264653", // deep blue
-      background: "#F7F7F2", // cream white
-      isDark: false,
-    },
-  ];
+  const { activeTheme, setActiveTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
 
   return (
-    <div className="bg-gradient-to-t from-beige mt-8 rounded-2xl p-8 shadow-xl">
-      <h1 className="font-bold text-2xl text-darkBlue mb-2">تنظیمات تم</h1>
-      <p className="text-gray-600 mb-6">انتخاب ظاهر سیستم مدیریت باشگاه</p>
+    <div className={`bg-gradient-to-t ${theme.colors.secondary} mt-8 rounded-2xl p-8 shadow-xl`}>
+      <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>تنظیمات تم</h1>
+      <p className={`text-${theme.colors.accent} mb-6`}>انتخاب ظاهر سیستم مدیریت باشگاه</p>
 
       <div className="flex flex-wrap gap-6 justify-center">
-        {themes.map((theme, idx) => (
+        {Object.keys(themes).map((themeKey, idx) => (
           <ThemeCard
             key={idx}
-            theme={theme}
-            isActive={activeTheme === idx}
-            onClick={() => setActiveTheme(idx)}
+            theme={themes[themeKey]}
+            isActive={activeTheme === themeKey}
+            onClick={() => setActiveTheme(themeKey)}
           />
         ))}
       </div>
@@ -64,26 +25,55 @@ function ThemeSettings() {
 }
 
 function ThemeCard({ theme, isActive, onClick }) {
+  // Convert Tailwind bg class to hex for inline styles
+  const getHexColor = (className) => {
+    const colorMap = {
+      "bg-darkBlue": "#123458",
+      "bg-beige": "#D4C9BE",
+      "bg-nearBlack": "#030303",
+      "bg-offWhite": "#F1EFEC",
+      "bg-fiery-primary": "#E63946",
+      "bg-fiery-secondary": "#F9C74F",
+      "bg-fiery-accent": "#073B4C",
+      "bg-fiery-background": "#F8F9FA",
+      "bg-night-primary": "#6C63FF",
+      "bg-night-secondary": "#2A2A2A",
+      "bg-night-accent": "#00F5D4",
+      "bg-night-background": "#121212",
+      "bg-nature-primary": "#2A9D8F",
+      "bg-nature-secondary": "#E9C46A",
+      "bg-nature-accent": "#264653",
+      "bg-nature-background": "#F7F7F2",
+    };
+    return colorMap[className] || "#ffffff";
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       style={{
-        backgroundColor: theme.isDark ? theme.background : "#ffffff",
-        color: theme.isDark ? "#ffffff" : theme.accent,
+        backgroundColor: theme.isDark
+          ? getHexColor(theme.colors.background.split(" ")[0])
+          : "#ffffff",
+        color: theme.isDark
+          ? "#ffffff"
+          : getHexColor(
+              theme.colors.accent.split(" ")[1].replace("text-", "bg-")
+            ),
       }}
       className={`w-64 rounded-xl overflow-hidden ${
-        isActive ? `ring-2 ring-offset-2` : ""
+        isActive ? `ring-2 ring-offset-2 ${theme.colors.primary}` : ""
       } shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer`}
       onClick={onClick}
     >
-      {/* Header with main theme color */}
       <div
         className="h-24 w-full relative"
-        style={{ backgroundColor: theme.primary }}
+        style={{
+          backgroundColor: getHexColor(theme.colors.primary.split(" ")[0]),
+        }}
       >
-        {/* Gym-themed icon overlay */}
         {isActive && (
           <motion.div
             className="absolute right-3 top-3 text-white opacity-90"
@@ -110,8 +100,6 @@ function ThemeCard({ theme, isActive, onClick }) {
             </svg>
           </motion.div>
         )}
-
-        {/* Floating color orbs */}
         <div className="absolute -bottom-6 w-full flex justify-center">
           <motion.div
             className="flex items-center"
@@ -119,26 +107,37 @@ function ThemeCard({ theme, isActive, onClick }) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {/* Primary color orb */}
-            <ColorOrb color={theme.primary} index={0} isActive={isActive} />
-
-            {/* Secondary color orb */}
-            <ColorOrb color={theme.secondary} index={1} isActive={isActive} />
-
-            {/* Accent color orb */}
-            <ColorOrb color={theme.accent} index={2} isActive={isActive} />
-
-            {/* Background color orb */}
-            <ColorOrb color={theme.background} index={3} isActive={isActive} />
+            <ColorOrb
+              color={getHexColor(theme.colors.primary.split(" ")[0])}
+              index={0}
+              isActive={isActive}
+            />
+            <ColorOrb
+              color={getHexColor(theme.colors.secondary.split(" ")[0])}
+              index={1}
+              isActive={isActive}
+            />
+            <ColorOrb
+              color={getHexColor(theme.colors.accent.split(" ")[0])}
+              index={2}
+              isActive={isActive}
+            />
+            <ColorOrb
+              color={getHexColor(theme.colors.background.split(" ")[0])}
+              index={3}
+              isActive={isActive}
+            />
           </motion.div>
         </div>
       </div>
-
-      {/* Content area */}
       <div className="pt-8 pb-6 px-6">
         <h3
           className="font-bold text-lg text-center mb-1"
-          style={{ color: theme.isDark ? "#ffffff" : theme.primary }}
+          style={{
+            color: theme.isDark
+              ? "#ffffff"
+              : getHexColor(theme.colors.primary.split(" ")[0]),
+          }}
         >
           {theme.name}
         </h3>
@@ -150,13 +149,12 @@ function ThemeCard({ theme, isActive, onClick }) {
         >
           {theme.description}
         </p>
-
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           style={{
             backgroundColor: isActive
-              ? theme.primary
+              ? getHexColor(theme.colors.primary.split(" ")[0])
               : theme.isDark
               ? "#444444"
               : "#e0e0e0",
@@ -172,7 +170,6 @@ function ThemeCard({ theme, isActive, onClick }) {
 }
 
 function ColorOrb({ color, index, isActive }) {
-  // Alternate positions for visual interest
   const offsetY = index % 2 === 0 ? -4 : 4;
 
   return (
