@@ -5,7 +5,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { NavLink } from "react-router-dom";
 
 const tabs = [
-  { id: "support", label: "تنظیمات امنیت و ظاهر" },
+  { id: "default", label: "تنظیمات پیش فرض" },
+  { id: "support", label: "تنظیمات توکن" },
   { id: "lockers", label: "مدیریت کمدها" },
   { id: "services", label: "مدیریت خدمات و قیمت‌ها" },
   { id: "admin", label: "تنظیمات دسترسی و مدیریت" },

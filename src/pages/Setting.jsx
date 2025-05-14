@@ -10,6 +10,7 @@ import DeviceManagement from "../components/setting/device-managment/DeviceManag
 import SalonsManagment from "../components/setting/salons/SalonsManagment.jsx";
 import CoachesManagement from "../components/setting/coaches/CoachManagment.jsx";
 import { useParams, Navigate } from "react-router-dom";
+import DefaultSetting from "../components/setting/defaultSettings/DefaultSetting.jsx";
 export default function SettingsPage() {
   // const [currentTab, setCurrentTab] = useState("support");
   const { tab } = useParams();
@@ -20,6 +21,8 @@ export default function SettingsPage() {
 
   const renderTabContent = () => {
     switch (tab) {
+      case "default" :
+        return <DefaultSetting />
       case "support":
         return <SupportSettings />;
       case "services":
