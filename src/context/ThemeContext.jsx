@@ -43,21 +43,21 @@ export function ThemeProvider({ children }) {
         to: "fiery-background",
       },
     },
-    night: {
-      name: "شب",
+    dark: {
+      name: "دارک",
       description: "تم تاریک و مدرن",
       isDark: true,
       colors: {
-        primary: "bg-night-primary text-night-primary border-night-primary",
+        primary: "bg-dark-primary text-dark-primary border-dark-primary",
         secondary:
-          "bg-night-secondary text-night-secondary border-night-secondary",
-        accent: "bg-night-accent text-night-accent border-night-accent",
+          "bg-dark-secondary text-dark-secondary border-dark-secondary",
+        accent: "bg-dark-accent text-dark-accent border-dark-accent",
         background:
-          "bg-night-background text-night-background border-night-background",
+          "bg-dark-background text-dark-background border-dark-background",
       },
       gradientColors: {
-        from: "night-secondary",
-        to: "night-background",
+        from: "dark-secondary",
+        to: "dark-background",
       },
     },
     nature: {

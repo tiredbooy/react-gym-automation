@@ -20,7 +20,7 @@ export default {
           accent: "#073B4C",
           background: "#F8F9FA",
         },
-        night: {
+        dark: {
           primary: "#6C63FF",
           secondary: "#2A2A2A",
           accent: "#00F5D4",
@@ -35,5 +35,16 @@ export default {
       },
     },
   },
+  safelist: [
+    // Safelist gradient classes for all themes
+    "from-beige",
+    "to-offWhite",
+    "from-fiery-secondary",
+    "to-fiery-background",
+    "from-dark-secondary",
+    "to-dark-background",
+    "from-nature-secondary",
+    "to-nature-background",
+  ],
   plugins: [daisyui],
 };

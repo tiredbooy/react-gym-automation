@@ -6,7 +6,7 @@ function ThemeSettings() {
   const theme = themes[activeTheme];
 
   return (
-    <div className={`bg-gradient-to-t ${theme.colors.secondary} mt-8 rounded-2xl p-8 shadow-xl`}>
+    <div className={`bg-gradient-to-b ${theme.colors.secondary} mt-8 rounded-2xl p-8 shadow-xl`}>
       <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>تنظیمات تم</h1>
       <p className={`text-${theme.colors.accent} mb-6`}>انتخاب ظاهر سیستم مدیریت باشگاه</p>
 
@@ -36,10 +36,10 @@ function ThemeCard({ theme, isActive, onClick }) {
       "bg-fiery-secondary": "#F9C74F",
       "bg-fiery-accent": "#073B4C",
       "bg-fiery-background": "#F8F9FA",
-      "bg-night-primary": "#6C63FF",
-      "bg-night-secondary": "#2A2A2A",
-      "bg-night-accent": "#00F5D4",
-      "bg-night-background": "#121212",
+      "bg-dark-primary": "#6C63FF",
+      "bg-dark-secondary": "#2A2A2A",
+      "bg-dark-accent": "#00F5D4",
+      "bg-dark-background": "#121212",
       "bg-nature-primary": "#2A9D8F",
       "bg-nature-secondary": "#E9C46A",
       "bg-nature-accent": "#264653",

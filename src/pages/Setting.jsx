@@ -11,9 +11,13 @@ import SalonsManagment from "../components/setting/salons/SalonsManagment.jsx";
 import CoachesManagement from "../components/setting/coaches/CoachManagment.jsx";
 import { useParams, Navigate } from "react-router-dom";
 import DefaultSetting from "../components/setting/defaultSettings/DefaultSetting.jsx";
+import { useTheme } from "../context/ThemeContext.jsx";
+
 export default function SettingsPage() {
   // const [currentTab, setCurrentTab] = useState("support");
   const { tab } = useParams();
+  const { activeTheme , themes } = useTheme();
+  const theme = themes[activeTheme]
 
   if (!tab) {
     return <Navigate to="/settings/support" replace />;
@@ -44,9 +48,9 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-offWhite text-nearBlack p-4 md:p-8">
+    <div className={`min-h-screen ${theme.colors.background} text-nearBlack p-4 md:p-8`}>
       <div className="w-full flex flex-col justify-center mx-auto">
-        <h1 className="text-2xl md:text-4xl font-bold mb-4 text-darkBlue text-center md:text-right">
+        <h1 className={`text-2xl md:text-4xl font-bold mb-4 text-${theme.colors.primary} text-center md:text-right`}>
           تنظیمات سیستم
         </h1>
         <SettingsNavbar />

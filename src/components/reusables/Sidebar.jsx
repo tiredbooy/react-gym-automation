@@ -99,7 +99,7 @@ export default function Sidebar() {
       <ul className="menu text-blackish bg-transparent gap-2 px-4 w-full">
         <li>
           <NavLink
-            to="/settings"
+            to="/settings/default"
             className={({ isActive }) =>
               `flex items-center gap-2 p-2 rounded-md hover:bg-beige hover:text-darkBlue hover:font-bold transition duration-150 ${
                 isActive ? "bg-beige text-darkBlue font-bold" : ""
