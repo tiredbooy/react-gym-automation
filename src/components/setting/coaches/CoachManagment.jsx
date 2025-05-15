@@ -14,19 +14,19 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import toast, { Toaster } from "react-hot-toast";
+import { useTheme } from "../../../context/ThemeContext";
 
 // CoachForm Component
 const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
   const [name, setName] = useState(coach?.name || "");
   const [contact, setContact] = useState(coach?.contact || "");
   const [specialty, setSpecialty] = useState(coach?.specialty || "بدنسازی");
-  const [priceProgram, setPriceProgram] = useState(
-    coach?.priceProgram || null
-  );
-  const [pricePrivate, setPricePrivate] = useState(
-    coach?.pricePrivate || null
-  );
+  const [priceProgram, setPriceProgram] = useState(coach?.priceProgram || null);
+  const [pricePrivate, setPricePrivate] = useState(coach?.pricePrivate || null);
   const [shift, setShift] = useState(coach?.shift || "صبح");
+
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -49,8 +49,8 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
     setContact("");
     setSpecialty("");
     setPriceProgram(null);
-    setPricePrivate(null)
-    setShift("صبح")
+    setPricePrivate(null);
+    setShift("صبح");
     onClose();
   };
 
@@ -63,43 +63,45 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
       exit={{ opacity: 0, y: 20 }}
       className="fixed inset-0 bg-nearBlack bg-opacity-50 flex items-center justify-center z-50"
     >
-      <div className="bg-offWhite p-8 rounded-2xl shadow-2xl w-full max-w-lg">
-        <h2 className="text-3xl font-bold text-darkBlue mb-6 font-amiri">
+      <div
+        className={`${theme.colors.background} p-8 rounded-2xl shadow-2xl w-full max-w-lg`}
+      >
+        <h2 className={`text-3xl font-bold text-${theme.colors.primary} mb-6`}>
           {coach ? "ویرایش مربی" : "افزودن مربی جدید"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-nearBlack mb-2 text-lg font-amiri">
+            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
               نام
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 font-amiri transition-all"
+              className={`w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all`}
               placeholder="نام مربی"
             />
           </div>
           <div>
-            <label className="block text-nearBlack mb-2 text-lg font-amiri">
+            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
               شماره تماس
             </label>
             <input
               type="text"
               value={contact}
               onChange={(e) => setContact(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 font-amiri transition-all"
+              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all"
               placeholder="09123456789"
             />
           </div>
           <div>
-            <label className="block text-nearBlack mb-2 text-lg font-amiri">
+            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
               تخصص
             </label>
             <select
               value={specialty}
               onChange={(e) => setSpecialty(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack font-amiri transition-all"
+              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack transition-all"
             >
               <option value="bodyBuilding">بدنسازی</option>
               <option value="yoga">یوگا</option>
@@ -108,37 +110,37 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
             </select>
           </div>
           <div>
-            <label className="block text-nearBlack mb-2 text-lg font-amiri">
+            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
               قیمت برنامه
             </label>
             <input
               type="number"
               value={priceProgram}
               onChange={(e) => setPriceProgram(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 font-amiri transition-all"
+              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all"
               placeholder="مثال: 200,000"
             />
           </div>
           <div>
-            <label className="block text-nearBlack mb-2 text-lg font-amiri">
+            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
               قیمت مربی خصوصی
             </label>
             <input
               type="number"
               value={pricePrivate}
               onChange={(e) => setPricePrivate(e.target.value)}
-              className="w-full p-3 bg-white border border-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 font-amiri transition-all"
+              className="w-full p-3 bg-white border border-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all"
               placeholder="مثال: 500,000 "
             />
           </div>
           <div>
-            <label className="block text-nearBlack mb-2 text-lg font-amiri">
+            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
               شیفت کاری
             </label>
             <select
               value={shift}
               onChange={(e) => setShift(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack font-amiri transition-all"
+              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack transition-all"
             >
               <option value="morning">صبح</option>
               <option value="evening">بعدازظهر</option>
@@ -149,13 +151,13 @@ const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 bg-lightGray text-nearBlack rounded-xl hover:bg-beige hover:text-darkBlue transition-all font-amiri text-lg"
+              className="px-6 py-3 bg-lightGray text-nearBlack rounded-xl hover:bg-beige hover:text-darkBlue transition-all text-lg"
             >
               لغو
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-darkBlue text-offWhite rounded-xl hover:bg-beige hover:text-darkBlue transition-all font-amiri text-lg"
+              className="px-6 py-3 bg-darkBlue text-offWhite rounded-xl hover:bg-beige hover:text-darkBlue transition-all text-lg"
             >
               ذخیره
             </button>
@@ -292,7 +294,7 @@ const CoachCard = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3 space-x-reverse">
           <motion.button
-            whileTap={{ scale: 0.9, rotate: "90deg" , transition : easeInOut }}
+            whileTap={{ scale: 0.9, rotate: "90deg", transition: easeInOut }}
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="text-darkBlue hover:darkBlue "
           >

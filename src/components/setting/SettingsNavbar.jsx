@@ -1,7 +1,5 @@
 import React from "react";
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { NavLink } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 
@@ -20,10 +18,16 @@ export default function SettingsNavbar() {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
+  // Helper to extract color name from composite string (e.g., "bg-beige text-beige border-beige" -> "beige")
+  const getColorName = (colorString) =>
+    colorString.split(" ")[1].replace("text-", "");
+
   return (
     <div className="overflow-x-auto mb-6 flex justify-center">
       <div
-        className={`flex gap-2 w-max md:gap-4 rounded-xl ${theme.colors.secondary} p-2 shadow-inner scroll-smooth`}
+        className={`flex gap-2 w-max md:gap-4 rounded-xl bg-${getColorName(
+          theme.colors.secondary
+        )} p-2 shadow-inner scroll-smooth`}
       >
         {tabs.map((tab) => (
           <NavLink
@@ -32,8 +36,12 @@ export default function SettingsNavbar() {
             className={({ isActive }) =>
               `relative px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
                 isActive
-                  ? `${theme.colors.primary} text-white`
-                  : `text-${theme.colors.accent} hover:bg-hoverBeige`
+                  ? `bg-${getColorName(
+                      theme.colors.primary
+                    )} text-${getColorName(theme.colors.secondary)}`
+                  : `text-${getColorName(
+                      theme.colors.accent
+                    )} hover:bg-hoverBeige`
               }`
             }
           >
@@ -42,7 +50,9 @@ export default function SettingsNavbar() {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className={`absolute inset-0 rounded-xl ${theme.colors.primary} -z-10`}
+                    className={`absolute inset-0 rounded-xl bg-${getColorName(
+                      theme.colors.primary
+                    )} -z-10`}
                     transition={{ type: "spring", stiffness: 200, damping: 30 }}
                   />
                 )}
