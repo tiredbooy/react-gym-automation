@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CheckCircle, XCircle, Users } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTheme } from "../../../context/ThemeContext";
 
 const initialUsers = [
   {
@@ -29,6 +30,8 @@ const initialUsers = [
 export default function UserManagement({ roles }) {
   const staffRoles = ["مدیر", "مربی", "پذیرش", "بوفه"];
   const [users, setUsers] = useState(initialUsers);
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
 
   const toggleActive = (id) => {
     setUsers((prev) =>
@@ -45,7 +48,7 @@ export default function UserManagement({ roles }) {
   return (
     <div>
       <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-        <Users className="text-darkBlue" size={20} /> مدیریت پرسنل
+        <Users className={`text-${theme.colors.primary}`} size={20} /> مدیریت پرسنل
       </h3>
 
       <div className="space-y-2">
@@ -54,7 +57,7 @@ export default function UserManagement({ roles }) {
           .map((user) => (
             <motion.div
               key={user.id}
-              className="bg-beige p-3 rounded-xl flex justify-between items-center shadow-sm"
+              className={`bg-${theme.colors.secondary} p-3 rounded-xl flex justify-between items-center shadow-sm`}
               whileHover={{ scale: 1.02 }}
             >
               <div>
@@ -65,7 +68,7 @@ export default function UserManagement({ roles }) {
                 <select
                   value={user.role}
                   onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                  className="rounded-xl p-1 border bg-offWhite focus:outline-none"
+                  className={`rounded-xl p-1 border bg-${theme.colors.background} focus:outline-none`}
                 >
                   {roles
                     .filter((r) => staffRoles.includes(r.name))

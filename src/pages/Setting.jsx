@@ -3,7 +3,7 @@ import SettingsNavbar from "../components/setting/SettingsNavbar";
 import SupportSettings from "../components/setting/SupportSetting";
 import ServiceSettings from "../components/setting/ServiceSettings";
 import LockerSettings from "../components/setting/LockerSettings.jsx";
-import AccessManagement from "../components/setting/AccessManagement.jsx";
+import AccessManagement from "../components/setting/access-managment/AccessManagement.jsx";
 import DeviceManagement from "../components/setting/device-managment/DeviceManagement.jsx";
 // import DevicesPage from "../components/setting/device-managment/DevicePage.jsx";
 // import SalonGatewaysPage from "../components/setting/salons/SalonGatewaysPage.jsx";
@@ -16,8 +16,8 @@ import { useTheme } from "../context/ThemeContext.jsx";
 export default function SettingsPage() {
   // const [currentTab, setCurrentTab] = useState("support");
   const { tab } = useParams();
-  const { activeTheme , themes } = useTheme();
-  const theme = themes[activeTheme]
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
 
   if (!tab) {
     return <Navigate to="/settings/support" replace />;
@@ -25,8 +25,8 @@ export default function SettingsPage() {
 
   const renderTabContent = () => {
     switch (tab) {
-      case "default" :
-        return <DefaultSetting />
+      case "default":
+        return <DefaultSetting />;
       case "support":
         return <SupportSettings />;
       case "services":
@@ -48,9 +48,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-${theme.colors.background} text-nearBlack p-4 md:p-8`}>
+    <div
+      className={`min-h-screen bg-${theme.colors.background} text-nearBlack p-4 md:p-8`}
+    >
       <div className="w-full flex flex-col justify-center mx-auto">
-        <h1 className={`text-2xl md:text-4xl font-bold mb-4 text-${theme.colors.primary} text-center md:text-right`}>
+        <h1
+          className={`text-2xl md:text-4xl font-bold mb-4 text-${theme.colors.primary} text-center md:text-right`}
+        >
           تنظیمات سیستم
         </h1>
         <SettingsNavbar />
