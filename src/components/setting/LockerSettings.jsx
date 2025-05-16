@@ -10,6 +10,7 @@ import {
   Check,
   AlertTriangle,
 } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function LockerSettings() {
   const [salons, setSalons] = useState([
@@ -38,6 +39,9 @@ export default function LockerSettings() {
     "Locker Device 2",
     "Locker Device 3",
   ]);
+
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
 
   function generateLockers(count, startFrom = 1, prefix = "") {
     return Array.from({ length: count }, (_, i) => ({
@@ -121,8 +125,12 @@ export default function LockerSettings() {
   };
 
   return (
-    <div className="bg-offWhite p-6 rounded-2xl shadow-lg text-darkBlue max-w-6xl mx-auto">
-      <h2 className="text-2xl font-bold mb-8 text-right border-b-2 border-beige pb-4">
+    <div
+      className={`bg-${theme.colors.background} p-6 rounded-2xl shadow-lg text-${theme.colors.primary} max-w-6xl mx-auto`}
+    >
+      <h2
+        className={`text-2xl font-bold mb-8 text-right border-b-2 border-${theme.colors.secondary} pb-4`}
+      >
         مدیریت تنظیمات کمد‌ها
       </h2>
 
@@ -132,13 +140,13 @@ export default function LockerSettings() {
           <input
             type="text"
             placeholder="نام سالن جدید (مثلاً سالن ۳)"
-            className="flex-1 p-3 rounded-xl border border-lightGray bg-offWhite text-right shadow-sm outline-none focus:ring-2 focus:ring-darkBlue/30"
+            className={`flex-1 p-3 rounded-xl border border-${theme.colors.primary} bg-${theme.colors.background} text-right shadow-sm outline-none focus:ring-2 focus:ring-${theme.colors.primary}/30`}
             value={newSalon}
             onChange={(e) => setNewSalon(e.target.value)}
           />
           <button
             onClick={handleAddSalon}
-            className="flex items-center gap-2 bg-darkBlue text-offWhite px-4 py-2 rounded-xl hover:bg-opacity-80 transition shadow"
+            className={`flex items-center gap-2 bg-${theme.colors.primary} text-${theme.colors.background} px-4 py-2 rounded-xl hover:bg-opacity-80 transition shadow`}
           >
             <Plus size={18} />
             افزودن
@@ -150,7 +158,7 @@ export default function LockerSettings() {
       <Card title="افزودن گروهی کمد" icon={<Boxes size={24} />}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <select
-            className="p-3 rounded-xl border border-lightGray bg-offWhite text-right shadow-sm focus:ring-2 focus:ring-darkBlue/30"
+            className={`p-3 rounded-xl border border-${theme.colors.primary} bg-${theme.colors.background} text-right shadow-sm focus:ring-2 focus:ring-${theme.colors.primary}/30`}
             value={selectedSalon || ""}
             onChange={(e) => setSelectedSalon(Number(e.target.value))}
           >
@@ -164,27 +172,27 @@ export default function LockerSettings() {
           <input
             type="text"
             placeholder="پیشوند (اختیاری)"
-            className="p-3 rounded-xl border border-lightGray bg-offWhite text-right shadow-sm outline-none focus:ring-2 focus:ring-darkBlue/30"
+            className={`p-3 rounded-xl border border-${theme.colors.primary} bg-${theme.colors.background} text-right shadow-sm outline-none focus:ring-2 focus:ring-${theme.colors.primary}/30`}
             value={prefix}
             onChange={(e) => setPrefix(e.target.value)}
           />
           <input
             type="number"
             placeholder="تعداد کمد جدید"
-            className="p-3 rounded-xl border border-lightGray bg-offWhite text-right shadow-sm outline-none focus:ring-2 focus:ring-darkBlue/30"
+            className={`p-3 rounded-xl border border-${theme.colors.primary} bg-${theme.colors.background} text-right shadow-sm outline-none focus:ring-2 focus:ring-${theme.colors.primary}/30`}
             value={addLockerCount}
             onChange={(e) => setAddLockerCount(e.target.value)}
           />
           <button
             onClick={handleAddLockers}
-            className="flex items-center justify-center gap-2 bg-darkBlue text-offWhite px-4 py-2 rounded-xl hover:bg-opacity-80 transition shadow"
+            className={`flex items-center justify-center gap-2 bg-${theme.colors.primary} text-${theme.colors.background} px-4 py-2 rounded-xl hover:bg-opacity-80 transition shadow`}
           >
             <Plus size={18} />
             افزودن
           </button>
         </div>
         {selectedSalon && (
-          <p className="text-sm text-gray-600 mt-2 text-right">
+          <p className={`text-sm text-${theme.colors.accent} mt-2 text-right`}>
             {`تعداد فعلی: ${
               salons.find((s) => s.id === selectedSalon)?.lockers.length
             } کمد`}
@@ -196,7 +204,7 @@ export default function LockerSettings() {
       {salons.map((salon) => (
         <div
           key={salon.id}
-          className="bg-beige/20 p-5 rounded-2xl shadow-sm hover:shadow-md transition mt-6"
+          className={`bg-${theme.colors.secondary} p-5 rounded-2xl shadow-sm hover:shadow-md transition mt-6`}
         >
           <div className="flex justify-between items-center mb-4">
             <div className="space-y-1 text-right">
@@ -212,7 +220,7 @@ export default function LockerSettings() {
                   {salon.status}
                 </span>
               </p>
-              <p className="text-sm text-gray-600 flex items-center gap-1">
+              <p className={`text-sm text-${theme.colors.accent} flex items-center gap-1`}>
                 <Info size={14} /> تعداد کل کمد‌ها: {salon.lockers.length}
               </p>
               <p className="text-xs text-gray-500">
@@ -259,9 +267,14 @@ export default function LockerSettings() {
 }
 
 function Card({ children, title, icon }) {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+
   return (
-    <div className="bg-beige/20 p-5 rounded-2xl mb-6 shadow-sm hover:shadow-md transition">
-      <div className="flex items-center gap-3 mb-4 text-darkBlue">
+    <div
+      className={`bg-${theme.colors.secondary}/20 p-5 rounded-2xl mb-6 shadow-sm hover:shadow-md transition`}
+    >
+      <div className={`flex items-center gap-3 mb-4 text-${theme.colors.primary}`}>
         {icon}
         <h3 className="text-lg font-bold">{title}</h3>
       </div>
