@@ -48,7 +48,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className={`min-h-screen ${theme.colors.background} text-nearBlack p-4 md:p-8`}>
+    <div className={`min-h-screen bg-${theme.colors.background} text-nearBlack p-4 md:p-8`}>
       <div className="w-full flex flex-col justify-center mx-auto">
         <h1 className={`text-2xl md:text-4xl font-bold mb-4 text-${theme.colors.primary} text-center md:text-right`}>
           تنظیمات سیستم

@@ -9,9 +9,16 @@ import {
   Trello,
 } from "lucide-react";
 
+import { useTheme } from "../../context/ThemeContext";
+
 export default function Sidebar() {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+
   return (
-    <div className="w-80 bg-darkBlue min-h-screen text-blackish flex flex-col shadow-4xl">
+    <div
+      className={`w-80 bg-${theme.colors.primary} text-${theme.colors.background} min-h-screen text-blackish flex flex-col shadow-4xl`}
+    >
       {/* Profile Section */}
       <div className="flex items-center space-x-4 p-4 border-b border-sand">
         <div className="w-12 h-12 rounded-full bg-sand flex items-center justify-center">
@@ -31,8 +38,12 @@ export default function Sidebar() {
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `flex items-center gap-2 p-2 rounded-md hover:bg-beige hover:text-darkBlue hover:font-bold transition duration-150 ${
-                isActive ? "bg-beige text-darkBlue font-bold" : ""
+              `flex items-center gap-2 p-2 rounded-md hover:bg-${
+                theme.colors.secondary
+              } hover:text-darkBlue hover:font-bold transition duration-150 ${
+                isActive
+                  ? `bg-${theme.colors.secondary} text-${theme.colors.primary} font-bold`
+                  : ""
               }`
             }
           >
@@ -44,8 +55,14 @@ export default function Sidebar() {
           <NavLink
             to="/users"
             className={({ isActive }) =>
-              `flex items-center gap-2 p-2 rounded-md hover:bg-beige hover:text-darkBlue hover:font-bold transition duration-150 ${
-                isActive ? "bg-beige text-darkBlue font-bold" : ""
+              `flex items-center gap-2 p-2 rounded-md hover:bg-${
+                theme.colors.secondary
+              } hover:text-${
+                theme.colors.primary
+              } hover:font-bold transition duration-150 ${
+                isActive
+                  ? `bg-${theme.colors.secondary} text-${theme.colors.primary} font-bold`
+                  : ""
               }`
             }
           >
@@ -57,8 +74,14 @@ export default function Sidebar() {
           <NavLink
             to="/payments"
             className={({ isActive }) =>
-              `flex items-center gap-2 p-2 rounded-md hover:bg-beige hover:text-darkBlue hover:font-bold transition duration-150 ${
-                isActive ? "bg-beige text-darkBlue font-bold" : ""
+              `flex items-center gap-2 p-2 rounded-md hover:bg-${
+                theme.colors.secondary
+              } hover:text-${
+                theme.colors.primary
+              } hover:font-bold transition duration-150 ${
+                isActive
+                  ? `bg-${theme.colors.secondary} text-${theme.colors.primary} font-bold`
+                  : ""
               }`
             }
           >
@@ -70,8 +93,14 @@ export default function Sidebar() {
           <NavLink
             to="/lockers"
             className={({ isActive }) =>
-              `flex items-center gap-2 p-2 rounded-md hover:bg-beige hover:text-darkBlue hover:font-bold transition duration-150 ${
-                isActive ? "bg-beige text-darkBlue font-bold" : ""
+              `flex items-center gap-2 p-2 rounded-md hover:bg-${
+                theme.colors.secondary
+              } hover:text-${
+                theme.colors.primary
+              } hover:font-bold transition duration-150 ${
+                isActive
+                  ? `bg-${theme.colors.secondary} text-${theme.colors.primary} font-bold`
+                  : ""
               }`
             }
           >
@@ -83,8 +112,14 @@ export default function Sidebar() {
           <NavLink
             to="/logs"
             className={({ isActive }) =>
-              `flex items-center gap-2 p-2 rounded-md hover:bg-beige hover:text-darkBlue hover:font-bold transition duration-150 ${
-                isActive ? "bg-beige text-darkBlue font-bold" : ""
+              `flex items-center gap-2 p-2 rounded-md hover:bg-${
+                theme.colors.secondary
+              } hover:text-${
+                theme.colors.primary
+              } hover:font-bold transition duration-150 ${
+                isActive
+                  ? `bg-${theme.colors.secondary} text-${theme.colors.primary} font-bold`
+                  : ""
               }`
             }
           >
@@ -101,8 +136,14 @@ export default function Sidebar() {
           <NavLink
             to="/settings/default"
             className={({ isActive }) =>
-              `flex items-center gap-2 p-2 rounded-md hover:bg-beige hover:text-darkBlue hover:font-bold transition duration-150 ${
-                isActive ? "bg-beige text-darkBlue font-bold" : ""
+              `flex items-center gap-2 p-2 rounded-md hover:bg-${
+                theme.colors.secondary
+              } hover:text-${
+                theme.colors.primary
+              } hover:font-bold transition duration-150 ${
+                isActive
+                  ? ` bg-${theme.colors.secondary} text-${theme.colors.primary} font-bold `
+                  : ""
               }`
             }
           >
@@ -114,7 +155,7 @@ export default function Sidebar() {
           <a
             href="#"
             onClick={() => console.log("Logging out...")}
-            className="flex items-center gap-2 p-2 rounded-md hover:bg-red-100 transition duration-150 text-red-500 font-bold"
+            className={`flex items-center gap-2 p-2 rounded-md hover:bg-${theme.colors.error}/10 transition duration-150 text-${theme.colors.error} font-bold`}
           >
             <LogOut size={18} />
             <span>خروج از سیستم</span>

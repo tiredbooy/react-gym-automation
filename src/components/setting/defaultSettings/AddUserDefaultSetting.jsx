@@ -40,14 +40,14 @@ function AddUserDefaultSetting() {
             <button
               key={label}
               onClick={() => toggleSetting(label)}
-              className={`flex items-center gap-2 p-2 rounded-lg text-${theme.colors.primary} transition-colors duration-200`}
+              className={`flex items-center gap-2 p-2 rounded-lg text-${theme.colors.accent} transition-colors duration-200`}
             >
               <div
-                className={`w-5 h-5 border-2 rounded-full flex items-center justify-center transition-colors duration-200 
+                className={`w-5 h-5 border-${theme.colors.primary} border-2 rounded-full flex items-center justify-center transition-colors duration-200 
                                 ${
                                   isChecked
-                                    ? theme.colors.primary
-                                    : `border-${theme.colors.accent}`
+                                    ? `bg-${theme.colors.primary}`
+                                    : `border-${theme.colors.primary}`
                                 }`}
               >
                 <AnimatePresence>

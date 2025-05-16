@@ -1,4 +1,3 @@
-// src/context/ThemeContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeContext = createContext();
@@ -14,12 +13,12 @@ export function ThemeProvider({ children }) {
       description: "تم رسمی و حرفه‌ای",
       isDark: false,
       colors: {
-        primary: "bg-darkBlue text-darkBlue border-darkBlue",
-        secondary: "bg-beige text-beige border-beige",
-        accent: "bg-nearBlack text-nearBlack border-nearBlack",
-        background: "bg-offWhite text-offWhite border-offWhite",
-        success: "bg-successGreen text-successGreen border-successGreen",
-        error: "bg-errorRed text-errorRed border-errorRed",
+        primary: "darkBlue",
+        secondary: "beige",
+        accent: "nearBlack",
+        background: "offWhite",
+        success: "successGreen",
+        error: "errorRed",
       },
       gradientColors: {
         from: "beige",
@@ -31,12 +30,10 @@ export function ThemeProvider({ children }) {
       description: "انرژی و قدرت",
       isDark: false,
       colors: {
-        primary: "bg-fiery-primary text-fiery-primary border-fiery-primary",
-        secondary:
-          "bg-fiery-secondary text-fiery-secondary border-fiery-secondary",
-        accent: "bg-fiery-accent text-fiery-accent border-fiery-accent",
-        background:
-          "bg-fiery-background text-fiery-background border-fiery-background",
+        primary: "fiery-primary",
+        secondary: "fiery-secondary",
+        accent: "fiery-accent",
+        background: "fiery-background",
       },
       gradientColors: {
         from: "fiery-secondary",
@@ -48,12 +45,10 @@ export function ThemeProvider({ children }) {
       description: "تم تاریک و مدرن",
       isDark: true,
       colors: {
-        primary: "bg-dark-primary text-dark-primary border-dark-primary",
-        secondary:
-          "bg-dark-secondary text-dark-secondary border-dark-secondary",
-        accent: "bg-dark-accent text-dark-accent border-dark-accent",
-        background:
-          "bg-dark-background text-dark-background border-dark-background",
+        primary: "dark-primary",
+        secondary: "dark-secondary",
+        accent: "dark-accent",
+        background: "dark-background",
       },
       gradientColors: {
         from: "dark-secondary",
@@ -65,12 +60,10 @@ export function ThemeProvider({ children }) {
       description: "الهام گرفته از طبیعت",
       isDark: false,
       colors: {
-        primary: "bg-nature-primary text-nature-primary border-nature-primary",
-        secondary:
-          "bg-nature-secondary text-nature-secondary border-nature-secondary",
-        accent: "bg-nature-accent text-nature-accent border-nature-accent",
-        background:
-          "bg-nature-background text-nature-background border-nature-background",
+        primary: "nature-primary",
+        secondary: "nature-secondary",
+        accent: "nature-accent",
+        background: "nature-background",
       },
       gradientColors: {
         from: "nature-secondary",
@@ -81,8 +74,7 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem("theme", activeTheme);
-    document.body.className =
-      themes[activeTheme].colors.background.split(" ")[0];
+    document.body.className = themes[activeTheme].colors.background;
   }, [activeTheme]);
 
   return (

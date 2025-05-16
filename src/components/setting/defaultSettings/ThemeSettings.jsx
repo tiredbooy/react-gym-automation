@@ -6,9 +6,15 @@ function ThemeSettings() {
   const theme = themes[activeTheme];
 
   return (
-    <div className={`bg-gradient-to-b ${theme.colors.secondary} mt-8 rounded-2xl p-8 shadow-xl`}>
-      <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>تنظیمات تم</h1>
-      <p className={`text-${theme.colors.accent} mb-6`}>انتخاب ظاهر سیستم مدیریت باشگاه</p>
+    <div
+      className={`bg-gradient-to-b from-${theme.colors.secondary} to-${theme.colors.background} mt-8 rounded-2xl p-8 shadow-xl`}
+    >
+      <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>
+        تنظیمات تم
+      </h1>
+      <p className={`text-${theme.colors.accent} mb-6`}>
+        انتخاب ظاهر سیستم مدیریت باشگاه
+      </p>
 
       <div className="flex flex-wrap gap-6 justify-center">
         {Object.keys(themes).map((themeKey, idx) => (
@@ -25,27 +31,26 @@ function ThemeSettings() {
 }
 
 function ThemeCard({ theme, isActive, onClick }) {
-  // Convert Tailwind bg class to hex for inline styles
-  const getHexColor = (className) => {
-    const colorMap = {
-      "bg-darkBlue": "#123458",
-      "bg-beige": "#D4C9BE",
-      "bg-nearBlack": "#030303",
-      "bg-offWhite": "#F1EFEC",
-      "bg-fiery-primary": "#E63946",
-      "bg-fiery-secondary": "#F9C74F",
-      "bg-fiery-accent": "#073B4C",
-      "bg-fiery-background": "#F8F9FA",
-      "bg-dark-primary": "#6C63FF",
-      "bg-dark-secondary": "#2A2A2A",
-      "bg-dark-accent": "#00F5D4",
-      "bg-dark-background": "#121212",
-      "bg-nature-primary": "#2A9D8F",
-      "bg-nature-secondary": "#E9C46A",
-      "bg-nature-accent": "#264653",
-      "bg-nature-background": "#F7F7F2",
-    };
-    return colorMap[className] || "#ffffff";
+  // Map theme colors to Tailwind-compatible classes or hex for inline styles
+  const colorMap = {
+    darkBlue: "#123458",
+    beige: "#D4C9BE",
+    nearBlack: "#030303",
+    offWhite: "#F1EFEC",
+    successGreen: "#28A745",
+    errorRed: "#DC3545",
+    "fiery-primary": "#E63946",
+    "fiery-secondary": "#F9C74F",
+    "fiery-accent": "#073B4C",
+    "fiery-background": "#F8F9FA",
+    "dark-primary": "#6C63FF",
+    "dark-secondary": "#2A2A2A",
+    "dark-accent": "#00F5D4",
+    "dark-background": "#121212",
+    "nature-primary": "#2A9D8F",
+    "nature-secondary": "#E9C46A",
+    "nature-accent": "#264653",
+    "nature-background": "#F7F7F2",
   };
 
   return (
@@ -53,26 +58,16 @@ function ThemeCard({ theme, isActive, onClick }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      style={{
-        backgroundColor: theme.isDark
-          ? getHexColor(theme.colors.background.split(" ")[0])
-          : "#ffffff",
-        color: theme.isDark
-          ? "#ffffff"
-          : getHexColor(
-              theme.colors.accent.split(" ")[1].replace("text-", "bg-")
-            ),
-      }}
-      className={`w-64 rounded-xl overflow-hidden ${
-        isActive ? `ring-2 ring-offset-2 ${theme.colors.primary}` : ""
+      className={`w-64 rounded-xl overflow-hidden bg-${
+        theme.colors.background
+      } ${
+        isActive ? `ring-2 ring-offset-2 ring-${theme.colors.primary}` : ""
       } shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer`}
       onClick={onClick}
     >
       <div
         className="h-24 w-full relative"
-        style={{
-          backgroundColor: getHexColor(theme.colors.primary.split(" ")[0]),
-        }}
+        style={{ backgroundColor: colorMap[theme.colors.primary] }}
       >
         {isActive && (
           <motion.div
@@ -108,22 +103,22 @@ function ThemeCard({ theme, isActive, onClick }) {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <ColorOrb
-              color={getHexColor(theme.colors.primary.split(" ")[0])}
+              color={colorMap[theme.colors.primary]}
               index={0}
               isActive={isActive}
             />
             <ColorOrb
-              color={getHexColor(theme.colors.secondary.split(" ")[0])}
+              color={colorMap[theme.colors.secondary]}
               index={1}
               isActive={isActive}
             />
             <ColorOrb
-              color={getHexColor(theme.colors.accent.split(" ")[0])}
+              color={colorMap[theme.colors.accent]}
               index={2}
               isActive={isActive}
             />
             <ColorOrb
-              color={getHexColor(theme.colors.background.split(" ")[0])}
+              color={colorMap[theme.colors.background]}
               index={3}
               isActive={isActive}
             />
@@ -133,11 +128,7 @@ function ThemeCard({ theme, isActive, onClick }) {
       <div className="pt-8 pb-6 px-6">
         <h3
           className="font-bold text-lg text-center mb-1"
-          style={{
-            color: theme.isDark
-              ? "#ffffff"
-              : getHexColor(theme.colors.primary.split(" ")[0]),
-          }}
+          style={{ color: colorMap[theme.colors.primary] }}
         >
           {theme.name}
         </h3>
@@ -152,15 +143,13 @@ function ThemeCard({ theme, isActive, onClick }) {
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          style={{
-            backgroundColor: isActive
-              ? getHexColor(theme.colors.primary.split(" ")[0])
+          className={`w-full py-2 rounded-lg font-medium transition-all duration-300 bg-${
+            isActive
+              ? theme.colors.primary
               : theme.isDark
-              ? "#444444"
-              : "#e0e0e0",
-            color: isActive || theme.isDark ? "#ffffff" : "#666666",
-          }}
-          className="w-full py-2 rounded-lg font-medium transition-all duration-300"
+              ? "gray-600"
+              : "gray-200"
+          } text-${isActive || theme.isDark ? "white" : "gray-600"}`}
         >
           {isActive ? "انتخاب شده" : "انتخاب تم"}
         </motion.button>
@@ -177,10 +166,7 @@ function ColorOrb({ color, index, isActive }) {
       style={{
         backgroundColor: color,
         border:
-          color === "#FFFFFF" ||
-          color === "#F1EFEC" ||
-          color === "#F8F9FA" ||
-          color === "#F7F7F2"
+          color === "#F1EFEC" || color === "#F8F9FA" || color === "#F7F7F2"
             ? "1px solid #e0e0e0"
             : "none",
       }}

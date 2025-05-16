@@ -19,15 +19,15 @@ export default function SettingsNavbar() {
   const theme = themes[activeTheme];
 
   // Helper to extract color name from composite string (e.g., "bg-beige text-beige border-beige" -> "beige")
-  const getColorName = (colorString) =>
-    colorString.split(" ")[1].replace("text-", "");
+  // const getColorName = (colorString) =>
+  //   colorString.split(" ")[1].replace("text-", "");
 
   return (
     <div className="overflow-x-auto mb-6 flex justify-center">
       <div
-        className={`flex gap-2 w-max md:gap-4 rounded-xl bg-${getColorName(
+        className={`flex gap-2 w-max md:gap-4 rounded-xl bg-${
           theme.colors.secondary
-        )} p-2 shadow-inner scroll-smooth`}
+        } p-2 shadow-inner scroll-smooth`}
       >
         {tabs.map((tab) => (
           <NavLink
@@ -36,12 +36,8 @@ export default function SettingsNavbar() {
             className={({ isActive }) =>
               `relative px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
                 isActive
-                  ? `bg-${getColorName(
-                      theme.colors.primary
-                    )} text-${getColorName(theme.colors.secondary)}`
-                  : `text-${getColorName(
-                      theme.colors.accent
-                    )} hover:bg-hoverBeige`
+                  ? `bg-${theme.colors.primary} text-${theme.colors.secondary}`
+                  : `text-${theme.colors.accent} hover:bg-hoverBeige`
               }`
             }
           >
@@ -50,9 +46,9 @@ export default function SettingsNavbar() {
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className={`absolute inset-0 rounded-xl bg-${getColorName(
+                    className={`absolute inset-0 rounded-xl bg-${
                       theme.colors.primary
-                    )} -z-10`}
+                    } -z-10`}
                     transition={{ type: "spring", stiffness: 200, damping: 30 }}
                   />
                 )}
