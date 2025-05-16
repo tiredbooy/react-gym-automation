@@ -1,5 +1,97 @@
 import daisyui from "daisyui";
 
+/** Define your themes here */
+const themes = {
+  classic: {
+    colors: {
+      primary: "darkBlue",
+      secondary: "beige",
+      accent: "nearBlack",
+      background: "offWhite",
+      success: "successGreen",
+      error: "errorRed",
+    },
+    gradientColors: {
+      from: "beige",
+      to: "offWhite",
+    },
+  },
+  fiery: {
+    colors: {
+      primary: "fiery-primary",
+      secondary: "fiery-secondary",
+      accent: "fiery-accent",
+      background: "fiery-background",
+    },
+    gradientColors: {
+      from: "fiery-secondary",
+      to: "fiery-background",
+    },
+  },
+  dark: {
+    colors: {
+      primary: "dark-primary",
+      secondary: "dark-secondary",
+      accent: "dark-accent",
+      background: "dark-background",
+    },
+    gradientColors: {
+      from: "dark-secondary",
+      to: "dark-background",
+    },
+  },
+  nature: {
+    colors: {
+      primary: "nature-primary",
+      secondary: "nature-secondary",
+      accent: "nature-accent",
+      background: "nature-background",
+    },
+    gradientColors: {
+      from: "nature-secondary",
+      to: "nature-background",
+    },
+  },
+};
+
+/** Helper to generate safelist entries for Tailwind variants */
+function generateSafelistFromThemes(themes) {
+  const classes = new Set();
+
+  const utilities = ["bg", "text", "border", "ring", "shadow"];
+  const variants = ["", "hover", "focus"];
+  const opacities = Array.from({ length: 9 }, (_, i) => `${(i + 1) * 10}`); // [10, 20, ..., 90]
+
+  Object.values(themes).forEach((theme) => {
+    const { colors = {}, gradientColors = {} } = theme;
+
+    Object.values(colors).forEach((color) => {
+      utilities.forEach((util) => {
+        variants.forEach((variant) => {
+          const base = `${util}-${color}`;
+          classes.add(variant ? `${variant}:${base}` : base);
+
+          // Add opacity variants for bg-* (e.g. bg-color/50)
+          if (util === "bg") {
+            opacities.forEach((opacity) => {
+              classes.add(
+                variant ? `${variant}:${base}/${opacity}` : `${base}/${opacity}`
+              );
+            });
+          }
+        });
+      });
+    });
+
+    if (gradientColors.from) classes.add(`from-${gradientColors.from}`);
+    if (gradientColors.to) classes.add(`to-${gradientColors.to}`);
+  });
+
+  return Array.from(classes);
+}
+
+const generatedSafelist = generateSafelistFromThemes(themes);
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -35,96 +127,6 @@ export default {
       },
     },
   },
-  safelist: [
-    // Gradient colors
-    "from-beige",
-    "to-offWhite",
-    "from-fiery-secondary",
-    "to-fiery-background",
-    "from-dark-secondary",
-    "to-dark-background",
-    "from-nature-secondary",
-    "to-nature-background",
-
-    // Background colors
-    "bg-darkBlue",
-    "bg-beige",
-    "bg-nearBlack",
-    "bg-offWhite",
-    "bg-successGreen",
-    "bg-errorRed",
-    "bg-fiery-primary",
-    "bg-fiery-secondary",
-    "bg-fiery-accent",
-    "bg-fiery-background",
-    "bg-dark-primary",
-    "bg-dark-secondary",
-    "bg-dark-accent",
-    "bg-dark-background",
-    "bg-nature-primary",
-    "bg-nature-secondary",
-    "bg-nature-accent",
-    "bg-nature-background",
-
-    // Hover background colors
-    "hover:bg-darkBlue",
-    "hover:bg-beige",
-    "hover:bg-nearBlack",
-    "hover:bg-offWhite",
-    "hover:bg-successGreen",
-    "hover:bg-errorRed",
-    "hover:bg-fiery-primary",
-    "hover:bg-fiery-secondary",
-    "hover:bg-fiery-accent",
-    "hover:bg-fiery-background",
-    "hover:bg-dark-primary",
-    "hover:bg-dark-secondary",
-    "hover:bg-dark-accent",
-    "hover:bg-dark-background",
-    "hover:bg-nature-primary",
-    "hover:bg-nature-secondary",
-    "hover:bg-nature-accent",
-    "hover:bg-nature-background",
-
-    // Text colors
-    "text-darkBlue",
-    "text-beige",
-    "text-nearBlack",
-    "text-offWhite",
-    "text-successGreen",
-    "text-errorRed",
-    "text-fiery-primary",
-    "text-fiery-secondary",
-    "text-fiery-accent",
-    "text-fiery-background",
-    "text-dark-primary",
-    "text-dark-secondary",
-    "text-dark-accent",
-    "text-dark-background",
-    "text-nature-primary",
-    "text-nature-secondary",
-    "text-nature-accent",
-    "text-nature-background",
-
-    // Hover text colors
-    "hover:text-darkBlue",
-    "hover:text-beige",
-    "hover:text-nearBlack",
-    "hover:text-offWhite",
-    "hover:text-successGreen",
-    "hover:text-errorRed",
-    "hover:text-fiery-primary",
-    "hover:text-fiery-secondary",
-    "hover:text-fiery-accent",
-    "hover:text-fiery-background",
-    "hover:text-dark-primary",
-    "hover:text-dark-secondary",
-    "hover:text-dark-accent",
-    "hover:text-dark-background",
-    "hover:text-nature-primary",
-    "hover:text-nature-secondary",
-    "hover:text-nature-accent",
-    "hover:text-nature-background",
-  ],
+  safelist: generatedSafelist,
   plugins: [daisyui],
 };
