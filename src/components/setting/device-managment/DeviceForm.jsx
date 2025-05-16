@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Plug, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function DeviceForm({ onAddDevice }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -23,6 +24,9 @@ export default function DeviceForm({ onAddDevice }) {
   const isSerialDevice = ["barcode", "rfid"].includes(deviceType); // USB
   const isNetworkDevice = ["turnstile", "gate"].includes(deviceType); // LAN
   const isRS485Device = ["biometric", "locker"].includes(deviceType); // RS485
+
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
 
   const handleAdd = (e) => {
     e.preventDefault();
@@ -75,7 +79,7 @@ export default function DeviceForm({ onAddDevice }) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsFormOpen(!isFormOpen)}
-        className="w-full p-3 bg-darkBlue text-offWhite rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-blue-700"
+        className={`w-full p-3 bg-${theme.colors.primary} text-${theme.colors.background} rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-${theme.colors.primary}/60`}
       >
         {isFormOpen ? (
           <ChevronUp className="w-5 h-5" />
@@ -91,14 +95,18 @@ export default function DeviceForm({ onAddDevice }) {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="mt-4 bg-beige p-6 rounded-xl shadow-lg"
+            className={`mt-4 bg-${theme.colors.secondary} p-6 rounded-xl shadow-lg`}
           >
-            <h2 className="text-xl font-bold text-nearBlack mb-4 text-center">
+            <h2
+              className={`text-xl font-bold text-${theme.colors.primary} mb-4 text-center`}
+            >
               افزودن دستگاه
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-nearBlack mb-1">
+                <label
+                  className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                >
                   شناسه دستگاه
                 </label>
                 <input
@@ -110,7 +118,9 @@ export default function DeviceForm({ onAddDevice }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-nearBlack mb-1">
+                <label
+                  className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                >
                   نام دستگاه
                 </label>
                 <input
@@ -122,7 +132,9 @@ export default function DeviceForm({ onAddDevice }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-nearBlack mb-1">
+                <label
+                  className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                >
                   نوع دستگاه
                 </label>
                 <select
@@ -139,7 +151,9 @@ export default function DeviceForm({ onAddDevice }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-nearBlack mb-1">
+                <label
+                  className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                >
                   گروه دستگاه
                 </label>
                 <select
@@ -155,11 +169,15 @@ export default function DeviceForm({ onAddDevice }) {
               </div>
               {isNetworkDevice && (
                 <div className="space-y-4 border-t border-gray-200 pt-4">
-                  <h3 className="text-sm font-semibold text-nearBlack">
+                  <h3
+                    className={`text-sm font-semibold text-${theme.colors.accent}`}
+                  >
                     تنظیمات شبکه (LAN)
                   </h3>
                   <div>
-                    <label className="block text-sm font-medium text-nearBlack mb-1">
+                    <label
+                      className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                    >
                       آی‌پی (اختیاری)
                     </label>
                     <input
@@ -171,7 +189,9 @@ export default function DeviceForm({ onAddDevice }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-nearBlack mb-1">
+                    <label
+                      className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                    >
                       پورت (اختیاری)
                     </label>
                     <input
@@ -183,7 +203,9 @@ export default function DeviceForm({ onAddDevice }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-nearBlack mb-1">
+                    <label
+                      className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                    >
                       پروتکل (اختیاری)
                     </label>
                     <select
@@ -199,7 +221,9 @@ export default function DeviceForm({ onAddDevice }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-nearBlack mb-1">
+                    <label
+                      className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                    >
                       تایم‌اوت (ثانیه، اختیاری)
                     </label>
                     <input
@@ -214,11 +238,13 @@ export default function DeviceForm({ onAddDevice }) {
               )}
               {(isSerialDevice || isRS485Device) && (
                 <div className="space-y-4 border-t border-gray-200 pt-4">
-                  <h3 className="text-sm font-semibold text-nearBlack">
+                  <h3 className={`text-sm font-semibold text-${theme.colors.accent}`}>
                     تنظیمات سریال ({isSerialDevice ? "USB" : "RS485"})
                   </h3>
                   <div>
-                    <label className="block text-sm font-medium text-nearBlack mb-1">
+                    <label
+                      className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                    >
                       پورت COM (اختیاری)
                     </label>
                     <input
@@ -230,7 +256,9 @@ export default function DeviceForm({ onAddDevice }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-nearBlack mb-1">
+                    <label
+                      className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                    >
                       نرخ باود (اختیاری)
                     </label>
                     <select
@@ -247,7 +275,9 @@ export default function DeviceForm({ onAddDevice }) {
                   </div>
                   {isSerialDevice && (
                     <div>
-                      <label className="block text-sm font-medium text-nearBlack mb-1">
+                      <label
+                        className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                      >
                         فاصله اسکن (میلی‌ثانیه، اختیاری)
                       </label>
                       <input
@@ -262,7 +292,9 @@ export default function DeviceForm({ onAddDevice }) {
                   {isRS485Device && (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-nearBlack mb-1">
+                        <label
+                          className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                        >
                           پریتی (اختیاری)
                         </label>
                         <select
@@ -277,7 +309,9 @@ export default function DeviceForm({ onAddDevice }) {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-nearBlack mb-1">
+                        <label
+                          className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                        >
                           بیت‌های داده (اختیاری)
                         </label>
                         <select
@@ -291,7 +325,9 @@ export default function DeviceForm({ onAddDevice }) {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-nearBlack mb-1">
+                        <label
+                          className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                        >
                           بیت‌های توقف (اختیاری)
                         </label>
                         <select
@@ -305,7 +341,9 @@ export default function DeviceForm({ onAddDevice }) {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-nearBlack mb-1">
+                        <label
+                          className={`block text-sm font-medium text-${theme.colors.primary} mb-1`}
+                        >
                           تایم‌اوت (ثانیه، اختیاری)
                         </label>
                         <input
@@ -324,13 +362,13 @@ export default function DeviceForm({ onAddDevice }) {
               <div className="flex gap-2">
                 <button
                   onClick={handleAdd}
-                  className="flex-1 p-2 bg-darkBlue text-offWhite rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                  className={`flex-1 p-2 bg-${theme.colors.primary} text-${theme.colors.background} rounded-lg hover:bg-${theme.colors.primary}/60 flex items-center justify-center gap-2 duration-300`}
                 >
                   <Plug className="w-5 h-5" /> افزودن دستگاه
                 </button>
                 <button
                   onClick={() => setIsFormOpen(false)}
-                  className="flex-1 p-2 bg-gray-300 text-nearBlack rounded-lg hover:bg-hoverBeige"
+                  className={`flex-1 p-2 bg-${theme.colors.accent} text-${theme.colors.background} rounded-lg hover:bg-${theme.colors.accent}/60 duration-150`}
                 >
                   لغو
                 </button>

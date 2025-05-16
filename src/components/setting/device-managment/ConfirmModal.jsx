@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle } from "lucide-react";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function ConfirmModal({
   isOpen,
@@ -8,6 +9,9 @@ export default function ConfirmModal({
   title,
   message,
 }) {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -21,13 +25,17 @@ export default function ConfirmModal({
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
-            className="bg-offWhite p-6 rounded-2xl shadow-lg max-w-sm w-full"
+            className={`bg-${theme.colors.background} p-6 rounded-2xl shadow-lg max-w-sm w-full`}
           >
             <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-500" />
-              <h2 className="text-lg font-bold text-nearBlack">{title}</h2>
+              <AlertTriangle className={`w-6 h-6 text-${theme.colors.primary}`} />
+              <h2 className={`text-lg font-bold text-${theme.colors.primary}`}>
+                {title}
+              </h2>
             </div>
-            <p className="text-sm text-nearBlack mb-4">{message}</p>
+            <p className={`text-sm text-${theme.colors.accent} mb-4`}>
+              {message}
+            </p>
             <div className="flex justify-end gap-2">
               <button
                 onClick={onClose}

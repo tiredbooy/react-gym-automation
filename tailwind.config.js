@@ -61,17 +61,19 @@ function generateSafelistFromThemes(themes) {
   const utilities = ["bg", "text", "border", "ring", "shadow"];
   const variants = ["", "hover", "focus"];
   const opacities = Array.from({ length: 9 }, (_, i) => `${(i + 1) * 10}`); // [10, 20, ..., 90]
+  const gradientDirections = ["r", "l", "t", "b", "tr", "tl", "br", "bl"]; // Gradient directions
 
   Object.values(themes).forEach((theme) => {
     const { colors = {}, gradientColors = {} } = theme;
 
+    // Add color-related classes
     Object.values(colors).forEach((color) => {
       utilities.forEach((util) => {
         variants.forEach((variant) => {
           const base = `${util}-${color}`;
           classes.add(variant ? `${variant}:${base}` : base);
 
-          // Add opacity variants for bg-* (e.g. bg-color/50)
+          // Add opacity variants for bg-* (e.g., bg-color/50)
           if (util === "bg") {
             opacities.forEach((opacity) => {
               classes.add(
@@ -81,10 +83,35 @@ function generateSafelistFromThemes(themes) {
           }
         });
       });
+
+      // Add gradient-related classes for each color
+      gradientDirections.forEach((dir) => {
+        // Add bg-gradient-to-* class
+        classes.add(`bg-gradient-to-${dir}`);
+        variants.forEach((variant) => {
+          classes.add(
+            variant
+              ? `${variant}:bg-gradient-to-${dir}`
+              : `bg-gradient-to-${dir}`
+          );
+        });
+
+        // Add from-*, to-*, and via-* classes for the color
+        classes.add(`from-${color}`);
+        classes.add(`to-${color}`);
+        classes.add(`via-${color}`);
+        variants.forEach((variant) => {
+          classes.add(variant ? `${variant}:from-${color}` : `from-${color}`);
+          classes.add(variant ? `${variant}:to-${color}` : `to-${color}`);
+          classes.add(variant ? `${variant}:via-${color}` : `via-${color}`);
+        });
+      });
     });
 
+    // Add gradientColors classes (if still needed)
     if (gradientColors.from) classes.add(`from-${gradientColors.from}`);
     if (gradientColors.to) classes.add(`to-${gradientColors.to}`);
+    if (gradientColors.via) classes.add(`via-${gradientColors.via}`);
   });
 
   return Array.from(classes);

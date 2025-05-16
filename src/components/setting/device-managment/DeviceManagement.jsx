@@ -13,6 +13,8 @@ import {
 import * as XLSX from "xlsx";
 import { writeFile } from "xlsx";
 import toast from "react-hot-toast";
+import { useTheme } from "../../../context/ThemeContext";
+
 import DeviceForm from "./DeviceForm";
 import Stats from "./Stats";
 import DeviceList from "./DeviceList";
@@ -64,22 +66,6 @@ const simulateHardwareAPI = {
     ),
 };
 
-// Component: DeviceForm (Extract to DeviceForm.jsx)
-
-// Component: DeviceList (Extract to DeviceList.jsx)
-
-// Component: DeviceLog (Extract to DeviceLog.jsx)
-
-// Component: Stats (Extract to Stats.jsx)
-
-// Component: ConnectionWizardModal (Extract to ConnectionWizardModal.jsx)
-
-// Component: DiagnosticModal (Extract to DiagnosticModal.jsx)
-
-// Component: ConfirmModal (Extract to ConfirmModal.jsx)
-
-// Component: ActionButtons (Extract to ActionButtons.jsx)
-
 // Component: DeviceManagementPage (Main Component)
 const DeviceManagementPage = () => {
   const [devices, setDevices] = useState(() => {
@@ -130,6 +116,9 @@ const DeviceManagementPage = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [selectedDevice, setSelectedDevice] = useState(null);
+
+  const {activeTheme , themes} = useTheme();
+  const theme = themes[activeTheme];
 
   useEffect(() => {
     try {
@@ -367,8 +356,7 @@ const DeviceManagementPage = () => {
 
   return (
     <div
-      className="min-h-screen bg-offWhite flex flex-col items-center justify-start p-4 space-y-6"
-      dir="rtl"
+      className={`min-h-screen bg-gradient-to-bl from-${theme.colors.secondary} flex flex-col rounded-xl items-center justify-start p-4 space-y-6`}
     >
       <DeviceForm onAddDevice={handleAddDevice} />
       <Stats devices={devices} deviceLog={deviceLog} />
