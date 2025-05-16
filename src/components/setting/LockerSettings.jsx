@@ -220,7 +220,7 @@ export default function LockerSettings() {
                   {salon.status}
                 </span>
               </p>
-              <p className={`text-sm text-${theme.colors.accent} flex items-center gap-1`}>
+              <p className={`text-sm text-gray-600 flex items-center gap-1`}>
                 <Info size={14} /> تعداد کل کمد‌ها: {salon.lockers.length}
               </p>
               <p className="text-xs text-gray-500">
