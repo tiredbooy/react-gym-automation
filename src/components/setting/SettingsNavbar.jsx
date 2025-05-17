@@ -17,11 +17,7 @@ const tabs = [
 export default function SettingsNavbar() {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
-  console.log(theme);
 
-  // Helper to extract color name from composite string (e.g., "bg-beige text-beige border-beige" -> "beige")
-  // const getColorName = (colorString) =>
-  //   colorString.split(" ")[1].replace("text-", "");
 
   return (
     <div className="overflow-x-auto mb-6 flex justify-center">
