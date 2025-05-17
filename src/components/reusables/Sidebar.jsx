@@ -40,7 +40,7 @@ export default function Sidebar() {
             className={({ isActive }) =>
               `flex items-center gap-2 p-2 rounded-md hover:bg-${
                 theme.colors.secondary
-              } hover:text-darkBlue hover:font-bold transition duration-150 ${
+              } hover:text-${theme.colors.accent} hover:font-bold transition duration-150 ${
                 isActive
                   ? `bg-${theme.colors.secondary} text-${theme.colors.primary} font-bold`
                   : ""

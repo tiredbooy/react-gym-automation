@@ -14,349 +14,11 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import toast, { Toaster } from "react-hot-toast";
+
 import { useTheme } from "../../../context/ThemeContext";
-
-// CoachForm Component
-const CoachForm = ({ isOpen, coach, onSave, onClose }) => {
-  const [name, setName] = useState(coach?.name || "");
-  const [contact, setContact] = useState(coach?.contact || "");
-  const [specialty, setSpecialty] = useState(coach?.specialty || "بدنسازی");
-  const [priceProgram, setPriceProgram] = useState(coach?.priceProgram || null);
-  const [pricePrivate, setPricePrivate] = useState(coach?.pricePrivate || null);
-  const [shift, setShift] = useState(coach?.shift || "صبح");
-
-  const { activeTheme, themes } = useTheme();
-  const theme = themes[activeTheme];
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!name.trim() || !contact.trim()) {
-      toast.error("نام و شماره تماس الزامی است");
-      return;
-    }
-    onSave({
-      id: coach?.id || Date.now(),
-      name,
-      contact,
-      specialty,
-      priceProgram,
-      pricePrivate,
-      shift,
-      clients: coach?.clients || [],
-    });
-
-    setName("");
-    setContact("");
-    setSpecialty("");
-    setPriceProgram(null);
-    setPricePrivate(null);
-    setShift("صبح");
-    onClose();
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      className="fixed inset-0 bg-nearBlack bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div
-        className={`${theme.colors.background} p-8 rounded-2xl shadow-2xl w-full max-w-lg`}
-      >
-        <h2 className={`text-3xl font-bold text-${theme.colors.primary} mb-6`}>
-          {coach ? "ویرایش مربی" : "افزودن مربی جدید"}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
-              نام
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={`w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all`}
-              placeholder="نام مربی"
-            />
-          </div>
-          <div>
-            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
-              شماره تماس
-            </label>
-            <input
-              type="text"
-              value={contact}
-              onChange={(e) => setContact(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all"
-              placeholder="09123456789"
-            />
-          </div>
-          <div>
-            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
-              تخصص
-            </label>
-            <select
-              value={specialty}
-              onChange={(e) => setSpecialty(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack transition-all"
-            >
-              <option value="bodyBuilding">بدنسازی</option>
-              <option value="yoga">یوگا</option>
-              <option value="crossfit">کراسفیت</option>
-              <option value="trx">تی ار ایکس</option>
-            </select>
-          </div>
-          <div>
-            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
-              قیمت برنامه
-            </label>
-            <input
-              type="number"
-              value={priceProgram}
-              onChange={(e) => setPriceProgram(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all"
-              placeholder="مثال: 200,000"
-            />
-          </div>
-          <div>
-            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
-              قیمت مربی خصوصی
-            </label>
-            <input
-              type="number"
-              value={pricePrivate}
-              onChange={(e) => setPricePrivate(e.target.value)}
-              className="w-full p-3 bg-white border border-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-gray-400 transition-all"
-              placeholder="مثال: 500,000 "
-            />
-          </div>
-          <div>
-            <label className={`block text-${theme.colors.accent} mb-2 text-lg`}>
-              شیفت کاری
-            </label>
-            <select
-              value={shift}
-              onChange={(e) => setShift(e.target.value)}
-              className="w-full p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack transition-all"
-            >
-              <option value="morning">صبح</option>
-              <option value="evening">بعدازظهر</option>
-              <option value="night">شب</option>
-            </select>
-          </div>
-          <div className="flex justify-end space-x-3 space-x-reverse">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-3 bg-lightGray text-nearBlack rounded-xl hover:bg-beige hover:text-darkBlue transition-all text-lg"
-            >
-              لغو
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-3 bg-darkBlue text-offWhite rounded-xl hover:bg-beige hover:text-darkBlue transition-all text-lg"
-            >
-              ذخیره
-            </button>
-          </div>
-        </form>
-      </div>
-    </motion.div>
-  );
-};
-
-// ClientAssignmentModal Component
-const ClientAssignmentModal = ({
-  isOpen,
-  onClose,
-  coach,
-  coaches,
-  onSaveClients,
-}) => {
-  const [clients, setClients] = useState(coach ? coach.clients || [] : []);
-  const [newClientName, setNewClientName] = useState("");
-  const [clientType, setClientType] = useState("برنامه");
-
-  const handleAddClient = () => {
-    if (newClientName.trim() && coach) {
-      const newClient = {
-        id: Date.now(),
-        name: newClientName,
-        type: clientType,
-      };
-      setClients([...clients, newClient]);
-      setNewClientName("");
-      toast.success("مشتری جدید اضافه شد");
-    }
-  };
-
-  const handleReassignClient = (clientId, newCoachId) => {
-    const newCoach = coaches.find((c) => c.id === newCoachId);
-    if (newCoach && coach) {
-      onSaveClients(newCoach.id, [
-        ...(newCoach.clients || []),
-        clients.find((c) => c.id === clientId),
-      ]);
-      setClients(clients.filter((c) => c.id !== clientId));
-      toast.success("مشتری با موفقیت منتقل شد");
-    }
-  };
-
-  if (!isOpen || !coach) return null;
-
-  const programCount = clients.filter((c) => c.type === "برنامه").length;
-  const privateCount = clients.filter((c) => c.type === "مربی خصوصی").length;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      className="fixed inset-0 bg-nearBlack bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div className="bg-offWhite p-8 rounded-2xl shadow-2xl w-full max-w-lg">
-        <h2 className="text-3xl font-bold text-darkBlue mb-6 font-amiri">
-          مدیریت مشتریان {coach.name}
-        </h2>
-        <div className="space-y-4">
-          <p className="text-lg text-nearBlack font-amiri">
-            تعداد برنامه: {programCount} (قیمت: {coach.priceProgram})
-          </p>
-          <p className="text-lg text-nearBlack font-amiri">
-            تعداد مربی خصوصی: {privateCount} (قیمت: {coach.pricePrivate})
-          </p>
-        </div>
-        <div className="mt-6 space-y-4">
-          <div className="flex space-x-3 space-x-reverse">
-            <input
-              type="text"
-              value={newClientName}
-              onChange={(e) => setNewClientName(e.target.value)}
-              className="flex-1 p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack placeholder-lightGray font-amiri transition-all"
-              placeholder="نام مشتری جدید"
-            />
-            <select
-              value={clientType}
-              onChange={(e) => setClientType(e.target.value)}
-              className="p-3 bg-white border border-lightGray rounded-xl focus:outline-none focus:ring-2 focus:ring-darkBlue text-nearBlack font-amiri transition-all"
-            >
-              <option value="برنامه">برنامه</option>
-              <option value="مربی خصوصی">مربی خصوصی</option>
-            </select>
-            <button
-              onClick={handleAddClient}
-              className="px-6 py-3 bg-darkBlue text-offWhite rounded-xl hover:bg-beige hover:text-darkBlue transition-all font-amiri text-lg"
-            >
-              افزودن
-            </button>
-          </div>
-        </div>
-        <div className="flex justify-end mt-6">
-          <button
-            onClick={onClose}
-            className="px-6 py-3 bg-lightGray text-nearBlack rounded-xl hover:bg-beige hover:text-darkBlue transition-all font-amiri text-lg"
-          >
-            بستن
-          </button>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// CoachCard Component
-const CoachCard = ({
-  coach,
-  onEdit,
-  onDelete,
-  onViewClients,
-  onUpdateClients,
-}) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-
-  const programCount = coach.clients
-    ? coach.clients.filter((c) => c.type === "برنامه").length
-    : 0;
-  const privateCount = coach.clients
-    ? coach.clients.filter((c) => c.type === "مربی خصوصی").length
-    : 0;
-
-  return (
-    <motion.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      whileHover={{ scale: 1.02 }}
-      className="bg-gradient-to-r from-white to-beige p-6 rounded-2xl shadow-lg border border-lightGray"
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3 space-x-reverse">
-          <motion.button
-            whileTap={{ scale: 0.9, rotate: "90deg", transition: easeInOut }}
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-darkBlue hover:darkBlue "
-          >
-            {isCollapsed ? <ChevronDown size={24} /> : <ChevronUp size={24} />}
-          </motion.button>
-          <h3 className="text-2xl font-bold text-darkBlue font-amiri">
-            {coach.name}
-          </h3>
-        </div>
-        <div className="flex space-x-3 space-x-reverse">
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => onEdit(coach)}
-            className="text-darkBlue hover:text-beige transition-colors"
-          >
-            <Edit size={24} />
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => onDelete(coach.id)}
-            className="text-errorRed hover:text-beige transition-colors"
-          >
-            <Trash2 size={24} />
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={() => onViewClients(coach)}
-            className="text-darkBlue hover:text-beige transition-colors"
-          >
-            <Calendar size={24} />
-          </motion.button>
-        </div>
-      </div>
-      <AnimatePresence>
-        {!isCollapsed && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="mt-6 space-y-4"
-          >
-            <div className="grid grid-cols-2 gap-4 text-lg text-nearBlack font-amiri">
-              <span>شماره تماس: {coach.contact}</span>
-              <span>تخصص: {coach.specialty}</span>
-              <span>شیفت: {coach.shift}</span>
-              <span>
-                قیمت برنامه:{" "}
-                {Number(coach?.priceProgram)?.toLocaleString("fa-IR")} تومان
-              </span>
-              <span>تعداد برنامه: {programCount}</span>
-              <span>
-                قیمت مربی خصوصی:{" "}
-                {Number(coach?.pricePrivate).toLocaleString("fa-IR")} تومان
-              </span>
-              <span>تعداد مربی خصوصی: {privateCount}</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
+import CoachForm from "./CoachForm";
+import ClientAssignmentModal from "./ClientAssignmentModal";
+import CoachCard from "./CoachCard";
 
 // CoachesManagement Component
 const CoachesManagement = () => {
@@ -393,6 +55,9 @@ const CoachesManagement = () => {
   const [editingCoach, setEditingCoach] = useState(null);
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [selectedCoach, setSelectedCoach] = useState(null);
+
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
 
   const addCoach = (coach) => {
     setCoaches([...coaches, coach]);
@@ -453,21 +118,21 @@ const CoachesManagement = () => {
 
   return (
     <div
-      className="bg-gradient-to-b from-offWhite to-beige min-h-screen p-8 font-amiri"
+      className={`bg-gradient-to-b from-${theme.colors.background} to-${theme.colors.secondary} rounded-xl min-h-screen p-8`}
       dir="rtl"
     >
       <Toaster position="bottom-left" />
       <div className="max-w-5xl mx-auto space-y-8">
         <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-darkBlue">مدیریت مربیان</h1>
+          <h1 className={`text-4xl font-bold text-${theme.colors.primary}`}>مدیریت مربیان</h1>
           <div className="flex space-x-3 space-x-reverse">
             <button
               onClick={exportData}
-              className="flex items-center px-6 py-3 bg-darkBlue text-offWhite rounded-xl hover:bg-beige hover:text-darkBlue transition-all font-amiri text-lg shadow-md"
+              className={`flex items-center px-6 py-3 bg-${theme.colors.primary} text-offWhite rounded-xl hover:bg-${theme.colors.primary}/90 font-semibold hover:text-${theme.colors.background} transition-all text-lg shadow-md duration-200`}
             >
               <Download size={20} className="mr-2" /> صدور
             </button>
-            <label className="flex items-center px-6 py-3 bg-darkBlue text-offWhite rounded-xl hover:bg-beige hover:text-darkBlue transition-all font-amiri text-lg shadow-md cursor-pointer">
+            <label className={`flex items-center px-6 py-3 bg-${theme.colors.primary} text-offWhite rounded-xl hover:bg-${theme.colors.primary}/90 font-semibold hover:text-${theme.colors.background} transition-all text-lg shadow-md cursor-pointer duration-200`}>
               <Upload size={20} className="mr-2" /> وارد کردن
               <input type="file" onChange={importData} className="hidden" />
             </label>
@@ -479,7 +144,7 @@ const CoachesManagement = () => {
             setEditingCoach(null);
             setIsFormOpen(true);
           }}
-          className="flex items-center mx-auto px-8 py-4 bg-darkBlue text-offWhite rounded-xl hover:bg-beige hover:text-darkBlue transition-all font-amiri text-xl shadow-md"
+          className={`flex items-center mx-auto px-8 py-4 bg-${theme.colors.primary} text-offWhite rounded-xl hover:bg-${theme.colors.primary}/90 font-semibold hover:text-${theme.colors.background} transition-all text-xl shadow-md duration-200`}
         >
           <UserPlus size={24} className="mr-2" /> افزودن مربی جدید
         </motion.button>

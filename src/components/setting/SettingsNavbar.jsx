@@ -31,7 +31,7 @@ export default function SettingsNavbar() {
             to={`/settings/${tab.id}`}
             key={tab.id}
             className={({ isActive }) =>
-              `relative px-4 py-2 rounded-xl   text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
+              `relative px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
                 isActive
                   ? `bg-${theme.colors.primary} text-${theme.colors.secondary}`
                   : `text-${theme.colors.accent} hover:bg-hoverBeige`
