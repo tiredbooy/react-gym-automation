@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import LogTable from "./LogTable";
 
+import { useTheme } from "../../context/ThemeContext";
+
 const userMocData = [
   {
     first_name: "مهدی",
@@ -146,6 +148,9 @@ const userMocData = [
 export default function DashboardItems() {
   const [userData, setUserData] = useState([]);
 
+  const { activeTheme , themes } = useTheme();
+  const theme = themes[activeTheme];
+
   useEffect(() => {
     setUserData(userMocData);
   }, []);
@@ -157,7 +162,7 @@ export default function DashboardItems() {
       <div className="flex flex-col gap-5 w-full border-t py-8">
         <header className="flex flex-row justify-between">
           <div className="flex flex-row justify-between items-center gap-5">
-            <div className="bg-darkBlue px-4 py-2 rounded-xl text-center text-beige font-bold">
+            <div className={`bg-${theme.colors.primary} px-4 py-2 rounded-xl text-center text-${theme.colors.secondary} font-bold`}>
               <span>تعداد افراد حاظر در باشگاه : 33</span>
             </div>
 
@@ -167,7 +172,7 @@ export default function DashboardItems() {
                 placeholder="جستجو ورزشکار..."
                 className="input input-bordered w-auto rounded-xl"
               />
-              <select className="select bg-darkBlue text-beige rounded-xl">
+              <select className={`select bg-${theme.colors.primary} text-${theme.colors.secondary} rounded-xl`}>
                 <option>همه رشته‌ها</option>
                 <option>کراسفیت</option>
                 <option>بکس</option>
@@ -176,26 +181,26 @@ export default function DashboardItems() {
           </div>
 
           <div className="flex flex-row gap-4">
-            <select className="select w-auto bg-darkBlue rounded-xl text-beige outline-none">
+            <select className={`select w-auto bg-${theme.colors.primary} rounded-xl text-${theme.colors.secondary} outline-none`}>
               <option>انتخاب سالن</option>
               <option>سالن اصلی</option>
               <option>سالن بکس</option>
               <option>سالن کراسفیت</option>
             </select>
 
-            <button className="bg-darkBlue text-beige flex items-center flex-row gap-1 px-4 py-2 rounded-xl hover:bg-[#2f5986] hover:font-semibold duration-150">
+            <button className={`bg-${theme.colors.primary} text-${theme.colors.secondary} flex items-center flex-row gap-1 px-4 py-2 rounded-xl hover:bg-${theme.colors.primary}/80 hover:font-semibold duration-150`}>
               <CirclePlus size={18} />
               <span>جلسه آزاد</span>
             </button>
 
-            <button className="bg-darkBlue text-beige flex items-center flex-row gap-1 px-4 py-2 rounded-xl hover:bg-[#2f5986] hover:font-semibold duration-150">
+            <button className={`bg-${theme.colors.primary} text-${theme.colors.secondary} flex items-center flex-row gap-1 px-4 py-2 rounded-xl hover:bg-${theme.colors.primary}/80 hover:font-semibold duration-150`}>
               <UserRoundPlus size={18} />
               <span>ثبت نام ورزشکار</span>
             </button>
           </div>
         </header>
 
-        <main className="overflow-hidden bg-darkBlue w-full rounded-xl">
+        <main className={`overflow-hidden bg-${theme.colors.primary} w-full rounded-xl`}>
           <LogTable userData={userData} />
         </main>
       </div>
