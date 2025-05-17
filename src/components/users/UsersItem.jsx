@@ -3,13 +3,17 @@ import Pagination from "../reusables/Pagination";
 import UserPageHeader from "./Header";
 import UserTable from "./UsersTable";
 import AddUserModal from "./add-user/AddUserModal";
+import { useTheme } from "../../context/ThemeContext";
 
-export default function UsersItem({ users }) {
+export default function UsersItem({ users , setUsers }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+
   return (
-    <div className="bg-offWhite py-12 px-8 text-center">
-      <UserPageHeader onAddUserModal={setIsOpen} />
+    <div className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
+      <UserPageHeader onAddUserModal={setIsOpen} users={users} setUsers={setUsers} />
       {isOpen && <AddUserModal isOpen={isOpen} onOpen={setIsOpen} />}
       <UserTable users={users} />
       <Pagination
@@ -17,9 +21,9 @@ export default function UsersItem({ users }) {
         currentPage={2}
         totalPages={10}
         onPageChange={(page) => console.log("Go to page:", page)}
-        color="text-nearBlack"
-        bgColor="bg-offWhite"
-        activeColor="bg-darkBlue text-offWhite"
+        color={`text-${theme.colors.accent}`}
+        bgColor={`bg-${theme.colors.background}`}
+        activeColor={`bg-${theme.colors.primary} text-${theme.colors.secondary}`}
         size="md"
       />
     </div>

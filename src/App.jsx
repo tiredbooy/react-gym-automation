@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useTheme } from "./context/ThemeContext";
+
 import Sidebar from "./components/reusables/Sidebar";
 import DashboardPage from "./pages/Dashboard";
 import UsersPage from "./pages/Users";
@@ -10,6 +12,8 @@ import SettingsPage from "./pages/Setting";
 // import SettingsPage from './pages/Settings';
 
 export default function App() {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
   return (
     <Router>
       <div className="flex min-h-screen">
@@ -17,7 +21,7 @@ export default function App() {
         <Sidebar />
 
         {/* Main content */}
-        <div className="flex-1 bg-offWhite">
+        <div className={`flex-1 bg-${theme.colors.background}`}>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/users" element={<UsersPage />} />
