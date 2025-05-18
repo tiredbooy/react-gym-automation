@@ -29,7 +29,7 @@ export default function UserTable({ users }) {
           {users.map((user, index) => (
             <tr
               key={index}
-              className={`bg-${secondary} hover:bg-${background}/30 transition duration-150`}
+              className={`bg-${secondary} text-${accent} hover:bg-${background}/30 transition duration-150`}
             >
               <td className="py-4 px-2">{index + 1}</td>
               <td className="py-4 px-2">

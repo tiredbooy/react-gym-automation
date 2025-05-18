@@ -15,7 +15,9 @@ export default function Filters({
   return (
     <div className="w-full max-w-5xl flex flex-col sm:flex-row gap-4">
       <div className="relative flex-1 group duration-200">
-        <Search className="absolute right-2 top-2.5 w-5 h-5 text-gray-500 group-focus-within:text-primary cursor-pointer duration-200" />
+        <Search
+          className={`absolute right-2 top-2.5 w-5 h-5 text-gray-500 cursor-pointer duration-200`}
+        />
         <input
           type="text"
           value={search}
