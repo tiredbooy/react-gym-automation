@@ -1,15 +1,17 @@
 import { motion } from "framer-motion";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Pagination({
   currentPage,
   totalPages,
   onPageChange,
-  color = "text-darkBlue",
-  bgColor = "bg-offWhite",
-  activeColor = "bg-darkBlue text-offWhite",
   size = "md",
   className,
 }) {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+  const { primary, secondary, accent, background } = theme.colors;
+
   const getSizeClasses = () => {
     switch (size) {
       case "sm":
@@ -31,12 +33,8 @@ export default function Pagination({
     const pages = [];
 
     if (totalPages <= 5) {
-      // Show all pages if 5 or less
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
-      // Always show first 3 pages, last page, and current +/-1
       if (currentPage <= 3) {
         pages.push(1, 2, 3, 4, "...", totalPages);
       } else if (currentPage >= totalPages - 2) {
@@ -66,8 +64,8 @@ export default function Pagination({
 
   return (
     <div
-      className={`flex gap-2 items-center justify-center rtl ${color} ${
-        className ? className : ""
+      className={`flex gap-2 items-center justify-center rtl text-${accent} ${
+        className || ""
       }`}
     >
       {/* Prev Button */}
@@ -75,10 +73,10 @@ export default function Pagination({
         whileTap={{ scale: 0.95 }}
         onClick={() => handleClick(currentPage - 1)}
         disabled={currentPage === 1}
-        className={`rounded-full border border-darkBlue transition-all duration-300 px-4 py-2 ${
+        className={`rounded-full border border-${primary} transition-all duration-300 px-4 py-2 ${
           currentPage === 1
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : `${bgColor} hover:bg-hoverBeige`
+            ? "bg-transparent text-gray-400 cursor-not-allowed"
+            : `bg-${primary}/20 hover:bg-hoverBeige`
         }`}
       >
         قبلی
@@ -87,7 +85,7 @@ export default function Pagination({
       {/* Page Numbers */}
       {renderPages().map((page, idx) =>
         page === "..." ? (
-          <span key={idx} className="px-3 py-1 text-darkBlue">
+          <span key={idx} className={`px-3 py-1 text-${primary}`}>
             ...
           </span>
         ) : (
@@ -95,10 +93,10 @@ export default function Pagination({
             whileTap={{ scale: 0.95 }}
             key={idx}
             onClick={() => handleClick(page)}
-            className={`rounded-full border border-darkBlue transition-all duration-300 ${getSizeClasses()} ${
+            className={`rounded-full border border-${primary} transition-all duration-300 ${getSizeClasses()} ${
               page === currentPage
-                ? `${activeColor} font-bold shadow-md`
-                : `${bgColor} hover:bg-hoverBeige`
+                ? `bg-${primary} text-${background} font-bold shadow-md`
+                : `bg-${primary}/20 hover:bg-hoverBeige`
             }`}
           >
             {page}
@@ -111,10 +109,10 @@ export default function Pagination({
         whileTap={{ scale: 0.95 }}
         onClick={() => handleClick(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className={`rounded-full border border-darkBlue transition-all duration-300 px-4 py-2 ${
+        className={`rounded-full border border-${primary} transition-all duration-300 px-4 py-2 ${
           currentPage === totalPages
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : `${bgColor} hover:bg-hoverBeige`
+            ? "bg-transparent text-gray-400 cursor-not-allowed"
+            : `bg-${primary}/20 hover:bg-hoverBeige`
         }`}
       >
         بعدی

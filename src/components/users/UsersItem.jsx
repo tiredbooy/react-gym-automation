@@ -7,6 +7,8 @@ import { useTheme } from "../../context/ThemeContext";
 
 export default function UsersItem({ users , setUsers }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [ currentPage , setCurrentPage ] = useState(1)
+  const totalPage = 60;
 
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
@@ -18,13 +20,9 @@ export default function UsersItem({ users , setUsers }) {
       <UserTable users={users} />
       <Pagination
         className="mt-5"
-        currentPage={2}
-        totalPages={10}
-        onPageChange={(page) => console.log("Go to page:", page)}
-        color={`text-${theme.colors.accent}`}
-        bgColor={`bg-${theme.colors.background}`}
-        activeColor={`bg-${theme.colors.primary} text-${theme.colors.secondary}`}
-        size="md"
+        currentPage={currentPage}
+        totalPages={totalPage}
+        onPageChange={(page) => setCurrentPage(page)}
       />
     </div>
   );
