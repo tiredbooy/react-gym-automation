@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-
+import { useTheme } from "../../context/ThemeContext";
 /**
  * A reusable radio group component with customizable options, styling, and animations.
  * @param {string} name - The name attribute for the radio inputs.
@@ -29,22 +29,28 @@ const RadioGroup = ({
   isVertical = false,
   ariaProps = {},
 }) => {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+  const { primary, secondary, accent, background } = theme.colors;
+
   return (
     <div className={`text-right ${wrapperClass}`}>
       {label && (
-        <p className={`mb-2 text-sm font-semibold text-nearBlack ${labelClass}`}>
+        <p
+          className={`mb-2 text-sm font-semibold text-${primary} ${labelClass}`}
+        >
           {label}
         </p>
       )}
       <div
-        className={`flex ${isVertical ? "flex-col gap-4" : "gap-6 justify-start"} ${
-          error ? "border-l-4 border-errorRed pl-2" : ""
-        }`}
+        className={`flex ${
+          isVertical ? "flex-col gap-4" : "gap-6 justify-start"
+        } ${error ? "border-l-4 border-errorRed pl-2" : ""}`}
       >
         {options.map((option) => (
           <motion.label
             key={String(option.value)}
-            className={`flex items-center gap-3 cursor-pointer relative ${optionClass} ${
+            className={`flex items-center gap-3 cursor-pointer text-${accent} relative ${optionClass} ${
               option.disabled ? "opacity-50 cursor-not-allowed" : ""
             }`}
             whileHover={option.disabled ? {} : { scale: 1.02 }}
@@ -56,14 +62,14 @@ const RadioGroup = ({
               value={option.value}
               checked={value === option.value}
               onChange={() => !option.disabled && onChange(option.value)}
-              className={`appearance-none w-5 h-5 border-2 border-gray-400 rounded-full checked:border-darkBlue checked:bg-darkBlue focus:outline-none focus:ring-2 focus:ring-hoverBeige transition-all duration-200 ${inputClass}`}
+              className={`appearance-none w-5 h-5 border-2 border-${accent} rounded-full checked:border-${primary} checked:bg-${primary} focus:outline-none focus:ring-2 focus:ring-${accent} transition-all duration-200 ${inputClass}`}
               aria-label={option.label}
               disabled={option.disabled}
               {...ariaProps}
             />
             <motion.span
-              className="text-sm font-medium text-nearBlack"
-              whileHover={option.disabled ? {} : { color: "#123458" }}
+              className={`text-sm font-medium text-${accent}`}
+              whileHover={option.disabled ? {} : { color: `${primary}` }}
               transition={{ duration: 0.2 }}
             >
               {option.label}

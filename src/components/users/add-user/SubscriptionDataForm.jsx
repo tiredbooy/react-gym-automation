@@ -4,6 +4,7 @@ import RadioGroup from "../../reusables/RadioGroup";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+import { useTheme } from "../../../context/ThemeContext";
 
 const sports = [
   { id: 1, label: "بدنسازی" },
@@ -64,6 +65,10 @@ const availableLockers = Array.from({ length: 50 }, (_, i) => ({
 }));
 
 export default function SubscriptionDataForm() {
+  const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+  const { primary, secondary, accent, background } = theme.colors;
+
   // Main form state
   const [formData, setFormData] = useState({
     sport: "",
@@ -368,7 +373,7 @@ export default function SubscriptionDataForm() {
 
   return (
     <motion.form
-      className="bg-beige shadow rounded-xl p-6"
+      className={`bg-gradient-to-l from-${secondary} shadow rounded-xl p-6`}
       onSubmit={handleSubmit}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -376,18 +381,18 @@ export default function SubscriptionDataForm() {
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             رشته ورزشی
           </label>
           <select
             name="sport"
             value={formData.sport}
             onChange={(e) => handleInputChange("sport", e.target.value)}
-            className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
-              formErrors.sport ? "border-red-500" : "border-gray-400"
+            className={`w-full px-4 py-3 text-right border-2 bg-${secondary} ${
+              formErrors.sport ? "border-red-500" : `border-${primary}`
             } rounded-xl
-              text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500
-              focus:border-transparent transition-all duration-300 hover:border-blue-300 appearance-none`}
+              text-${accent}  focus:outline-none focus:ring-2 focus:ring-${primary}
+              focus:border-transparent transition-all duration-300 hover:border-${primary}/40 appearance-none`}
             aria-label="رشته ورزشی"
           >
             <option className="text-gray-400" value="" disabled>
@@ -404,18 +409,18 @@ export default function SubscriptionDataForm() {
           )}
         </div>
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             سانس
           </label>
           <select
             name="session_time"
             value={formData.session_time}
             onChange={(e) => handleInputChange("session_time", e.target.value)}
-            className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
-              formErrors.session_time ? "border-red-500" : "border-gray-400"
+            className={`w-full px-4 py-3 text-right border-2 bg-${secondary} ${
+              formErrors.session_time ? "border-red-500" : `border-${primary}`
             } rounded-xl
-              text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500
-              focus:border-transparent transition-all duration-300 hover:border-blue-300 appearance-none`}
+              text-${accent}  focus:outline-none focus:ring-2 focus:ring-${primary}
+              focus:border-transparent transition-all duration-300 hover:border-${primary}/40 appearance-none`}
             aria-label="سانس"
           >
             <option className="text-gray-400" value="" disabled>
@@ -434,16 +439,16 @@ export default function SubscriptionDataForm() {
           )}
         </div>
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             مربی
           </label>
           <select
             name="coach"
             value={formData.coach}
             onChange={handleCoachSelect}
-            className={`w-full px-4 py-3 text-right bg-transparent border-2 border-gray-400 rounded-xl
-              text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500
-              focus:border-transparent transition-all duration-300 hover:border-blue-300 appearance-none`}
+            className={`w-full px-4 py-3 text-right bg-transparent border-2 border-${primary} rounded-xl
+              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
+              focus:border-transparent transition-all duration-300 hover:border-${primary}/30 appearance-none`}
             aria-label="مربی"
           >
             <option className="text-gray-400" value="">
@@ -470,12 +475,14 @@ export default function SubscriptionDataForm() {
                   { value: false, label: "برنامه" },
                 ]}
                 label="نوع برنامه"
-                wrapperClass="card bg-beige p-4 rounded-xl"
+                wrapperClass={`card bg-gradient-to-l shadow from-${background} to-${secondary} p-4 rounded-xl`}
               />
             </div>
 
             <div className="text-right">
-              <label className="block mb-2 text-sm font-semibold text-gray-700">
+              <label
+                className={`block mb-2 text-sm font-semibold text-${accent}`}
+              >
                 هزینه ی برنامه
               </label>
               <input
@@ -484,16 +491,16 @@ export default function SubscriptionDataForm() {
                 value={formData.coach_price}
                 onChange={handleNumericChange}
                 autoComplete="off"
-                className={`w-full px-4 py-3 text-right border-2 bg-transparent border-gray-400 rounded-xl 
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                  transition-all duration-300 hover:border-blue-300 text-gray-800 placeholder-gray-400`}
+                className={`w-full px-4 py-3 text-right bg-transparent border-2 border-${primary} rounded-xl
+              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
+              focus:border-transparent transition-all duration-300 hover:border-${primary}/30 appearance-none`}
                 placeholder="هزینه ی برنامه را وارد کنید"
               />
             </div>
           </>
         )}
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             نوع عضویت
           </label>
           <select
@@ -503,13 +510,13 @@ export default function SubscriptionDataForm() {
             className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
               formErrors.subscription_type
                 ? "border-red-500"
-                : "border-gray-400"
+                : `border-${primary}`
             } rounded-xl
-              text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500
-              focus:border-transparent transition-all duration-300 hover:border-blue-300 appearance-none`}
+              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
+              focus:border-transparent transition-all duration-300 hover:border-${primary}/30 appearance-none`}
             aria-label="نوع عضویت"
           >
-            <option className="text-gray-400" value="" disabled>
+            <option className={`text-${accent}`} value="" disabled>
               نوع عضویت خود را انتخاب کنید
             </option>
             {subscriptionTypes.map((type) => (
@@ -527,10 +534,13 @@ export default function SubscriptionDataForm() {
         {/* VIP-specific locker number field */}
         {formData.subscription_type === "vip" && (
           <div className="text-right">
-            <label className="block mb-2 text-sm font-semibold text-gray-700">
+            <label
+              className={`block mb-2 text-sm font-semibold text-${accent}`}
+            >
               شماره کمد
             </label>
-            <select
+            <input
+              type="number"
               name="locker_number"
               value={formData.locker_number || ""}
               onChange={(e) =>
@@ -540,21 +550,14 @@ export default function SubscriptionDataForm() {
                 )
               }
               className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
-                formErrors.locker_number ? "border-red-500" : "border-gray-400"
+                formErrors.locker_number
+                  ? "border-red-500"
+                  : `border-${primary}`
               } rounded-xl
-                text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500
-                focus:border-transparent transition-all duration-300 hover:border-blue-300 appearance-none`}
+                text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
+                focus:border-transparent transition-all duration-300 hover:border-${primary}/60 appearance-none`}
               aria-label="شماره کمد"
-            >
-              <option className="text-gray-400" value="" disabled>
-                شماره کمد را انتخاب کنید
-              </option>
-              {availableLockers.map((locker) => (
-                <option key={locker.value} value={locker.value}>
-                  {locker.label}
-                </option>
-              ))}
-            </select>
+            />
             {formErrors.locker_number && (
               <p className="text-red-500 text-xs mt-1">
                 {formErrors.locker_number}
@@ -562,24 +565,25 @@ export default function SubscriptionDataForm() {
             )}
           </div>
         )}
+
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             مدت زمان
           </label>
           <select
             name="duration"
             value={formData.duration}
             onChange={handleDurationChange}
-            className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
-              formErrors.duration ? "border-red-500" : "border-gray-400"
+            className={`w-full px-4 py-3 text-right bg-${secondary} border-2 ${
+              formErrors.duration ? "border-red-500" : `border-${primary}`
             } rounded-xl 
-              text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500
-              focus:border-transparent transition-all duration-300 hover:border-blue-300 appearance-none
+              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}
+              focus:border-transparent transition-all duration-300 hover:border-${primary} appearance-none
               ${formData.subscription_type === "session" ? "opacity-50" : ""}`}
             aria-label="مدت زمان"
             disabled={formData.subscription_type === "session"}
           >
-            <option className="text-gray-400" value="" disabled>
+            <option className={`text-${accent}`} value="" disabled>
               مدت زمان را انتخاب کنید
             </option>
             {durations.map((duration) => (
@@ -592,8 +596,9 @@ export default function SubscriptionDataForm() {
             <p className="text-red-500 text-xs mt-1">{formErrors.duration}</p>
           )}
         </div>
+
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             تعداد جلسات
           </label>
           <select
@@ -602,11 +607,11 @@ export default function SubscriptionDataForm() {
             onChange={(e) =>
               handleInputChange("sessions", parseInt(e.target.value, 10))
             }
-            className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
-              formErrors.sessions ? "border-red-500" : "border-gray-400"
+            className={`w-full px-4 py-3 text-right bg-${secondary} border-2 ${
+              formErrors.sessions ? "border-red-500" : `border-${primary}`
             } rounded-xl
-              text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500
-              focus:border-transparent transition-all duration-300 hover:border-blue-300 appearance-none
+             text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}
+              focus:border-transparent transition-all duration-300 hover:border-${primary} appearance-none
               ${formData.subscription_type !== "session" ? "opacity-50" : ""}`}
             aria-label="تعداد جلسات"
             disabled={formData.subscription_type !== "session"}
@@ -625,7 +630,7 @@ export default function SubscriptionDataForm() {
           )}
         </div>
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             تاریخ شروع
           </label>
           <DatePicker
@@ -634,11 +639,11 @@ export default function SubscriptionDataForm() {
             calendarPosition="bottom-right"
             value={formData.start_date}
             onChange={handleStartDateChange}
-            inputClass={`w-full px-4 py-3 text-right border-2 bg-transparent ${
-              formErrors.start_date ? "border-red-500" : "border-gray-400"
+            inputClass={`w-full px-4 py-3 text-right border-2 bg-${secondary} ${
+              formErrors.start_date ? "border-red-500" : `border-${primary}`
             } rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-              transition-all duration-300 hover:border-blue-300 text-gray-800 placeholder-gray-400`}
+              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="تاریخ شروع را انتخاب کنید"
             aria-label="تاریخ شروع"
           />
@@ -647,7 +652,7 @@ export default function SubscriptionDataForm() {
           )}
         </div>
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             تاریخ پایان
           </label>
           <input
@@ -659,14 +664,14 @@ export default function SubscriptionDataForm() {
             readOnly
             placeholder="تاریخ پایان"
             autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-gray-400 rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-              transition-all duration-300 hover:border-blue-300 text-gray-800 placeholder-gray-500`}
+            className={`w-full px-4 py-3 text-right border-2 bg-${secondary} border-${primary} rounded-xl 
+              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
           />
         </div>
         {/* Price Fields */}
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             هزینه ی بیمه
           </label>
           <input
@@ -675,14 +680,14 @@ export default function SubscriptionDataForm() {
             value={formData.insurance_fee}
             onChange={handleNumericChange}
             autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-gray-400 rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-              transition-all duration-300 hover:border-blue-300 text-gray-800 placeholder-gray-400`}
+            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
+              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="هزینه ی بیمه را وارد کنید"
           />
         </div>
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             هزینه ی کارت
           </label>
           <input
@@ -691,14 +696,14 @@ export default function SubscriptionDataForm() {
             value={formData.card_fee}
             onChange={handleNumericChange}
             autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-gray-400 rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-              transition-all duration-300 hover:border-blue-300 text-gray-800 placeholder-gray-400`}
+            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
+              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="هزینه ی کارت را وارد کنید"
           />
         </div>
         <div className="text-right">
-          <label className="block mb-2 text-sm font-semibold text-gray-700">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             تخفیف
           </label>
           <input
@@ -707,29 +712,29 @@ export default function SubscriptionDataForm() {
             value={formData.discount}
             onChange={handleNumericChange}
             autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-gray-400 rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-              transition-all duration-300 hover:border-blue-300 text-gray-800 placeholder-gray-400`}
+            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
+              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="مبلغ تخفیف را وارد کنید"
           />
         </div>
-        
+
         {/* Summary Fields */}
         <div className="col-span-full flex flex-row gap-24 w-full">
-          <div className="text-right w-full bg-lightGray p-4 rounded-xl">
-            <label className="block mb-2 text-sm font-semibold text-darkBlue">
+          <div className={`text-right w-full bg-${accent} p-4 rounded-xl`}>
+            <label className={`block mb-2 text-sm font-semibold text-${background}`}>
               شهریه
             </label>
-            <div className="text-lg font-bold text-darkBlue">
+            <div className={`text-lg font-bold text-${background}`}>
               {formatCurrency(formData.total_tuition)} تومان
             </div>
           </div>
 
-          <div className="text-right w-full bg-darkBlue p-4 rounded-xl">
-            <label className="block mb-2 text-sm font-semibold text-offWhite">
+          <div className={`text-right w-full bg-${primary}  p-4 rounded-xl`}>
+            <label className={`block mb-2 text-sm font-semibold text-${background}`}>
               مبلغ کل
             </label>
-            <div className="text-lg font-bold text-offWhite">
+            <div className={`text-lg font-bold text-${background}`}>
               {formatCurrency(formData.total_price)} تومان
             </div>
           </div>

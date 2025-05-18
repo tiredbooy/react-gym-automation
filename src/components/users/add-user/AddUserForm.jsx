@@ -9,6 +9,7 @@ import HandleAuthMethodInput from "./HandleAuthMethodInput";
 import FormDataInputs from "./FormDataInputs";
 import InsuranceDataInputs from "./InsuranceDataInputs";
 import SubscriptionDataForm from "./SubscriptionDataForm";
+import { useTheme } from "../../../context/ThemeContext";
 
 function AddUserForm({ onOpen }) {
   const [formData, setFormData] = useState({
@@ -26,6 +27,10 @@ function AddUserForm({ onOpen }) {
   });
   const [errors, setErrors] = useState({});
   const [hardwareData, setHardwareData] = useState(""); // Mock hardware data
+
+   const { activeTheme, themes } = useTheme();
+  const theme = themes[activeTheme];
+  const { primary, secondary, accent, background } = theme.colors;
 
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -90,7 +95,7 @@ function AddUserForm({ onOpen }) {
       transition={{ type: "spring", stiffness: 260, damping: 20 }}
       autoComplete="off"
       onSubmit={handleSubmit}
-      className="w-full mx-auto p-8 bg-gradient-to-tl from-beige rounded-xl mt-5"
+      className={`w-full mx-auto p-8 bg-gradient-to-tl from-${secondary} rounded-xl mt-5`}
     >
       <FormDataInputs
         formData={formData}
@@ -109,7 +114,7 @@ function AddUserForm({ onOpen }) {
             { value: false, label: "ندارد" },
           ]}
           label="بیمه ورزشی"
-          wrapperClass="card bg-beige p-4 rounded-xl"
+          wrapperClass={`card bg-${secondary} p-4 rounded-xl`}
           error={errors.hasInsurance}
         />
       </div>
@@ -124,7 +129,7 @@ function AddUserForm({ onOpen }) {
       )}
 
       {/* Combined Authentication Section */}
-      <div className="border-t border-gray-400 mt-8 pt-6 w-full">
+      <div className={`border-t border-${primary} mt-8 pt-6 w-full`}>
         <RadioGroup
           name="auth_method"
           value={formData.auth_method}
@@ -136,7 +141,7 @@ function AddUserForm({ onOpen }) {
             { value: "none", label: "هیچکدام" },
           ]}
           label="روش احراز هویت"
-          wrapperClass="card bg-beige p-4 rounded-xl"
+          wrapperClass={`card bg-${secondary} p-4 rounded-xl`}
           error={errors.auth_method}
         />
         <AnimatePresence>
@@ -149,8 +154,8 @@ function AddUserForm({ onOpen }) {
         </AnimatePresence>
       </div>
 
-      <div className="border-t border-gray-400 mt-8 pt-6 w-full flex flex-col gap-4">
-        <h2 className="text-center text-2xl font-bold text-nearBlack">
+      <div className={`border-t border-${primary} mt-8 pt-6 w-full flex flex-col gap-4`}>
+        <h2 className={`text-center text-2xl font-bold text-${primary}`}>
           اشتراک
         </h2>
 
@@ -161,7 +166,7 @@ function AddUserForm({ onOpen }) {
         <motion.button
           onClick={() => onOpen(isOpen => !isOpen)}
           type="button"
-          className="mt-8 w-full sm:w-auto flex justify-center bg-red-700 hover:bg-red-700/90 text-offWhite rounded-xl px-6 py-3"
+          className={`mt-8 w-full sm:w-auto flex justify-center bg-red-700 hover:bg-red-700/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 300 }}
@@ -170,7 +175,7 @@ function AddUserForm({ onOpen }) {
         </motion.button>
         <motion.button
           type="submit"
-          className="mt-8 w-full sm:w-auto flex justify-center bg-darkBlue hover:bg-darkBlue/90 text-offWhite rounded-xl px-6 py-3"
+          className={`mt-8 w-full sm:w-auto flex justify-center bg-${primary} hover:bg-${primary}/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 300 }}

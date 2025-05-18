@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Camera, Upload } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTheme } from "../../../context/ThemeContext";
 
 function UserProfilePicture() {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -11,6 +12,10 @@ function UserProfilePicture() {
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  const { activeTheme, themes } = useTheme();
+    const theme = themes[activeTheme];
+    const { primary, secondary, accent, background } = theme.colors;
 
   // Start webcam with debugging
   const startWebcam = async () => {
@@ -128,14 +133,14 @@ function UserProfilePicture() {
     <motion.div
       initial={{ y: -200, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className={`bg-beige rounded-xl p-6 flex flex-col items-center justify-center h-1/2 ${
-        dragActive ? "ring-2 ring-darkBlue" : ""
+      className={`bg-gradient-to-b from-${secondary} shadow-xl rounded-xl p-6 flex flex-col items-center justify-center h-1/2 ${
+        dragActive ? `ring-2 ring-${primary}` : ""
       }`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="mb-4 relative w-32 h-32 rounded-full overflow-hidden flex items-center justify-center bg-offWhite border-2 border-darkBlue">
+      <div className={`mb-4 relative w-32 h-32 rounded-full overflow-hidden flex items-center justify-center bg-${background} border-2 border-${primary}`}>
         {previewUrl ? (
           <img
             src={previewUrl}
@@ -143,7 +148,7 @@ function UserProfilePicture() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <Camera size={48} className="text-darkBlue opacity-70" />
+          <Camera size={48} className={`text-${primary} opacity-70`} />
         )}
       </div>
 
@@ -151,7 +156,7 @@ function UserProfilePicture() {
         {/* Webcam button */}
         <button
           onClick={handleWebcamClick}
-          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
+          className={`cursor-pointer bg-${primary} hover:bg-opacity-90 text-${background} font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2`}
         >
           <Camera size={24} />
           {/* <span className="">دوربین</span> */}
@@ -160,7 +165,7 @@ function UserProfilePicture() {
         {/* File upload button */}
         <button
           onClick={handleFileButtonClick}
-          className="cursor-pointer bg-darkBlue hover:bg-opacity-90 text-offWhite font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2"
+          className={`cursor-pointer bg-${primary} hover:bg-opacity-90 text-${background} font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2`}
         >
             <Upload size={24} />
           {/* <span className="">آپلود فایل</span> */}
@@ -177,7 +182,7 @@ function UserProfilePicture() {
         />
       </div>
 
-      <p className="mt-3 text-center text-xs text-darkBlue opacity-70">
+      <p className={`mt-3 text-center text-xs text-${accent} opacity-70`}>
         فرمت‌های قابل قبول: JPG، PNG، Avif , Webp
       </p>
 

@@ -59,7 +59,7 @@ function generateSafelistFromThemes(themes) {
   const classes = new Set();
 
   const utilities = ["bg", "text", "border", "ring", "shadow"];
-  const variants = ["", "hover", "focus"];
+  const variants = ["", "hover", "focus", "checked" , "ring"];
   const opacities = Array.from({ length: 9 }, (_, i) => `${(i + 1) * 10}`); // [10, 20, ..., 90]
   const gradientDirections = ["r", "l", "t", "b", "tr", "tl", "br", "bl"]; // Gradient directions
 
@@ -152,6 +152,14 @@ export default {
           background: "#F7F7F2",
         },
       },
+    },
+  },
+  variants: {
+    extend: {
+      backgroundColor: ["checked"],
+      borderColor: ["checked"],
+      ringColor: ["checked"],
+      boxShadow: ["checked"],
     },
   },
   safelist: generatedSafelist,
