@@ -1,30 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useTheme } from "../../context/ThemeContext";
+
+import AddUserModal from "./add-user/AddUserModal";
 import Pagination from "../reusables/Pagination";
 import UserPageHeader from "./Header";
 import UserTable from "./UsersTable";
-import AddUserModal from "./add-user/AddUserModal";
-import { useTheme } from "../../context/ThemeContext";
+import ViewUserModal from "./view-user/ViewUserModal";
+import Loader from "../reusables/Loader";
 import toast from "react-hot-toast";
 
-export default function UsersItem({}) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function UsersItem() {
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [isViewUserOpen, setIsViewUserOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
+
   const [users, setUsers] = useState([]);
   const [shift, setShift] = useState(
     JSON.parse(localStorage.getItem("shift")) || 2
   );
-  const [searchQuerys, setSearchQuerys] = useState({
+  const [searchQueries, setSearchQueries] = useState({
     person_name: "",
-    id: null,
+    person_id: null,
   });
-
   const [totalPage, setTotalPage] = useState(null);
 
   useEffect(() => {
-    async function getUserDatas() {
+    console.log("Selected Id :", selectedUserId);
+  }, [selectedUserId, isAddUserOpen]);
+
+  useEffect(() => {
+    async function fetchUserData() {
       try {
         setIsLoading(true);
         const queryParams = new URLSearchParams({
@@ -46,7 +55,6 @@ export default function UsersItem({}) {
             new Date(b.creation_datetime) - new Date(a.creation_datetime)
         );
 
-        // Preprocess user data to format base64 images
         const processedUsers = sortedData.map((user) => ({
           ...user,
           thumbnail_image: user.thumbnail_image
@@ -66,32 +74,72 @@ export default function UsersItem({}) {
         setUsers(processedUsers);
         setTotalPage(data?.total_pages);
       } catch (e) {
-        toast.error("متاسفانه هنگام دریافت اطلاعات خطایی رخ داد لحظاتی دیگر دوباره امتحان کنید!")
+        toast.error(
+          "متاسفانه هنگام دریافت اطلاعات خطایی رخ داد لحظاتی دیگر دوباره امتحان کنید!"
+        );
       } finally {
         setIsLoading(false);
       }
     }
 
-    getUserDatas();
+    fetchUserData();
   }, [shift, currentPage]);
 
-  useEffect(
-    () =>
-      console.log(
-        `Total Page : ${totalPage} And Current Page : ${currentPage}`
-      ),
-    [currentPage, totalPage]
-  );
+  useEffect(() => {
+    console.log(`Total Page : ${totalPage} And Current Page : ${currentPage}`);
+  }, [currentPage, totalPage]);
+
+  // 🔍 Filtering logic
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const normalize = (str) =>
+        str?.trim().replace(/\s+/g, " ").toLowerCase() || "";
+
+      const fullName = normalize(user.full_name);
+      const searchName = normalize(searchQueries.person_name);
+
+      const matchesName = searchName ? fullName.includes(searchName) : true;
+
+      const matchesId = searchQueries.id
+        ? String(user.id) === String(searchQueries.id)
+        : true;
+
+      return matchesName && matchesId;
+    });
+  }, [users, searchQueries]);
 
   return (
     <div className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
       <UserPageHeader
-        onAddUserModal={setIsOpen}
-        searchQuerys={searchQuerys}
-        onChangeSearchQuery={setSearchQuerys}
+        onAddUserModal={setIsAddUserOpen}
+        searchQueries={searchQueries}
+        onChangeSearchQuery={setSearchQueries}
       />
-      {isOpen && <AddUserModal isOpen={isOpen} onOpen={setIsOpen} />}
-      {isLoading ? <p>Loading ...</p> : <UserTable users={users} />}
+      {isAddUserOpen && (
+        <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
+      )}
+      {isViewUserOpen && (
+        <ViewUserModal
+          personId={selectedUserId} // or from your state
+          onCloseModal={() => setIsViewUserOpen(false)}
+        />
+      )}
+      {isLoading ? (
+        <Loader
+          color={`text-${theme.colors.accent}`}
+          textClassName={`text-xl`}
+          className={`justify-center px-4 py-6 rounded-xl bg-gradient-to-l from-${theme.colors.background} to-${theme.colors.secondary} brightness-75`}
+          size={26}
+        >
+          درحال بارگذاری
+        </Loader>
+      ) : (
+        <UserTable
+          users={filteredUsers}
+          onOpenViewUser={() => setIsViewUserOpen((isOpen) => !isOpen)}
+          onChangeSlectedUserId={setSelectedUserId}
+        />
+      )}
       <Pagination
         className="mt-5"
         currentPage={currentPage}

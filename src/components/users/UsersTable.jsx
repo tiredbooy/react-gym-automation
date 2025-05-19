@@ -2,13 +2,17 @@ import { Repeat, LogOut, Trash2, Eye, SquarePen } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
 
-export default function UserTable({ users }) {
+export default function UserTable({
+  users,
+  onOpenViewUser,
+  onChangeSlectedUserId,
+}) {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
   const { primary, secondary, accent, background } = theme.colors;
 
   return (
-    <div className={`h-[60vh] overflow-y-auto bg-${primary} rounded-lg`}>
+    <div className={`h-[60vh] overflow-y-auto bg-${background} rounded-lg`}>
       <table className="table w-full rounded-lg">
         {/* Head */}
         <thead
@@ -73,6 +77,10 @@ export default function UserTable({ users }) {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      onOpenViewUser();
+                      onChangeSlectedUserId(user.person_id);
+                    }}
                     className={`text-${primary} font-bold`}
                   >
                     <Eye size={18} />

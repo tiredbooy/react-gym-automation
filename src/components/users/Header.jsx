@@ -5,21 +5,16 @@ import { UserRoundPlus, Search, User } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
 
-export default function UserPageHeader({ onAddUserModal, users, setUsers }) {
+export default function UserPageHeader({
+  onAddUserModal,
+  searchQueries,
+  onChangeSearchQuery,
+}) {
   const [originalUsers, setOriginalUsers] = useState([]);
-  const [memberName, setMemberName] = useState("");
-  const [memberId, setMemberId] = useState(null);
-  
+
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
-  function handleMemeberName () {
-
-  }
-
-  function handleMemberId() {
-    
-  }
 
   return (
     <div className="flex flex-col gap-5 items-center py-4">
@@ -45,11 +40,13 @@ export default function UserPageHeader({ onAddUserModal, users, setUsers }) {
           whileFocus={{ scale: 1.02 }}
           className={`w-24 rounded-xl px-4 py-2 border border-${theme.colors.primary} bg-${theme.colors.background} text-${theme.colors.primary} placeholder:text-${theme.colors.primary} outline-none transition-all duration-300 focus:border-${theme.colors.primary} focus:ring-2 focus:ring-${theme.colors.primary}/60 shadow-sm`}
           placeholder="کد کاربر"
-          value={memberId}
-          onChange={(e) => {
-            const val = e.target.value;
-            setMemberId(val ? Number(val) : null);
-          }}
+          value={searchQueries.person_id || ""}
+          onChange={(e) =>
+            onChangeSearchQuery((prev) => ({
+              ...prev,
+              person_id: e.target.value ? Number(e.target.value) : null,
+            }))
+          }
         />
         <div className="relative w-full group">
           <Search
@@ -58,8 +55,13 @@ export default function UserPageHeader({ onAddUserModal, users, setUsers }) {
           <motion.input
             className={`w-full rounded-2xl pr-12 pl-4 py-2 border border-${theme.colors.primary} bg-${theme.colors.background} text-${theme.colors.primary} placeholder:text-${theme.colors.primary} outline-none transition-all duration-300 focus:border-${theme.colors.primary} focus:ring-4 focus:ring-${theme.colors.primary}/60 focus:ring-offset-0 shadow-sm focus:shadow-lg`}
             placeholder="جستجوی کاربران"
-            value={memberName}
-            onChange={(e) => setMemberName(e.target.value)}
+            value={searchQueries.person_name}
+            onChange={(e) =>
+              onChangeSearchQuery((prev) => ({
+                ...prev,
+                person_name: e.target.value,
+              }))
+            }
           />
         </div>
 
