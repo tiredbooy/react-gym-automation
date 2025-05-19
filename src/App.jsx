@@ -8,6 +8,7 @@ import { Payments } from "./pages/Payments";
 import LockerManagementPage from "./pages/LockerPage";
 import LogPage from "./pages/Logs";
 import SettingsPage from "./pages/Setting";
+import { Toaster } from "react-hot-toast";
 // import LogsPage from './pages/Logs';
 // import SettingsPage from './pages/Settings';
 
@@ -16,6 +17,8 @@ export default function App() {
   const theme = themes[activeTheme];
   return (
     <Router>
+      <Toaster position="top-center" />
+
       <div className="flex min-h-screen">
         {/* Static Sidebar */}
         <Sidebar />

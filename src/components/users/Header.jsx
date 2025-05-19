@@ -9,38 +9,17 @@ export default function UserPageHeader({ onAddUserModal, users, setUsers }) {
   const [originalUsers, setOriginalUsers] = useState([]);
   const [memberName, setMemberName] = useState("");
   const [memberId, setMemberId] = useState(null);
-
+  
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
-  // Save original users once
-  useEffect(() => {
-    if (users?.length > 0) {
-      setOriginalUsers(users);
-    }
-  }, [users]);
+  function handleMemeberName () {
 
-  useEffect(() => {
-    if (memberName || memberId) {
-      const filtered = originalUsers?.filter((user) => {
-        const normalizedFullName = user.full_name.replace(/\s+/g, " ").trim();
-        const normalizedQuery = memberName.replace(/\s+/g, " ").trim();
+  }
 
-        return (
-          (memberId && user.person_id === memberId) ||
-          (memberName && normalizedFullName.includes(normalizedQuery))
-        );
-      });
-
-      setUsers(filtered);
-    } else {
-      setUsers(originalUsers);
-    }
-  }, [memberName, memberId, originalUsers, setUsers]);
-
-  // useEffect(() => {
-  //   setUsers(filteredUsers?.length ? filteredUsers : users);
-  // }, [filteredUsers, users]);
+  function handleMemberId() {
+    
+  }
 
   return (
     <div className="flex flex-col gap-5 items-center py-4">
