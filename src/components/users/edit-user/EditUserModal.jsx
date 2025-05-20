@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../../../context/ThemeContext";
 import FormDataInputs from "../add-user/FormDataInputs";
@@ -6,7 +6,7 @@ import InsuranceDataInputs from "../add-user/InsuranceDataInputs";
 import SubscriptionDataForm from "../add-user/SubscriptionDataForm";
 import HandleAuthMethodInput from "../add-user/HandleAuthMethodInput";
 import RadioGroup from "../../reusables/RadioGroup";
-import { X, Save } from "lucide-react";
+import { X, Save, Camera, Upload } from "lucide-react";
 
 function EditUserModal({ onCloseModal, personId }) {
   const { activeTheme, themes } = useTheme();
@@ -16,6 +16,13 @@ function EditUserModal({ onCloseModal, personId }) {
   const [errors, setErrors] = useState({});
   const [hardwareData, setHardwareData] = useState("");
   const [imageSrc, setImageSrc] = useState(null);
+  const [showUploadOptions, setShowUploadOptions] = useState(false);
+  const [isWebcamActive, setIsWebcamActive] = useState(false);
+  const [webcamError, setWebcamError] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const streamRef = useRef(null);
 
   useEffect(() => {
     if (!personId) return;
@@ -45,6 +52,13 @@ function EditUserModal({ onCloseModal, personId }) {
         }
       })
       .catch(console.error);
+
+    // Cleanup webcam stream on component unmount
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
   }, [personId]);
 
   const handleInputChange = (name, value) => {
@@ -65,6 +79,65 @@ function EditUserModal({ onCloseModal, personId }) {
         default:
           setHardwareData("");
       }
+    }
+  };
+
+  const startWebcam = async () => {
+    try {
+      setWebcamError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setIsWebcamActive(true);
+        setShowUploadOptions(false);
+      }
+    } catch (err) {
+      setWebcamError(
+        "دسترسی به وب‌کم امکان‌پذیر نیست. لطفا دسترسی را بررسی کنید."
+      );
+      console.error("Webcam error:", err);
+    }
+  };
+
+  const captureImage = () => {
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext("2d");
+      canvasRef.current.width = videoRef.current.videoWidth;
+      canvasRef.current.height = videoRef.current.videoHeight;
+      context.drawImage(videoRef.current, 0, 0);
+      const base64Image = canvasRef.current.toDataURL("image/jpeg");
+      setImageSrc(base64Image);
+      setFormData((prev) => ({
+        ...prev,
+        person_image: base64Image.split(",")[1],
+      }));
+      stopWebcam();
+    }
+  };
+
+  const stopWebcam = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setIsWebcamActive(false);
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64Image = reader.result;
+        setImageSrc(base64Image);
+        setFormData((prev) => ({
+          ...prev,
+          person_image: base64Image.split(",")[1],
+        }));
+        setShowUploadOptions(false);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -102,6 +175,7 @@ function EditUserModal({ onCloseModal, personId }) {
         ins_end_date: formData.insurance_end,
         action: "update_person",
         person_id: formData.person_id,
+        person_image: formData.person_image || null, // Include Base64 image
       };
 
       fetch("http://localhost:8000/api/dynamic/", {
@@ -134,8 +208,8 @@ function EditUserModal({ onCloseModal, personId }) {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 50 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className={`bg-${background} text-${primary} rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mx-4 relative`}
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          className={`bg-${background} text-${primary} rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mx-4 relative`}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="p-6 md:p-8">
             {/* Header */}
@@ -161,15 +235,82 @@ function EditUserModal({ onCloseModal, personId }) {
 
             {/* Image Section */}
             {imageSrc && (
-              <div className="flex flex-col items-center mb-8">
-                <img
-                  src={imageSrc}
-                  alt="کاربر"
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg"
-                />
+              <div className="flex flex-col items-center mb-8 relative">
+                <div
+                  className="relative group cursor-pointer"
+                  onClick={() => setShowUploadOptions(true)}
+                >
+                  <img
+                    src={imageSrc}
+                    alt="کاربر"
+                    className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="text-white text-sm">تغییر تصویر</span>
+                  </div>
+                </div>
                 <p className="text-sm text-gray-500 mt-3">
                   ایجاد شده در: {formData.creation_datetime}
                 </p>
+
+                {/* Upload Options */}
+                <AnimatePresence>
+                  {showUploadOptions && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-24 mt-2 bg-white rounded-lg shadow-xl p-4 z-10"
+                    >
+                      <button
+                        onClick={startWebcam}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Camera size={18} /> وب‌کم
+                      </button>
+                      <button
+                        onClick={() => fileInputRef.current.click()}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Upload size={18} /> آپلود فایل
+                      </button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        className="hidden"
+                        onChange={handleFileUpload}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Webcam Capture */}
+            {isWebcamActive && (
+              <div className="flex flex-col items-center mb-8">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  className="w-64 h-48 rounded-lg border-2 border-gray-200"
+                />
+                <button
+                  onClick={captureImage}
+                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  ثبت تصویر
+                </button>
+                <button
+                  onClick={stopWebcam}
+                  className="mt-2 text-red-500 hover:text-red-700"
+                >
+                  لغو
+                </button>
+                {webcamError && (
+                  <p className="text-red-500 text-sm mt-2">{webcamError}</p>
+                )}
+                <canvas ref={canvasRef} className="hidden" />
               </div>
             )}
 
