@@ -6,6 +6,7 @@ export default function UserTable({
   users,
   onOpenViewUser,
   onChangeSlectedUserId,
+  onDeleting
 }) {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
@@ -103,6 +104,10 @@ export default function UserTable({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     className="text-red-500 font-bold"
+                    onClick={() => {
+                      onDeleting(isOpen => !isOpen)
+                      onChangeSlectedUserId(user.person_id)
+                    }}
                   >
                     <Trash2 size={18} />
                   </motion.button>

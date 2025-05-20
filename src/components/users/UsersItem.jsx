@@ -6,12 +6,16 @@ import Pagination from "../reusables/Pagination";
 import UserPageHeader from "./Header";
 import UserTable from "./UsersTable";
 import ViewUserModal from "./view-user/ViewUserModal";
+import EditUserModal from "./edit-user/EditUserModal";
 import Loader from "../reusables/Loader";
 import toast from "react-hot-toast";
+import DeleteModal from "../reusables/DeleteModal";
 
 export default function UsersItem() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -108,6 +112,29 @@ export default function UsersItem() {
     });
   }, [users, searchQueries]);
 
+  async function handleDelete() {
+    try {
+      setIsLoading(true);
+      const response = await fetch(
+        `http://localhost:8000/api/dynamic/?action=person&id=${selectedUserId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) return;
+      const data = await response.json();
+
+      console.log(data.items);
+
+      toast.success(`کاربر ${selectedUserId} با موفیقت حذف شد`);
+    } catch (e) {
+      console.log(e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <div className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
       <UserPageHeader
@@ -116,7 +143,7 @@ export default function UsersItem() {
         onChangeSearchQuery={setSearchQueries}
       />
       {isAddUserOpen && (
-        <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
+        <EditUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
       )}
       {isViewUserOpen && (
         <ViewUserModal
@@ -124,6 +151,24 @@ export default function UsersItem() {
           onCloseModal={() => setIsViewUserOpen(false)}
         />
       )}
+      {isDeleting && (
+        <DeleteModal
+          onClose={() => setIsDeleting(false)}
+          onConfirm={handleDelete}
+          title="آیا از حذف این آیتم مطمئن هستید؟"
+          isLoading={isLoading}
+        >
+          این عملیات غیرقابل بازگشت است. آیا مطمئن هستید که می‌خواهید ادامه
+          دهید؟
+        </DeleteModal>
+      )}
+      {isEditing && (
+        <EditUserModal
+          personId={selectedUserId} // or from your state
+          onCloseModal={() => setIsEditing(false)}
+        />
+      )}
+
       {isLoading ? (
         <Loader
           color={`text-${theme.colors.accent}`}
@@ -138,6 +183,7 @@ export default function UsersItem() {
           users={filteredUsers}
           onOpenViewUser={() => setIsViewUserOpen((isOpen) => !isOpen)}
           onChangeSlectedUserId={setSelectedUserId}
+          onDeleting={setIsDeleting}
         />
       )}
       <Pagination

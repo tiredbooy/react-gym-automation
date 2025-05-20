@@ -37,9 +37,6 @@ function ViewUserModal({ onCloseModal, personId }) {
         const userData = res.items?.[0];
         setUser(userData);
         setForm(userData);
-
-        console.log('UserData : ', userData);
-
         if (userData?.person_image) {
         //   setImageSrc(`data:image/jpeg;base64,${userData.image}`);
         setImageSrc(`data:image/jpeg;base64,${userData.person_image.replace(
@@ -110,20 +107,12 @@ function ViewUserModal({ onCloseModal, personId }) {
                 </button>
               </>
             ) : (
-              <>
-                <button
-                  onClick={() => setEditMode(true)}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-                >
-                  <Pencil size={18} /> ویرایش
-                </button>
                 <button
                   onClick={handleExportPDF}
                   className="flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                 >
                   <Download size={18} /> خروجی PDF
                 </button>
-              </>
             )}
             <button
               onClick={onCloseModal}
