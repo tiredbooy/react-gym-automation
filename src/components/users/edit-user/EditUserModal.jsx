@@ -106,9 +106,7 @@ function EditUserModal({ onCloseModal, personId }) {
 
       fetch("http://localhost:8000/api/dynamic/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       })
         .then((res) => res.json())
@@ -121,114 +119,123 @@ function EditUserModal({ onCloseModal, personId }) {
 
   return (
     <AnimatePresence>
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center"
         onClick={onCloseModal}
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-40"
-      />
-
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        className={`fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 bg-${background} text-${primary} rounded-3xl shadow-xl w-full max-w-5xl max-h-[95vh] overflow-hidden`}
       >
-        <div className="h-full overflow-y-auto p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">ویرایش اطلاعات کاربر</h2>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleSubmit}
-                className="flex items-center gap-1 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700"
-              >
-                <Save size={18} /> ذخیره
-              </button>
-              <button
-                onClick={onCloseModal}
-                className="text-red-500 hover:text-red-700"
-              >
-                <X size={28} />
-              </button>
+        {/* Modal */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 50 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className={`bg-${background} text-${primary} rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mx-4 relative`}
+          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+        >
+          <div className="p-6 md:p-8">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                ویرایش اطلاعات کاربر
+              </h2>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleSubmit}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md"
+                >
+                  <Save size={18} /> ذخیره
+                </button>
+                <button
+                  onClick={onCloseModal}
+                  className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
-          </div>
 
-          {imageSrc && (
-            <div className="flex flex-col justify-center items-center mb-6">
-              <img
-                src={imageSrc}
-                alt="کاربر"
-                className="w-32 h-32 rounded-xl border-2 border-gray-300 object-cover"
-              />
-              <p className="text-sm text-gray-500 mt-2">
-                ایجاد شده در: {formData.creation_datetime}
-              </p>
-            </div>
-          )}
+            {/* Image Section */}
+            {imageSrc && (
+              <div className="flex flex-col items-center mb-8">
+                <img
+                  src={imageSrc}
+                  alt="کاربر"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg"
+                />
+                <p className="text-sm text-gray-500 mt-3">
+                  ایجاد شده در: {formData.creation_datetime}
+                </p>
+              </div>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <FormDataInputs
-              formData={formData}
-              handleInputChange={handleInputChange}
-              errors={errors}
-            />
-
-            <RadioGroup
-              name="hasInsurance"
-              value={formData.hasInsurance}
-              onChange={(v) => handleInputChange("hasInsurance", v)}
-              options={[
-                { value: true, label: "دارد" },
-                { value: false, label: "ندارد" },
-              ]}
-              label="بیمه ورزشی"
-              wrapperClass={`card bg-${secondary} p-4 rounded-xl`}
-              error={errors.hasInsurance}
-            />
-
-            {formData.hasInsurance && (
-              <InsuranceDataInputs
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <FormDataInputs
                 formData={formData}
                 handleInputChange={handleInputChange}
                 errors={errors}
               />
-            )}
 
-            <div className={`border-t border-${primary} pt-6`}>
               <RadioGroup
-                name="auth_method"
-                value={formData.auth_method}
-                onChange={(v) => handleInputChange("auth_method", v)}
+                name="hasInsurance"
+                value={formData.hasInsurance}
+                onChange={(v) => handleInputChange("hasInsurance", v)}
                 options={[
-                  { value: "card", label: "کارت" },
-                  { value: "fingerprint", label: "اثر انگشت" },
-                  { value: "face", label: "چهره" },
-                  { value: "none", label: "هیچکدام" },
+                  { value: true, label: "دارد" },
+                  { value: false, label: "ندارد" },
                 ]}
-                label="روش احراز هویت"
-                wrapperClass={`card bg-${secondary} p-4 rounded-xl`}
-                error={errors.auth_method}
+                label="بیمه ورزشی"
+                wrapperClass={`card bg-${secondary} p-5 rounded-lg shadow-md`}
+                error={errors.hasInsurance}
               />
-              <AnimatePresence>
-                {formData.auth_method !== "none" && (
-                  <HandleAuthMethodInput
-                    hardwareData={hardwareData}
-                    formData={formData}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
 
-            <div className={`border-t border-${primary} pt-6`}>
-              <h3 className={`text-xl font-bold mb-4 text-${primary}`}>
-                تمدید اشتراک
-              </h3>
-              <SubscriptionDataForm />
-            </div>
-          </form>
-        </div>
+              {formData.hasInsurance && (
+                <InsuranceDataInputs
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  errors={errors}
+                />
+              )}
+
+              <div className={`border-t border-${primary}/20 pt-6`}>
+                <RadioGroup
+                  name="auth_method"
+                  value={formData.auth_method}
+                  onChange={(v) => handleInputChange("auth_method", v)}
+                  options={[
+                    { value: "card", label: "کارت" },
+                    { value: "fingerprint", label: "اثر انگشت" },
+                    { value: "face", label: "چهره" },
+                    { value: "none", label: "هیچکدام" },
+                  ]}
+                  label="روش احراز هویت"
+                  wrapperClass={`card bg-${secondary} p-5 rounded-lg shadow-md`}
+                  error={errors.auth_method}
+                />
+                <AnimatePresence>
+                  {formData.auth_method !== "none" && (
+                    <HandleAuthMethodInput
+                      hardwareData={hardwareData}
+                      formData={formData}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className={`border-t border-${primary}/20 pt-6`}>
+                <h3 className={`text-xl font-bold mb-4 text-${primary}`}>
+                  تمدید اشتراک
+                </h3>
+                <SubscriptionDataForm />
+              </div>
+            </form>
+          </div>
+        </motion.div>
       </motion.div>
     </AnimatePresence>
   );

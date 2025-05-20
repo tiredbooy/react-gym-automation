@@ -184,6 +184,7 @@ export default function UsersItem() {
           onOpenViewUser={() => setIsViewUserOpen((isOpen) => !isOpen)}
           onChangeSlectedUserId={setSelectedUserId}
           onDeleting={setIsDeleting}
+          onEdting={setIsEditing}
         />
       )}
       <Pagination
