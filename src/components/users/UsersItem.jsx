@@ -32,60 +32,58 @@ export default function UsersItem() {
   });
   const [totalPage, setTotalPage] = useState(null);
 
-  useEffect(() => {
-    console.log("Selected Id :", selectedUserId);
-  }, [selectedUserId, isAddUserOpen]);
+  // Inside your component
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true);
 
-  useEffect(() => {
-    async function fetchUserData() {
-      try {
-        setIsLoading(true);
-        const queryParams = new URLSearchParams({
-          action: "person",
-          gender: shift === 1 ? "M" : "F",
-          page: currentPage,
-          limit: "24",
-        });
+      const queryParams = new URLSearchParams({
+        action: "person",
+        order_by: "latest",
+        gender: shift === 1 ? "M" : "F",
+        page: currentPage,
+        limit: "24",
+      });
 
-        const response = await fetch(
-          `http://localhost:8000/api/dynamic/?${queryParams.toString()}`
-        );
-        const data = await response.json();
+      const response = await fetch(
+        `http://localhost:8000/api/dynamic/?${queryParams.toString()}`
+      );
+      const data = await response.json();
 
-        const items = data.items;
+      const items = data.items;
 
-        const sortedData = items?.sort(
-          (a, b) =>
-            new Date(b.creation_datetime) - new Date(a.creation_datetime)
-        );
+      const sortedData = items?.sort(
+        (a, b) => new Date(b.creation_datetime) - new Date(a.creation_datetime)
+      );
 
-        const processedUsers = sortedData.map((user) => ({
-          ...user,
-          thumbnail_image: user.thumbnail_image
-            ? `data:image/jpeg;base64,${user.thumbnail_image.replace(
-                /^.*\/9j\//,
-                "/9j/"
-              )}`
-            : null,
-          person_image: user.person_image
-            ? `data:image/jpeg;base64,${user.person_image.replace(
-                /^.*\/9j\//,
-                "/9j/"
-              )}`
-            : null,
-        }));
+      const processedUsers = sortedData.map((user) => ({
+        ...user,
+        thumbnail_image: user.thumbnail_image
+          ? `data:image/jpeg;base64,${user.thumbnail_image.replace(
+              /^.*\/9j\//,
+              "/9j/"
+            )}`
+          : null,
+        person_image: user.person_image
+          ? `data:image/jpeg;base64,${user.person_image.replace(
+              /^.*\/9j\//,
+              "/9j/"
+            )}`
+          : null,
+      }));
 
-        setUsers(processedUsers);
-        setTotalPage(data?.total_pages);
-      } catch (e) {
-        toast.error(
-          "متاسفانه هنگام دریافت اطلاعات خطایی رخ داد لحظاتی دیگر دوباره امتحان کنید!"
-        );
-      } finally {
-        setIsLoading(false);
-      }
+      setUsers(processedUsers);
+      setTotalPage(data?.total_pages);
+    } catch (e) {
+      toast.error(
+        "متاسفانه هنگام دریافت اطلاعات خطایی رخ داد لحظاتی دیگر دوباره امتحان کنید!"
+      );
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchUserData();
   }, [shift, currentPage]);
 
@@ -93,7 +91,6 @@ export default function UsersItem() {
     console.log(`Total Page : ${totalPage} And Current Page : ${currentPage}`);
   }, [currentPage, totalPage]);
 
-  // 🔍 Filtering logic
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const normalize = (str) =>
@@ -122,14 +119,19 @@ export default function UsersItem() {
         }
       );
 
-      if (!response.ok) return;
-      const data = await response.json();
+      if (!response.ok) {
+        toast.error("خطا در حذف کاربر");
+        return;
+      }
 
-      console.log(data.items);
+      toast.success(`کاربر ${selectedUserId} با موفقیت حذف شد`);
 
-      toast.success(`کاربر ${selectedUserId} با موفیقت حذف شد`);
+      setIsDeleting((isOpen) => !isOpen);
+
+      // 🔄 Refresh user list after successful deletion
+      await fetchUserData();
     } catch (e) {
-      console.log(e.message);
+      console.log("Fetch error:", e.message);
     } finally {
       setIsLoading(false);
     }
@@ -165,7 +167,10 @@ export default function UsersItem() {
       {isEditing && (
         <EditUserModal
           personId={selectedUserId} // or from your state
-          onCloseModal={() => setIsEditing(false)}
+          onCloseModal={() => {
+            setIsEditing(false);
+            fetchUserData();
+          }}
         />
       )}
 

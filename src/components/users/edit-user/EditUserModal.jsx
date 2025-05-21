@@ -69,12 +69,7 @@ function EditUserModal({ onCloseModal, personId }) {
         });
 
         if (data.person_image) {
-          setImageSrc(
-            `data:image/jpeg;base64,${data.person_image.replace(
-              /^.*\/9j\//,
-              "/9j/"
-            )}`
-          );
+          setImageSrc(`data:image/jpeg;base64,${data.person_image}`);
         }
       })
       .catch((err) => {
@@ -85,14 +80,26 @@ function EditUserModal({ onCloseModal, personId }) {
     return () => {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
       }
     };
   }, [personId]);
 
   const handleInputChange = (name, value) => {
+    const formattedValue =
+      name === "birth_date" && value?.toString
+        ? value.toString("YYYY/MM/DD", { calendar: "persian" })
+        : name === "gender"
+        ? value === "زن"
+          ? "F"
+          : value === "مرد"
+          ? "M"
+          : value
+        : value;
+
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: formattedValue,
       ...(name === "first_name" || name === "last_name"
         ? {
             full_name: `${prev.first_name || ""} ${
@@ -102,6 +109,7 @@ function EditUserModal({ onCloseModal, personId }) {
         : {}),
     }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
+
     if (name === "auth_method") {
       switch (value) {
         case "card":
@@ -122,10 +130,19 @@ function EditUserModal({ onCloseModal, personId }) {
   const startWebcam = async () => {
     try {
       setWebcamError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: 640, height: 480 },
+      });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.play().catch((err) => {
+          console.error("Video play error:", err);
+          setWebcamError(
+            "نمی‌توان ویدیو را پخش کرد. لطفا دسترسی را بررسی کنید."
+          );
+        });
+        console.log("Webcam stream started:", stream);
         setIsWebcamActive(true);
         setShowUploadOptions(false);
       }
@@ -151,6 +168,10 @@ function EditUserModal({ onCloseModal, personId }) {
         ...prev,
         person_image: base64Data,
       }));
+      console.log(
+        "Captured image Base64:",
+        base64Data.substring(0, 50) + "..."
+      );
       stopWebcam();
     }
   };
@@ -160,22 +181,42 @@ function EditUserModal({ onCloseModal, personId }) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     setIsWebcamActive(false);
   };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("لطفا یک فایل تصویری آپلود کنید");
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         const base64Image = reader.result;
-        const base64Data = base64Image.split(",")[1];
-        setImageSrc(base64Image);
-        setFormData((prev) => ({
-          ...prev,
-          person_image: base64Data,
-        }));
-        setShowUploadOptions(false);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          const jpegBase64 = canvas.toDataURL("image/jpeg").split(",")[1];
+          setImageSrc(`data:image/jpeg;base64,${jpegBase64}`);
+          setFormData((prev) => ({
+            ...prev,
+            person_image: jpegBase64,
+          }));
+          console.log(
+            "Uploaded image Base64:",
+            jpegBase64.substring(0, 50) + "..."
+          );
+          setShowUploadOptions(false);
+        };
+        img.src = base64Image;
       };
       reader.readAsDataURL(file);
     }
@@ -185,7 +226,6 @@ function EditUserModal({ onCloseModal, personId }) {
     e.preventDefault();
     const newErrors = {};
 
-    // Validate required fields
     if (!formData?.first_name) newErrors.first_name = "نام الزامی است";
     if (!formData?.last_name) newErrors.last_name = "نام خانوادگی الزامی است";
     if (!formData?.mobile) newErrors.mobile = "شماره تماس الزامی است";
@@ -198,6 +238,8 @@ function EditUserModal({ onCloseModal, personId }) {
     else if (!/^\d{4}\/\d{2}\/\d{2}$/.test(formData.birth_date))
       newErrors.birth_date = "فرمت تاریخ تولد باید YYYY/MM/DD باشد";
     if (!formData?.gender) newErrors.gender = "جنسیت الزامی است";
+    else if (!["M", "F"].includes(formData.gender))
+      newErrors.gender = "جنسیت باید مرد یا زن باشد";
     if (formData?.has_insurance) {
       if (!formData?.insurance_number)
         newErrors.insurance_number = "شماره بیمه الزامی است";
@@ -214,10 +256,8 @@ function EditUserModal({ onCloseModal, personId }) {
 
     if (Object.keys(newErrors).length === 0) {
       const payload = {
-        person_id: formData.person_id,
         first_name: formData.first_name,
         last_name: formData.last_name,
-        full_name: formData.full_name,
         national_code: formData.national_code,
         gender: formData.gender,
         mobile: formData.mobile,
@@ -238,10 +278,14 @@ function EditUserModal({ onCloseModal, personId }) {
         )
           .then(async (res) => {
             const responseData = await res.json();
+            console.log("API response:", responseData);
             if (!res.ok) {
-              throw new Error(
-                responseData.message || `HTTP ${res.status}: Bad Request`
-              );
+              const errorMessage = responseData.errors
+                ? Object.entries(responseData.errors)
+                    .map(([field, errors]) => `${field}: ${errors.join(", ")}`)
+                    .join("; ")
+                : responseData.message || `HTTP ${res.status}: Bad Request`;
+              throw new Error(errorMessage);
             }
             return responseData;
           })
@@ -353,31 +397,34 @@ function EditUserModal({ onCloseModal, personId }) {
                 </div>
               )}
 
-              {isWebcamActive && (
-                <div className="flex flex-col items-center mb-8">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    className="w-64 h-48 rounded-lg border-2 border-gray-200"
-                  />
-                  <button
-                    onClick={captureImage}
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                  >
-                    ثبت تصویر
-                  </button>
-                  <button
-                    onClick={stopWebcam}
-                    className="mt-2 text-red-500 hover:text-red-700"
-                  >
-                    لغو
-                  </button>
-                  {webcamError && (
-                    <p className="text-red-500 text-sm mt-2">{webcamError}</p>
-                  )}
-                  <canvas ref={canvasRef} className="hidden" />
-                </div>
-              )}
+              <div
+                className="flex flex-col items-center mb-8"
+                style={{ display: isWebcamActive ? "flex" : "none" }}
+              >
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-64 h-48 rounded-lg border-2 border-gray-200 bg-black object-cover"
+                />
+                <button
+                  onClick={captureImage}
+                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  ثبت تصویر
+                </button>
+                <button
+                  onClick={stopWebcam}
+                  className="mt-2 text-red-500 hover:text-red-700"
+                >
+                  لغو
+                </button>
+                {webcamError && (
+                  <p className="text-red-500 text-sm mt-2">{webcamError}</p>
+                )}
+                <canvas ref={canvasRef} className="hidden" />
+              </div>
 
               <form onSubmit={handleSubmit} className="space-y-8">
                 <FormDataInputs

@@ -4,7 +4,9 @@ function SubscriptionDataForm({ formData, handleInputChange, errors }) {
   return (
     <div className="bg-gradient-to-l from-gray-100 to-gray-50 shadow rounded-xl p-6 space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700">نام تیم</label>
+        <label className="block text-sm font-medium text-gray-700">
+          نام تیم
+        </label>
         <input
           type="text"
           name="team_name"
