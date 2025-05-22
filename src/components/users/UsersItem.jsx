@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useTheme } from "../../context/ThemeContext";
 
 import AddUserModal from "./add-user/AddUserModal";
@@ -19,6 +19,7 @@ export default function UsersItem() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const searchRef = useRef();
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
@@ -32,6 +33,13 @@ export default function UsersItem() {
   });
   const [totalPage, setTotalPage] = useState(null);
 
+ function handleKeyDown(e) {
+  if (e.key === 'Enter') {
+    console.log('Working');
+    searchRef.current?.focus();
+  }
+}
+
   // Inside your component
   const fetchUserData = async () => {
     try {
@@ -40,7 +48,7 @@ export default function UsersItem() {
       const queryParams = new URLSearchParams({
         action: "person",
         order_by: "latest",
-        gender: shift === 1 ? "M" : "F",
+        gender: "M",
         page: currentPage,
         limit: "24",
       });
@@ -138,8 +146,9 @@ export default function UsersItem() {
   }
 
   return (
-    <div className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
+    <div tabIndex={0} onKeyDown={(e) => handleKeyDown(e)} className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
       <UserPageHeader
+        searchRef={searchRef}
         onAddUserModal={setIsAddUserOpen}
         searchQueries={searchQueries}
         onChangeSearchQuery={setSearchQueries}

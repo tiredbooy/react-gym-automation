@@ -154,8 +154,8 @@ export default function FormDataInputs({
           <option value="" disabled>
             جنسیت را انتخاب کنید
           </option>
-          <option value="male">مرد</option>
-          <option value="female">زن</option>
+          <option value="M">مرد</option>
+          <option value="F">زن</option>
         </select>
         {errors.gender && (
           <p className="text-errorRed text-xs mt-1 text-right">
