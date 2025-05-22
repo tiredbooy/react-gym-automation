@@ -59,7 +59,7 @@ function generateSafelistFromThemes(themes) {
   const classes = new Set();
 
   const utilities = ["bg", "text", "border", "ring", "shadow"];
-  const variants = ["", "hover", "focus", "checked" , "ring"];
+  const variants = ["", "hover", "focus", "checked", "ring"];
   const opacities = Array.from({ length: 9 }, (_, i) => `${(i + 1) * 10}`); // [10, 20, ..., 90]
   const gradientDirections = ["r", "l", "t", "b", "tr", "tl", "br", "bl"]; // Gradient directions
 
@@ -134,11 +134,12 @@ export default {
         successGreen: "#4CAF50",
         errorRed: "#F44336",
         fiery: {
-          primary: "#E63946",
-          secondary: "#F9C74F",
-          accent: "#073B4C",
-          background: "#F8F9FA",
+          primary: "#D7263D", // deeper, refined crimson — bold but modern
+          secondary: "#FF924C", // rich sunset orange — warmth with elegance
+          accent: "#6A040F", // dark red wine — moody, powerful grounding tone
+          background: "#FFF3E4", // soft peachy-beige — warm and inviting
         },
+
         dark: {
           primary: "#6C63FF",
           secondary: "#2A2A2A",
@@ -146,10 +147,10 @@ export default {
           background: "#121212",
         },
         nature: {
-          primary: "#2A9D8F",
-          secondary: "#E9C46A",
-          accent: "#264653",
-          background: "#F7F7F2",
+          primary: "#3a5a40", // moss green (rich, clean)
+          secondary: "#a3b18a", // soft sage (balancing, calming)
+          accent: "#588157", // muted olive (great for buttons/icons)
+          background: "#dad7cd", // pale stone (light, elegant backdrop)
         },
       },
     },
