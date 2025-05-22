@@ -33,12 +33,11 @@ export default function UsersItem() {
   });
   const [totalPage, setTotalPage] = useState(null);
 
- function handleKeyDown(e) {
-  if (e.key === 'Enter') {
-    console.log('Working');
-    searchRef.current?.focus();
+  function handleKeyDown(e) {
+    if (e.key === "Enter") {
+      searchRef.current?.focus();
+    }
   }
-}
 
   // Inside your component
   const fetchUserData = async () => {
@@ -146,7 +145,11 @@ export default function UsersItem() {
   }
 
   return (
-    <div tabIndex={0} onKeyDown={(e) => handleKeyDown(e)} className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
+    <div
+      tabIndex={0}
+      onKeyDown={(e) => handleKeyDown(e)}
+      className={`bg-${theme.colors.background} py-12 px-8 text-center`}
+    >
       <UserPageHeader
         searchRef={searchRef}
         onAddUserModal={setIsAddUserOpen}

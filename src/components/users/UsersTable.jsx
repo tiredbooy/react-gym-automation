@@ -7,7 +7,7 @@ export default function UserTable({
   onOpenViewUser,
   onChangeSlectedUserId,
   onDeleting,
-  onEdting
+  onEdting,
 }) {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
@@ -35,6 +35,10 @@ export default function UserTable({
           {users.map((user, index) => (
             <tr
               key={index}
+              onDoubleClick={() => {
+                onChangeSlectedUserId(user.person_id)
+                onOpenViewUser()
+              }}
               className={`bg-${secondary} text-${accent} hover:bg-${background} hover:brightness-110 transition duration-150`}
             >
               <td className="py-4 px-2">{index + 1}</td>
