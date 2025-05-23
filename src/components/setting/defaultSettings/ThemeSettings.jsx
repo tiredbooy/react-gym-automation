@@ -3,11 +3,15 @@ import { useTheme } from "../../../context/ThemeContext";
 
 function ThemeSettings() {
   const { activeTheme, setActiveTheme, themes } = useTheme();
-  const theme = themes[activeTheme];
+  const theme = themes[activeTheme] || themes.classic; // Fallback to classic if activeTheme is undefined
 
   return (
     <div
-      className={`bg-gradient-to-b from-${theme.colors.secondary} to-${theme.colors.background} mt-8 rounded-2xl p-8 shadow-xl`}
+      className={`bg-gradient-to-b from-${
+        theme.gradientColors?.from || theme.colors.secondary
+      } to-${
+        theme.gradientColors?.to || theme.colors.background
+      } mt-8 rounded-2xl p-8 shadow-xl`}
     >
       <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>
         تنظیمات تم
@@ -17,10 +21,11 @@ function ThemeSettings() {
       </p>
 
       <div className="flex flex-wrap gap-6 justify-center">
-        {Object.keys(themes).map((themeKey, idx) => (
+        {Object.entries(themes).map(([themeKey, themeData], idx) => (
           <ThemeCard
-            key={idx}
-            theme={themes[themeKey]}
+            key={themeKey} // Use themeKey for uniqueness
+            theme={themeData}
+            themeKey={themeKey}
             isActive={activeTheme === themeKey}
             onClick={() => setActiveTheme(themeKey)}
           />
@@ -30,29 +35,7 @@ function ThemeSettings() {
   );
 }
 
-function ThemeCard({ theme, isActive, onClick }) {
-  // Map theme colors to Tailwind-compatible classes or hex for inline styles
-  const colorMap = {
-    darkBlue: "#123458",
-    beige: "#D4C9BE",
-    nearBlack: "#030303",
-    offWhite: "#F1EFEC",
-    successGreen: "#28A745",
-    errorRed: "#DC3545",
-    "fiery-primary": "#E63946",
-    "fiery-secondary": "#F9C74F",
-    "fiery-accent": "#073B4C",
-    "fiery-background": "#F8F9FA",
-    "dark-primary": "#6C63FF",
-    "dark-secondary": "#2A2A2A",
-    "dark-accent": "#00F5D4",
-    "dark-background": "#121212",
-    "nature-primary": "#2A9D8F",
-    "nature-secondary": "#E9C46A",
-    "nature-accent": "#264653",
-    "nature-background": "#F7F7F2",
-  };
-
+function ThemeCard({ theme, themeKey, isActive, onClick }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -65,10 +48,7 @@ function ThemeCard({ theme, isActive, onClick }) {
       } shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer`}
       onClick={onClick}
     >
-      <div
-        className="h-24 w-full relative"
-        style={{ backgroundColor: colorMap[theme.colors.primary] }}
-      >
+      <div className={`h-24 w-full bg-${theme.colors.primary} relative`}>
         {isActive && (
           <motion.div
             className="absolute right-3 top-3 text-white opacity-90"
@@ -103,22 +83,22 @@ function ThemeCard({ theme, isActive, onClick }) {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <ColorOrb
-              color={colorMap[theme.colors.primary]}
+              colorClass={`bg-${theme.colors.primary}`}
               index={0}
               isActive={isActive}
             />
             <ColorOrb
-              color={colorMap[theme.colors.secondary]}
+              colorClass={`bg-${theme.colors.secondary}`}
               index={1}
               isActive={isActive}
             />
             <ColorOrb
-              color={colorMap[theme.colors.accent]}
+              colorClass={`bg-${theme.colors.accent}`}
               index={2}
               isActive={isActive}
             />
             <ColorOrb
-              color={colorMap[theme.colors.background]}
+              colorClass={`bg-${theme.colors.background}`}
               index={3}
               isActive={isActive}
             />
@@ -127,8 +107,7 @@ function ThemeCard({ theme, isActive, onClick }) {
       </div>
       <div className="pt-8 pb-6 px-6">
         <h3
-          className="font-bold text-lg text-center mb-1"
-          style={{ color: colorMap[theme.colors.primary] }}
+          className={`font-bold text-lg text-center text-${theme.colors.primary} mb-1`}
         >
           {theme.name}
         </h3>
@@ -158,19 +137,12 @@ function ThemeCard({ theme, isActive, onClick }) {
   );
 }
 
-function ColorOrb({ color, index, isActive }) {
+function ColorOrb({ colorClass, index, isActive }) {
   const offsetY = index % 2 === 0 ? -4 : 4;
 
   return (
     <motion.div
-      style={{
-        backgroundColor: color,
-        border:
-          color === "#F1EFEC" || color === "#F8F9FA" || color === "#F7F7F2"
-            ? "1px solid #e0e0e0"
-            : "none",
-      }}
-      className="w-12 h-12 rounded-full shadow-lg mx-[-8px]"
+      className={`w-12 h-12 rounded-full shadow-lg mx-[-8px] ${colorClass}`}
       initial={{ y: 0 }}
       animate={{
         y: isActive ? offsetY : 0,

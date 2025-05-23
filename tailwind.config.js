@@ -40,6 +40,18 @@ const themes = {
       to: "dark-background",
     },
   },
+  solara: {
+    colors: {
+      primary: "solara-primary",
+      secondary: "solara-secondary",
+      accent: "solara-accent",
+      background: "solara-background",
+    },
+    gradientColors: {
+      from: "solara-secondary",
+      to: "solara-background",
+    },
+  },
   nature: {
     colors: {
       primary: "nature-primary",
@@ -52,6 +64,18 @@ const themes = {
       to: "nature-background",
     },
   },
+  ocean: {
+    colors: {
+      primary: "ocean-primary",
+      secondary: "ocean-secondary",
+      accent: "ocean-accent",
+      background: "ocean-background",
+    },
+    gradientColors: {
+      from: "ocean-secondary",
+      to: "ocean-background",
+    },
+  },
 };
 
 /** Helper to generate safelist entries for Tailwind variants */
@@ -61,7 +85,7 @@ function generateSafelistFromThemes(themes) {
   const utilities = ["bg", "text", "border", "ring", "shadow"];
   const variants = ["", "hover", "focus", "checked", "ring"];
   const opacities = Array.from({ length: 9 }, (_, i) => `${(i + 1) * 10}`); // [10, 20, ..., 90]
-  const gradientDirections = ["r", "l", "t", "b", "tr", "tl", "br", "bl"]; // Gradient directions
+  const gradientDirections = ["r", "l", "t", "b", "tr", "tl", "br", "bl"];
 
   Object.values(themes).forEach((theme) => {
     const { colors = {}, gradientColors = {} } = theme;
@@ -73,7 +97,6 @@ function generateSafelistFromThemes(themes) {
           const base = `${util}-${color}`;
           classes.add(variant ? `${variant}:${base}` : base);
 
-          // Add opacity variants for bg-* (e.g., bg-color/50)
           if (util === "bg") {
             opacities.forEach((opacity) => {
               classes.add(
@@ -84,9 +107,7 @@ function generateSafelistFromThemes(themes) {
         });
       });
 
-      // Add gradient-related classes for each color
       gradientDirections.forEach((dir) => {
-        // Add bg-gradient-to-* class
         classes.add(`bg-gradient-to-${dir}`);
         variants.forEach((variant) => {
           classes.add(
@@ -96,7 +117,6 @@ function generateSafelistFromThemes(themes) {
           );
         });
 
-        // Add from-*, to-*, and via-* classes for the color
         classes.add(`from-${color}`);
         classes.add(`to-${color}`);
         classes.add(`via-${color}`);
@@ -108,7 +128,6 @@ function generateSafelistFromThemes(themes) {
       });
     });
 
-    // Add gradientColors classes (if still needed)
     if (gradientColors.from) classes.add(`from-${gradientColors.from}`);
     if (gradientColors.to) classes.add(`to-${gradientColors.to}`);
     if (gradientColors.via) classes.add(`via-${gradientColors.via}`);
@@ -134,12 +153,11 @@ export default {
         successGreen: "#4CAF50",
         errorRed: "#F44336",
         fiery: {
-          primary: "#D7263D", // deeper, refined crimson — bold but modern
-          secondary: "#FF924C", // rich sunset orange — warmth with elegance
-          accent: "#6A040F", // dark red wine — moody, powerful grounding tone
-          background: "#FFF3E4", // soft peachy-beige — warm and inviting
+          primary: "#D7263D",
+          secondary: "#FF924C",
+          accent: "#6A040F",
+          background: "#FFF3E4",
         },
-
         dark: {
           primary: "#6C63FF",
           secondary: "#2A2A2A",
@@ -147,10 +165,22 @@ export default {
           background: "#121212",
         },
         nature: {
-          primary: "#3a5a40", // moss green (rich, clean)
-          secondary: "#a3b18a", // soft sage (balancing, calming)
-          accent: "#588157", // muted olive (great for buttons/icons)
-          background: "#dad7cd", // pale stone (light, elegant backdrop)
+          primary: "#3a5a40",
+          secondary: "#a3b18a",
+          accent: "#588157",
+          background: "#dad7cd",
+        },
+        solara: {
+          primary: "#eb5e28",
+          secondary: "#ccc5b9",
+          accent: "#252422",
+          background: "#fffcf2",
+        },
+        ocean: {
+          primary: "#1A759F",
+          secondary: "#34A0A4",
+          accent: "#168AAD",
+          background: "#E6F4FA",
         },
       },
     },

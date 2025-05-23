@@ -55,6 +55,21 @@ export function ThemeProvider({ children }) {
         to: "dark-background",
       },
     },
+    solara: {
+      name: "سولارا",
+      description: "تم سولارا",
+      isDark: false,
+      colors: {
+        primary: "solara-primary",
+        secondary: "solara-secondary",
+        accent: "solara-accent",
+        background: "solara-background",
+      },
+      gradientColors: {
+        from: "solara-secondary",
+        to: "solara-background",
+      },
+    },
     nature: {
       name: "طبیعت",
       description: "الهام گرفته از طبیعت",
@@ -70,11 +85,27 @@ export function ThemeProvider({ children }) {
         to: "nature-background",
       },
     },
+    ocean: {
+      name: "اقیانوس",
+      description: "تم الهام گرفته از اقیانوس",
+      isDark: false,
+      colors: {
+        primary: "ocean-primary",
+        secondary: "ocean-secondary",
+        accent: "ocean-accent",
+        background: "ocean-background",
+      },
+      gradientColors: {
+        from: "ocean-secondary",
+        to: "ocean-background",
+      },
+    },
   };
 
   useEffect(() => {
     localStorage.setItem("theme", activeTheme);
-    document.body.className = themes[activeTheme].colors.background;
+    document.body.className =
+      themes[activeTheme]?.colors.background || "offWhite";
   }, [activeTheme]);
 
   return (
