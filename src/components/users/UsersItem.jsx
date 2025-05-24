@@ -10,12 +10,14 @@ import EditUserModal from "./edit-user/EditUserModal";
 import Loader from "../reusables/Loader";
 import toast from "react-hot-toast";
 import DeleteModal from "../reusables/DeleteModal";
+import SubscriptionRenewalModal from "./extension/ExtendSubscriptionModal";
 
 export default function UsersItem() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isRenewal, setIsRenewal] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -144,6 +146,18 @@ export default function UsersItem() {
     }
   }
 
+  async function handleRenewal() {
+    try {
+      const response = await fetchUserData(`http://localhost:8000/api/dynamic/?action=person&id=${selectedUserId}`);
+      const data = await response.json();
+
+      console.log(data);
+    }
+    catch(e) {
+      console.log(e.meesage);
+    }
+  }
+
   return (
     <div
       tabIndex={0}
@@ -176,6 +190,9 @@ export default function UsersItem() {
           دهید؟
         </DeleteModal>
       )}
+
+      {isRenewal && <SubscriptionRenewalModal onSubmitUser={handleRenewal} onClose={() => setIsRenewal(isOpen => !isOpen)} />}
+
       {isEditing && (
         <EditUserModal
           personId={selectedUserId} // or from your state
@@ -202,6 +219,7 @@ export default function UsersItem() {
           onChangeSlectedUserId={setSelectedUserId}
           onDeleting={setIsDeleting}
           onEdting={setIsEditing}
+          onRenewal={setIsRenewal}
         />
       )}
       <Pagination

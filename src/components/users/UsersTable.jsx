@@ -8,6 +8,7 @@ export default function UserTable({
   onChangeSlectedUserId,
   onDeleting,
   onEdting,
+  onRenewal,
 }) {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
@@ -36,8 +37,8 @@ export default function UserTable({
             <tr
               key={index}
               onDoubleClick={() => {
-                onChangeSlectedUserId(user.person_id)
-                onOpenViewUser()
+                onChangeSlectedUserId(user.person_id);
+                onOpenViewUser();
               }}
               className={`bg-${secondary} text-${accent} hover:bg-${background} hover:brightness-110 transition duration-150`}
             >
@@ -95,6 +96,11 @@ export default function UserTable({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     className="text-green-500 font-bold"
+                    onClick={() => {
+                      onRenewal((isOpen) => !isOpen);
+                      onChangeSlectedUserId(user.person_id);
+                      console.log("User ID : ", user.person_id);
+                    }}
                   >
                     <Repeat size={18} />
                   </motion.button>
@@ -103,8 +109,8 @@ export default function UserTable({
                     whileTap={{ scale: 0.9 }}
                     className="text-yellow-500 font-bold"
                     onClick={() => {
-                      onEdting(isOpen => !isOpen);
-                      onChangeSlectedUserId(user.person_id)
+                      onEdting((isOpen) => !isOpen);
+                      onChangeSlectedUserId(user.person_id);
                     }}
                   >
                     <SquarePen size={18} />
