@@ -176,11 +176,12 @@ export default {
           accent: "#252422",
           background: "#fffcf2",
         },
-        ocean: {
-          primary: "#1A759F",
-          secondary: "#34A0A4",
-          accent: "#168AAD",
-          background: "#E6F4FA",
+        serenity: {
+          primary: "#353535", 
+          secondary: "#FFFFFF", 
+          accent: "#284B63", 
+          highlight: "#3C6E71", 
+          background: "#D9D9D9",
         },
       },
     },

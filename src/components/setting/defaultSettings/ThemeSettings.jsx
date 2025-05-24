@@ -4,7 +4,7 @@ import { useTheme } from "../../../context/ThemeContext";
 function ThemeSettings() {
   const { activeTheme, setActiveTheme, themes } = useTheme();
   const theme = themes[activeTheme] || themes.classic; // Fallback to classic if activeTheme is undefined
-
+  console.log(theme);
   return (
     <div
       className={`bg-gradient-to-b from-${
@@ -40,6 +40,7 @@ function ThemeCard({ theme, themeKey, isActive, onClick }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      key={themeKey}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className={`w-64 rounded-xl overflow-hidden bg-${
         theme.colors.background

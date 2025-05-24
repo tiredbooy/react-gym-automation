@@ -85,19 +85,20 @@ export function ThemeProvider({ children }) {
         to: "nature-background",
       },
     },
-    ocean: {
-      name: "اقیانوس",
-      description: "تم الهام گرفته از اقیانوس",
+    serenity: {
+      name: "سرنیتی", // Serenity in Persian
+      description: "تمی با الهام از آرامش و رنگ‌های ملایم", // "A theme inspired by serenity and soft colors"
       isDark: false,
       colors: {
-        primary: "ocean-primary",
-        secondary: "ocean-secondary",
-        accent: "ocean-accent",
-        background: "ocean-background",
+        primary: "serenity-primary", // #353535
+        secondary: "serenity-secondary", // #FFFFFF
+        accent: "serenity-accent", // #284B63
+        highlight: "serenity-highlight", // #3C6E71
+        background: "serenity-background", // #D9D9D9
       },
       gradientColors: {
-        from: "ocean-secondary",
-        to: "ocean-background",
+        from: "serenity-secondary", // #FFFFFF
+        to: "serenity-background", // #D9D9D9
       },
     },
   };
