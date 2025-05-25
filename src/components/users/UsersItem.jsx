@@ -10,7 +10,7 @@ import EditUserModal from "./edit-user/EditUserModal";
 import Loader from "../reusables/Loader";
 import toast from "react-hot-toast";
 import DeleteModal from "../reusables/DeleteModal";
-import SubscriptionRenewalModal from "./extension/ExtendSubscriptionModal";
+import SubscriptionRenewalModal from "./renewal/SubscriptionRenewal";
 
 export default function UsersItem() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
