@@ -101,6 +101,53 @@ export function ThemeProvider({ children }) {
         to: "serenity-background", // #D9D9D9
       },
     },
+    softDusk: {
+      name: "غروب نرم", // Soft Dusk
+      description: "تمی الهام گرفته از رنگ‌های گرم و ملایم غروب", // A theme inspired by the warm, soft colors of dusk
+      isDark: false,
+      colors: {
+        primary: "softdusk-primary", // #B7C4CF
+        secondary: "softdusk-secondary", // #EEE3CB
+        accent: "softdusk-accent", // #D7C0AE
+        highlight: "softdusk-highlight", // #967E76
+        background: "softdusk-background", // #EEE3CB
+      },
+      gradientColors: {
+        from: "softdusk-secondary", // #EEE3CB
+        to: "softdusk-accent", // #D7C0AE
+      },
+    },
+    dream: {
+      name: "رؤیا", // Dream
+      description: "تمی الهام گرفته از رویاهای نرم و رنگ‌های آسمانی", // A theme inspired by soft dreams and celestial colors
+      isDark: false,
+      colors: {
+        primary: "dream-primary", // #E6D8F2
+        secondary: "dream-secondary", // #F2E8F6
+        accent: "dream-accent", // #C3A6D9
+        background: "dream-background", // #F2E8F6
+      },
+      gradientColors: {
+        from: "dream-secondary", // #F2E8F6
+        to: "dream-accent", // #C3A6D9
+      },
+    },
+    ember: {
+      name: "اخگر",
+      description: "تمی الهام گرفته از گرمای ملایم و رنگ‌های پرشور",
+      isDark: false,
+      colors: {
+        primary: "ember-primary", // #B7C4CF
+        secondary: "ember-secondary", // #EEE3CB
+        accent: "ember-accent", // #D7C0AE
+        highlight: "ember-highlight", // #967E76
+        background: "ember-background", // #EEE3CB
+      },
+      gradientColors: {
+        from: "ember-scondary", 
+        to: "ember-background", 
+      },
+    },
   };
 
   useEffect(() => {

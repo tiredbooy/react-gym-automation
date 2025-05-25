@@ -4,7 +4,7 @@ import { useTheme } from "../../../context/ThemeContext";
 function ThemeSettings() {
   const { activeTheme, setActiveTheme, themes } = useTheme();
   const theme = themes[activeTheme] || themes.classic; // Fallback to classic if activeTheme is undefined
-  console.log(theme);
+  
   return (
     <div
       className={`bg-gradient-to-b from-${

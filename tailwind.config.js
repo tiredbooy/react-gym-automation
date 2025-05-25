@@ -64,16 +64,55 @@ const themes = {
       to: "nature-background",
     },
   },
-  ocean: {
+  serenity: {
     colors: {
-      primary: "ocean-primary",
-      secondary: "ocean-secondary",
-      accent: "ocean-accent",
-      background: "ocean-background",
+      primary: "serenity-primary", // #353535
+      secondary: "serenity-secondary", // #FFFFFF
+      accent: "serenity-accent", // #284B63
+      highlight: "serenity-highlight", // #3C6E71
+      background: "serenity-background", // #D9D9D9
     },
     gradientColors: {
-      from: "ocean-secondary",
-      to: "ocean-background",
+      from: "serenity-secondary", // #FFFFFF
+      to: "serenity-background", // #D9D9D9
+    },
+  },
+  softDusk: {
+    colors: {
+      primary: "softdusk-primary", // #B7C4CF
+      secondary: "softdusk-secondary", // #EEE3CB
+      accent: "softdusk-accent", // #D7C0AE
+      highlight: "softdusk-highlight", // #967E76
+      background: "softdusk-background", // #EEE3CB
+    },
+    gradientColors: {
+      from: "softdusk-secondary", // #EEE3CB
+      to: "softdusk-accent", // #D7C0AE
+    },
+  },
+  dream: {
+    colors: {
+      primary: "dream-primary", // #E6D8F2
+      secondary: "dream-secondary", // #F2E8F6
+      accent: "dream-accent", // #C3A6D9
+      background: "dream-background", // #F2E8F6
+    },
+    gradientColors: {
+      from: "dream-secondary", // #F2E8F6
+      to: "dream-accent", // #C3A6D9
+    },
+  },
+  ember: {
+    colors: {
+      primary: "ember-primary", // #B7C4CF
+      secondary: "ember-secondary", // #EEE3CB
+      accent: "ember-accent", // #D7C0AE
+      highlight: "ember-highlight", // #967E76
+      background: "ember-background", // #EEE3CB
+    },
+    gradientColors: {
+      from: "ember-scondary",
+      to: "ember-background",
     },
   },
 };
@@ -177,11 +216,29 @@ export default {
           background: "#fffcf2",
         },
         serenity: {
-          primary: "#353535", 
-          secondary: "#FFFFFF", 
-          accent: "#284B63", 
-          highlight: "#3C6E71", 
+          primary: "#353535",
+          secondary: "#FFFFFF",
+          accent: "#284B63",
+          highlight: "#3C6E71",
           background: "#D9D9D9",
+        },
+        softdusk: {
+          primary: "#FAF3E0",
+          secondary: "#EABF9F",
+          accent: "#1E212D",
+          background: "#B68973",
+        },
+        dream: {
+          primary: "#A68BC1",
+          secondary: "#E6D8F2",
+          accent: "#C3A6D9",
+          background: "#F2E8F6",
+        },
+        ember: {
+          primary: "#3E4149",
+          secondary: "#FFC8C8",
+          accent: "#444F5A",
+          background: "#FF9999",
         },
       },
     },
