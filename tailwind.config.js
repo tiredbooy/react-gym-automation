@@ -253,4 +253,7 @@ export default {
   },
   safelist: generatedSafelist,
   plugins: [daisyui],
+  daisyui: {
+    themes: false,
+  },
 };

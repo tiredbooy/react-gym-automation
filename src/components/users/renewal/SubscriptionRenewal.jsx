@@ -12,6 +12,10 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useTheme } from "../../../context/ThemeContext";
+import DatePicker from "react-multi-date-picker";
+import { DateObject } from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
 
 export default function SubscriptionRenewalModal() {
   const { activeTheme, themes } = useTheme();
@@ -77,7 +81,9 @@ function UserInfo({ userData }) {
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
   return (
-    <div className={`flex flex-col justify-center items-center gap-3 border-b border-${primary} pb-5`}>
+    <div
+      className={`flex flex-col justify-center items-center gap-3 border-b border-${primary} pb-5`}
+    >
       <div
         className={`rounded-full mx-auto w-48 h-48 flex items-center justify-center`}
       >
@@ -104,5 +110,247 @@ function UserInfo({ userData }) {
 }
 
 function SubscriptionInfo() {
-  return <div>Sub</div>
+  const { activeTheme, themes } = useTheme();
+  const { primary, secondary, accent, background } = themes[activeTheme].colors;
+
+  const [formData, setFormData] = useState({
+    plan: "normal",
+    duration: "",
+    startDate: "",
+    endDate: "",
+    sessions: "",
+    price: "",
+    tax: "",
+    coach: "no-coach",
+    coachPrice: "",
+  });
+
+  const coachList = ["بدون مربی", "مربی احمدی", "مربی رضایی", "مربی محمدی"];
+
+  // Auto-calculate endDate
+  useEffect(() => {
+    if (formData.startDate && formData.duration) {
+      const start = new Date(formData.startDate);
+      const months = parseInt(formData.duration, 10);
+
+      if (!isNaN(months)) {
+        const end = new Date(start);
+        end.setMonth(end.getMonth() + months);
+        const endTimestamp = end.getTime();
+
+        setFormData((prev) => ({
+          ...prev,
+          endDate: endTimestamp,
+        }));
+      }
+    }
+  }, [formData.startDate, formData.duration]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="p-4 space-y-4"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Plan */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            نوع اشتراک
+          </label>
+          <select
+            name="plan"
+            value={formData.plan}
+            onChange={handleChange}
+            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+          >
+            <option value="normal">عادی</option>
+            <option value="vip">ویژه (VIP)</option>
+          </select>
+        </div>
+
+        {/* Duration */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            مدت (ماه)
+          </label>
+          <select
+            name="duration"
+            value={formData.duration}
+            onChange={handleChange}
+            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+          >
+            <option value="">انتخاب کنید</option>
+            {[1, 2, 3, 6, 12].map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sessions */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            تعداد جلسات
+          </label>
+          <select
+            name="sessions"
+            value={formData.sessions}
+            onChange={handleChange}
+            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+          >
+            <option value="">انتخاب کنید</option>
+            {[8, 12, 16, 20, 24, 26, 30].map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Start Date */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right text-${accent}`}>
+            تاریخ شروع
+          </label>
+          <DatePicker
+            calendar={persian}
+            locale={persian_fa}
+            value={
+              formData.startDate
+                ? new DateObject({ date: formData.startDate })
+                : ""
+            }
+            onChange={(date) => {
+              const gregorianDate = date?.toDate();
+              const timestamp = gregorianDate?.getTime();
+              setFormData({
+                ...formData,
+                startDate: timestamp || "",
+              });
+            }}
+            className="custom-persian-picker"
+            containerClassName="w-full"
+            inputClass={`w-full bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus:ring-${primary}/60 text-${accent} outline-none text-right`}
+            placeholder="تاریخ را انتخاب کنید"
+            calendarPosition="bottom-right"
+          />
+        </div>
+
+        {/* End Date (readonly) */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            تاریخ پایان
+          </label>
+          <input
+            type="text"
+            name="endDate"
+            readOnly
+            value={
+              formData.endDate
+                ? new DateObject({
+                    date: formData.endDate,
+                    calendar: persian,
+                    locale: persian_fa,
+                  }).format("YYYY/MM/DD")
+                : ""
+            }
+            className={`bg-${background} border-${primary} cursor-not-allowed outline-none text-${accent} px-4 py-2 rounded-xl`}
+          />
+        </div>
+
+        {/* Price */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            قیمت (تومان)
+          </label>
+          <input
+            type="number"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            placeholder="مثلاً 500000"
+          />
+        </div>
+
+        {/* Tax Input */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            مالیات (%)
+          </label>
+          <input
+            type="number"
+            name="tax"
+            value={formData.tax}
+            onChange={handleChange}
+            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            placeholder="اگر خالی باشد بدون مالیات"
+          />
+        </div>
+
+        {/* Coach Select */}
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            انتخاب مربی
+          </label>
+          <select
+            name="coach"
+            value={formData.coach}
+            onChange={handleChange}
+            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+          >
+            {coachList.map((c, i) => (
+              <option key={i} value={i === 0 ? "no-coach" : c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Coach Price (if coach selected) */}
+        {formData.coach !== "no-coach" && (
+          <motion.div
+            className="flex flex-col col-span-1"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <label className={`text-sm font-medium text-right ${accent}`}>
+              هزینه مربی (تومان)
+            </label>
+            <input
+              type="number"
+              name="coachPrice"
+              value={formData.coachPrice}
+              onChange={handleChange}
+              className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+              placeholder="مثلاً 200000"
+            />
+          </motion.div>
+        )}
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex justify-end">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          whileHover={{ scale: 1.02 }}
+          className="bg-primary text-white font-bold py-2 px-6 rounded-xl hover:bg-opacity-90 transition"
+          onClick={(e) => {
+            e.preventDefault();
+            // toast.success("تمدید با موفقیت ثبت شد");
+          }}
+        >
+          ثبت تمدید
+        </motion.button>
+      </div>
+    </motion.div>
+  );
 }
