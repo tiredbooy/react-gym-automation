@@ -6,6 +6,7 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5175 && cross-env NODE_ENV=development electron .\"",
+    "server" : "npx json-server ./SettingData/setting_data.json",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -14,6 +15,7 @@
   "dependencies": {
     "electron-store": "^10.0.1",
     "framer-motion": "^12.9.4",
+    "json-server": "^1.0.0-beta.3",
     "lucide-react": "^0.507.0",
     "net": "^1.0.2",
     "react": "^19.0.0",
