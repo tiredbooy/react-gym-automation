@@ -1,51 +1,11 @@
-import React, { useState } from "react";
 import SettingsNavbar from "../components/setting/SettingsNavbar";
-import SupportSettings from "../components/setting/SupportSetting";
-import ServiceSettings from "../components/setting/ServiceSettings";
-import LockerSettings from "../components/setting/LockerSettings.jsx";
-import AccessManagement from "../components/setting/access-managment/AccessManagement.jsx";
-import DeviceManagement from "../components/setting/device-managment/DeviceManagement.jsx";
-// import DevicesPage from "../components/setting/device-managment/DevicePage.jsx";
-// import SalonGatewaysPage from "../components/setting/salons/SalonGatewaysPage.jsx";
-import SalonsManagment from "../components/setting/salons/SalonsManagment.jsx";
-import CoachesManagement from "../components/setting/coaches/CoachManagment.jsx";
-import { useParams, Navigate } from "react-router-dom";
+import {  Outlet } from "react-router-dom";
 import DefaultSetting from "../components/setting/defaultSettings/DefaultSetting.jsx";
-import { useTheme } from "../context/ThemeContext.jsx";
+import { useTheme } from "../context/ThemeContext";
 
 export default function SettingsPage() {
-  // const [currentTab, setCurrentTab] = useState("support");
-  const { tab } = useParams();
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
-
-  if (!tab) {
-    return <Navigate to="/settings/support" replace />;
-  }
-
-  const renderTabContent = () => {
-    switch (tab) {
-      case "default":
-        return <DefaultSetting />;
-      case "support":
-        return <SupportSettings />;
-      case "services":
-        return <ServiceSettings />;
-      // Future cases:
-      case "lockers":
-        return <LockerSettings />;
-      case "admin":
-        return <AccessManagement />;
-      case "devices":
-        return <DeviceManagement />;
-      case "salons":
-        return <SalonsManagment />;
-      case "coaches":
-        return <CoachesManagement />;
-      default:
-        return <div>در حال توسعه...</div>;
-    }
-  };
 
   return (
     <div
@@ -60,8 +20,7 @@ export default function SettingsPage() {
         <SettingsNavbar />
       </div>
       <div className="max-w-6xl mx-auto">
-        {/* currentTab={currentTab} onChange={setCurrentTab} */}
-        {renderTabContent()}
+        <Outlet />
       </div>
     </div>
   );

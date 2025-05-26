@@ -144,16 +144,18 @@ export function ThemeProvider({ children }) {
         background: "ember-background", // #EEE3CB
       },
       gradientColors: {
-        from: "ember-scondary", 
-        to: "ember-background", 
+        from: "ember-secondary",
+        to: "ember-background",
       },
     },
   };
 
   useEffect(() => {
     localStorage.setItem("theme", activeTheme);
-    document.body.className =
-      themes[activeTheme]?.colors.background || "offWhite";
+    document.body.classList.remove(...document.body.classList);
+    document.body.classList.add(
+      themes[activeTheme]?.colors.background || "offWhite"
+    );
   }, [activeTheme]);
 
   return (
