@@ -115,6 +115,7 @@ function SubscriptionInfo() {
 
   const [formData, setFormData] = useState({
     plan: "normal",
+    sport: "body_bulding",
     duration: "",
     startDate: "",
     endDate: "",
@@ -151,6 +152,22 @@ function SubscriptionInfo() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const calculateTax = () => {
+    const price = Number(formData.price) || 0;
+    const coachPrice = Number(formData.coachPrice) || 0;
+    const tax = Number(formData.tax) || 0;
+
+    if (!price) return { taxPrice: 0, totalPrice: coachPrice }; // no base price, nothing to calculate
+
+    const taxPrice = (tax / 100) * price;
+    const totalPrice = price + taxPrice + coachPrice;
+
+    return {
+      taxPrice,
+      totalPrice,
+    };
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -158,7 +175,7 @@ function SubscriptionInfo() {
       transition={{ duration: 0.3 }}
       className="p-4 space-y-4"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-2 px-1">
         {/* Plan */}
         <div className="flex flex-col">
           <label className={`text-sm font-medium text-right ${accent}`}>
@@ -172,6 +189,23 @@ function SubscriptionInfo() {
           >
             <option value="normal">عادی</option>
             <option value="vip">ویژه (VIP)</option>
+          </select>
+        </div>
+
+        <div className="flex flex-col">
+          <label className={`text-sm font-medium text-right ${accent}`}>
+            رشته
+          </label>
+          <select
+            name="body_bulding"
+            value={formData.body_bulding}
+            onChange={handleChange}
+            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+          >
+            <option value="bulding">بدنسازی</option>
+            <option value="crossfit">کراسفیت</option>
+            <option value="trx">تی ار اکس</option>
+            <option value="yoga">یوگا</option>
           </select>
         </div>
 
@@ -282,19 +316,21 @@ function SubscriptionInfo() {
         </div>
 
         {/* Tax Input */}
-        <div className="flex flex-col">
-          <label className={`text-sm font-medium text-right ${accent}`}>
-            مالیات (%)
-          </label>
-          <input
-            type="number"
-            name="tax"
-            value={formData.tax}
-            onChange={handleChange}
-            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
-            placeholder="اگر خالی باشد بدون مالیات"
-          />
-        </div>
+        {formData.price && (
+          <div className="flex flex-col">
+            <label className={`text-sm font-medium text-right ${accent}`}>
+              مالیات (%)
+            </label>
+            <input
+              type="number"
+              name="tax"
+              value={formData.tax}
+              onChange={handleChange}
+              className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+              placeholder="اگر خالی باشد بدون مالیات"
+            />
+          </div>
+        )}
 
         {/* Coach Select */}
         <div className="flex flex-col">
@@ -334,6 +370,45 @@ function SubscriptionInfo() {
               placeholder="مثلاً 200000"
             />
           </motion.div>
+        )}
+      </div>
+
+      <div
+        className={`w-full px-6 py-4 flex flex-wrap gap-6 rounded-xl font-bold bg-${secondary}`}
+      >
+        <div>
+          <span>نوع اشتراک : </span>
+          <span>{formData.plan === "normal" ? "معمولی" : formData.plan}</span>
+        </div>
+        {formData.duration && (
+          <div>
+            <span>مدت اشتراک :</span>
+            <span>{formData.duration} ماه</span>
+          </div>
+        )}
+        {formData.price && (
+          <div>
+            <span>شهریه : </span>
+            <span>{Number(formData?.price)?.toLocaleString("fa-IR")}</span>
+          </div>
+        )}
+        {formData.tax && (
+          <div>
+            <span>مالیات : </span>
+            <span>{calculateTax()?.taxPrice.toLocaleString("fa-IR")}</span>
+          </div>
+        )}
+        {formData.coachPrice && (
+          <div>
+            <span>مربی : </span>
+            <span>{Number(formData?.coachPrice)?.toLocaleString("fa-IR")}</span>
+          </div>
+        )}
+        {formData.tax && (
+          <div>
+            <span>جمع کل : </span>
+            <span>{calculateTax()?.totalPrice.toLocaleString("fa-IR")}</span>
+          </div>
         )}
       </div>
 
