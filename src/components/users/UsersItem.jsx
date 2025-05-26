@@ -11,6 +11,7 @@ import Loader from "../reusables/Loader";
 import toast from "react-hot-toast";
 import DeleteModal from "../reusables/DeleteModal";
 import SubscriptionRenewalModal from "./renewal/SubscriptionRenewal";
+import { AnimatePresence } from "framer-motion";
 
 export default function UsersItem() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -191,7 +192,9 @@ export default function UsersItem() {
         </DeleteModal>
       )}
 
-      {isRenewal && <SubscriptionRenewalModal onSubmitUser={handleRenewal} onClose={() => setIsRenewal(isOpen => !isOpen)} />}
+      <AnimatePresence mode="wait">
+        {isRenewal && <SubscriptionRenewalModal onSubmitUser={handleRenewal} onClose={() => setIsRenewal(isOpen => !isOpen)} />}
+      </AnimatePresence>
 
       {isEditing && (
         <EditUserModal

@@ -117,14 +117,17 @@ const CoachesManagement = () => {
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ y: -300, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
       className={`bg-gradient-to-b from-${theme.colors.background} to-${theme.colors.secondary} rounded-xl min-h-screen p-8`}
-      dir="rtl"
     >
       <Toaster position="bottom-left" />
       <div className="max-w-5xl mx-auto space-y-8">
         <div className="flex justify-between items-center">
-          <h1 className={`text-4xl font-bold text-${theme.colors.primary}`}>مدیریت مربیان</h1>
+          <h1 className={`text-4xl font-bold text-${theme.colors.primary}`}>
+            مدیریت مربیان
+          </h1>
           <div className="flex space-x-3 space-x-reverse">
             <button
               onClick={exportData}
@@ -132,7 +135,9 @@ const CoachesManagement = () => {
             >
               <Download size={20} className="mr-2" /> صدور
             </button>
-            <label className={`flex items-center px-6 py-3 bg-${theme.colors.primary} text-offWhite rounded-xl hover:bg-${theme.colors.primary}/90 font-semibold hover:text-${theme.colors.background} transition-all text-lg shadow-md cursor-pointer duration-200`}>
+            <label
+              className={`flex items-center px-6 py-3 bg-${theme.colors.primary} text-offWhite rounded-xl hover:bg-${theme.colors.primary}/90 font-semibold hover:text-${theme.colors.background} transition-all text-lg shadow-md cursor-pointer duration-200`}
+            >
               <Upload size={20} className="mr-2" /> وارد کردن
               <input type="file" onChange={importData} className="hidden" />
             </label>
@@ -163,21 +168,27 @@ const CoachesManagement = () => {
             />
           ))}
         </div>
-        <CoachForm
-          isOpen={isFormOpen}
-          coach={editingCoach}
-          onSave={editingCoach ? editCoach : addCoach}
-          onClose={() => setIsFormOpen(false)}
-        />
-        <ClientAssignmentModal
-          isOpen={isClientModalOpen}
-          onClose={() => setIsClientModalOpen(false)}
-          coach={selectedCoach}
-          coaches={coaches}
-          onSaveClients={saveClients}
-        />
+        <AnimatePresence mode="wait">
+          {isFormOpen && (
+            <CoachForm
+              coach={editingCoach}
+              onSave={editingCoach ? editCoach : addCoach}
+              onClose={() => setIsFormOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+        <AnimatePresence mode="wait">
+          {isClientModalOpen && (
+            <ClientAssignmentModal
+              onClose={() => setIsClientModalOpen(false)}
+              coach={selectedCoach}
+              coaches={coaches}
+              onSaveClients={saveClients}
+            />
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

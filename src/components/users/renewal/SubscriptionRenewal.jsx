@@ -17,7 +17,7 @@ import { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 
-export default function SubscriptionRenewalModal() {
+export default function SubscriptionRenewalModal({ onSubmitUser, onClose }) {
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
@@ -29,31 +29,35 @@ export default function SubscriptionRenewalModal() {
   };
 
   return (
-    <AnimatePresence>
+    <>
       <motion.div
-        initial={{ opacity: 0, scale: 0.4 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.4 }}
+        key="overlay"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
         className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
+        onClick={onClose}
       />
       <motion.div
-        initial={{ opacity: 0, scale: 0.4 }}
+        key="modal"
+        initial={{ opacity: 0, scale: 0.1 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.4 }}
+        exit={{ opacity: 0, scale: 0.1 }}
         transition={{ duration: 0.25 }}
         className={`fixed z-50 
           bg-${background} text-${accent} rounded-3xl shadow-2xl 
           w-full max-w-6xl max-h-[90vh] overflow-y-auto p-8`}
       >
-        <Header />
+        <Header onClose={onClose} />
         <UserInfo userData={userData} />
         <SubscriptionInfo />
       </motion.div>
-    </AnimatePresence>
+    </>
   );
 }
 
-function Header() {
+function Header({ onClose }) {
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
@@ -70,7 +74,10 @@ function Header() {
           mass: 1,
         }}
       >
-        <X className={`text-${primary} cursor-pointer`} />
+        <X
+          onClick={() => onClose()}
+          className={`text-${primary} cursor-pointer`}
+        />
       </motion.span>
     </header>
   );
@@ -178,14 +185,14 @@ function SubscriptionInfo() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-2 px-1">
         {/* Plan */}
         <div className="flex flex-col">
-          <label className={`text-sm font-medium text-right ${accent}`}>
+          <label className={`text-sm font-medium text-right text-${accent}`}>
             نوع اشتراک
           </label>
           <select
             name="plan"
             value={formData.plan}
             onChange={handleChange}
-            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
           >
             <option value="normal">عادی</option>
             <option value="vip">ویژه (VIP)</option>
@@ -200,7 +207,7 @@ function SubscriptionInfo() {
             name="body_bulding"
             value={formData.body_bulding}
             onChange={handleChange}
-            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
           >
             <option value="bulding">بدنسازی</option>
             <option value="crossfit">کراسفیت</option>
@@ -218,7 +225,7 @@ function SubscriptionInfo() {
             name="duration"
             value={formData.duration}
             onChange={handleChange}
-            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
           >
             <option value="">انتخاب کنید</option>
             {[1, 2, 3, 6, 12].map((m) => (
@@ -238,7 +245,7 @@ function SubscriptionInfo() {
             name="sessions"
             value={formData.sessions}
             onChange={handleChange}
-            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
           >
             <option value="">انتخاب کنید</option>
             {[8, 12, 16, 20, 24, 26, 30].map((s) => (
@@ -296,7 +303,7 @@ function SubscriptionInfo() {
                   }).format("YYYY/MM/DD")
                 : ""
             }
-            className={`bg-${background} border-${primary} cursor-not-allowed outline-none text-${accent} px-4 py-2 rounded-xl`}
+            className={`bg-${background} border border-${primary} cursor-not-allowed outline-none text-${accent} px-4 py-2 rounded-xl`}
           />
         </div>
 
@@ -310,7 +317,7 @@ function SubscriptionInfo() {
             name="price"
             value={formData.price}
             onChange={handleChange}
-            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
             placeholder="مثلاً 500000"
           />
         </div>
@@ -326,7 +333,7 @@ function SubscriptionInfo() {
               name="tax"
               value={formData.tax}
               onChange={handleChange}
-              className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+              className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
               placeholder="اگر خالی باشد بدون مالیات"
             />
           </div>
@@ -341,7 +348,7 @@ function SubscriptionInfo() {
             name="coach"
             value={formData.coach}
             onChange={handleChange}
-            className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+            className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
           >
             {coachList.map((c, i) => (
               <option key={i} value={i === 0 ? "no-coach" : c}>
@@ -366,7 +373,7 @@ function SubscriptionInfo() {
               name="coachPrice"
               value={formData.coachPrice}
               onChange={handleChange}
-              className={`bg-${background} border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
+              className={`bg-${background} border border-${primary} px-4 py-2 rounded-xl focus:ring focus-ring-${primary}/60 duration-200 outline-none text-${accent}`}
               placeholder="مثلاً 200000"
             />
           </motion.div>
