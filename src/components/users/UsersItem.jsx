@@ -97,10 +97,6 @@ export default function UsersItem() {
     fetchUserData();
   }, [shift, currentPage]);
 
-  useEffect(() => {
-    console.log(`Total Page : ${totalPage} And Current Page : ${currentPage}`);
-  }, [currentPage, totalPage]);
-
   const filteredUsers = useMemo(() => {
     return users.filter((user) => {
       const normalize = (str) =>
@@ -186,7 +182,7 @@ export default function UsersItem() {
           />
         )}
       </AnimatePresence>
-      
+
       <AnimatePresence mode="wait">
         {isDeleting && (
           <DeleteModal

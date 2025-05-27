@@ -307,193 +307,191 @@ function EditUserModal({ onCloseModal, personId }) {
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-      <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center"
+        onClick={onCloseModal}
+      >
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center"
-          onClick={onCloseModal}
+          initial={{ opacity: 0, scale: 0.8, y: 150 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.3, y: 150 }}
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          className={`bg-${background} text-${primary} rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mx-4 relative`}
+          onClick={(e) => e.stopPropagation()}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 50 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 50 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            className={`bg-${background} text-${primary} rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 mx-4 relative`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6 md:p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-                  ویرایش اطلاعات کاربر
-                </h2>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={handleSubmit}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md"
-                  >
-                    <Save size={18} /> ذخیره
-                  </button>
-                  <button
-                    onClick={onCloseModal}
-                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                  >
-                    <X size={24} />
-                  </button>
-                </div>
+          <div className="p-6 md:p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                ویرایش اطلاعات کاربر
+              </h2>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleSubmit}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md"
+                >
+                  <Save size={18} /> ذخیره
+                </button>
+                <button
+                  onClick={onCloseModal}
+                  className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                >
+                  <X size={24} />
+                </button>
               </div>
+            </div>
 
-              {imageSrc && (
-                <div className="flex flex-col items-center mb-8 relative">
-                  <div
-                    className="relative group cursor-pointer"
-                    onClick={() => setShowUploadOptions(true)}
-                  >
-                    <img
-                      src={imageSrc}
-                      alt="کاربر"
-                      className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg"
-                    />
-                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <span className="text-white text-sm">تغییر تصویر</span>
-                    </div>
+            {imageSrc && (
+              <div className="flex flex-col items-center mb-8 relative">
+                <div
+                  className="relative group cursor-pointer"
+                  onClick={() => setShowUploadOptions(true)}
+                >
+                  <img
+                    src={imageSrc}
+                    alt="کاربر"
+                    className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="text-white text-sm">تغییر تصویر</span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-3">
-                    ایجاد شده در: {formData.creation_datetime}
-                  </p>
-
-                  <AnimatePresence>
-                    {showUploadOptions && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-24 mt-2 bg-white rounded-lg shadow-xl p-4 z-10"
-                      >
-                        <button
-                          onClick={startWebcam}
-                          className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                          <Camera size={18} /> وب‌کم
-                        </button>
-                        <button
-                          onClick={() => fileInputRef.current.click()}
-                          className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                          <Upload size={18} /> آپلود فایل
-                        </button>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          ref={fileInputRef}
-                          className="hidden"
-                          onChange={handleFileUpload}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
-              )}
+                <p className="text-sm text-gray-500 mt-3">
+                  ایجاد شده در: {formData.creation_datetime}
+                </p>
 
-              <div
-                className="flex flex-col items-center mb-8"
-                style={{ display: isWebcamActive ? "flex" : "none" }}
-              >
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-64 h-48 rounded-lg border-2 border-gray-200 bg-black object-cover"
-                />
-                <button
-                  onClick={captureImage}
-                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  ثبت تصویر
-                </button>
-                <button
-                  onClick={stopWebcam}
-                  className="mt-2 text-red-500 hover:text-red-700"
-                >
-                  لغو
-                </button>
-                {webcamError && (
-                  <p className="text-red-500 text-sm mt-2">{webcamError}</p>
-                )}
-                <canvas ref={canvasRef} className="hidden" />
+                <AnimatePresence>
+                  {showUploadOptions && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-24 mt-2 bg-white rounded-lg shadow-xl p-4 z-10"
+                    >
+                      <button
+                        onClick={startWebcam}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Camera size={18} /> وب‌کم
+                      </button>
+                      <button
+                        onClick={() => fileInputRef.current.click()}
+                        className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <Upload size={18} /> آپلود فایل
+                      </button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        className="hidden"
+                        onChange={handleFileUpload}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+            )}
 
-              <form onSubmit={handleSubmit} className="space-y-8">
-                <FormDataInputs
+            <div
+              className="flex flex-col items-center mb-8"
+              style={{ display: isWebcamActive ? "flex" : "none" }}
+            >
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-64 h-48 rounded-lg border-2 border-gray-200 bg-black object-cover"
+              />
+              <button
+                onClick={captureImage}
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                ثبت تصویر
+              </button>
+              <button
+                onClick={stopWebcam}
+                className="mt-2 text-red-500 hover:text-red-700"
+              >
+                لغو
+              </button>
+              {webcamError && (
+                <p className="text-red-500 text-sm mt-2">{webcamError}</p>
+              )}
+              <canvas ref={canvasRef} className="hidden" />
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <FormDataInputs
+                formData={formData}
+                handleInputChange={handleInputChange}
+                errors={errors}
+              />
+
+              <RadioGroup
+                name="has_insurance"
+                value={formData.has_insurance}
+                onChange={(v) => handleInputChange("has_insurance", v)}
+                options={[
+                  { value: true, label: "دارد" },
+                  { value: false, label: "ندارد" },
+                ]}
+                label="بیمه ورزشی"
+                wrapperClass={`card bg-${secondary} p-5 rounded-lg shadow-md`}
+                error={errors.has_insurance}
+              />
+
+              {formData.has_insurance && (
+                <InsuranceDataInputs
                   formData={formData}
                   handleInputChange={handleInputChange}
                   errors={errors}
                 />
+              )}
 
+              <div className={`border-t border-${primary}/20 pt-6`}>
                 <RadioGroup
-                  name="has_insurance"
-                  value={formData.has_insurance}
-                  onChange={(v) => handleInputChange("has_insurance", v)}
+                  name="auth_method"
+                  value={formData.auth_method}
+                  onChange={(v) => handleInputChange("auth_method", v)}
                   options={[
-                    { value: true, label: "دارد" },
-                    { value: false, label: "ندارد" },
+                    { value: "card", label: "کارت" },
+                    { value: "fingerprint", label: "اثر انگشت" },
+                    { value: "face", label: "چهره" },
+                    { value: "none", label: "هیچکدام" },
                   ]}
-                  label="بیمه ورزشی"
+                  label="روش احراز هویت"
                   wrapperClass={`card bg-${secondary} p-5 rounded-lg shadow-md`}
-                  error={errors.has_insurance}
+                  error={errors.auth_method}
                 />
+                <AnimatePresence>
+                  {formData.auth_method !== "none" && (
+                    <HandleAuthMethodInput
+                      hardwareData={hardwareData}
+                      formData={formData}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
 
-                {formData.has_insurance && (
-                  <InsuranceDataInputs
-                    formData={formData}
-                    handleInputChange={handleInputChange}
-                    errors={errors}
-                  />
-                )}
-
-                <div className={`border-t border-${primary}/20 pt-6`}>
-                  <RadioGroup
-                    name="auth_method"
-                    value={formData.auth_method}
-                    onChange={(v) => handleInputChange("auth_method", v)}
-                    options={[
-                      { value: "card", label: "کارت" },
-                      { value: "fingerprint", label: "اثر انگشت" },
-                      { value: "face", label: "چهره" },
-                      { value: "none", label: "هیچکدام" },
-                    ]}
-                    label="روش احراز هویت"
-                    wrapperClass={`card bg-${secondary} p-5 rounded-lg shadow-md`}
-                    error={errors.auth_method}
-                  />
-                  <AnimatePresence>
-                    {formData.auth_method !== "none" && (
-                      <HandleAuthMethodInput
-                        hardwareData={hardwareData}
-                        formData={formData}
-                      />
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                <div className={`border-t border-${primary}/20 pt-6`}>
-                  <h3 className={`text-xl font-bold mb-4 text-${primary}`}>
-                    تمدید اشتراک
-                  </h3>
-                  <SubscriptionDataForm
-                    formData={formData}
-                    handleInputChange={handleInputChange}
-                    errors={errors}
-                  />
-                </div>
-              </form>
-            </div>
-          </motion.div>
+              <div className={`border-t border-${primary}/20 pt-6`}>
+                <h3 className={`text-xl font-bold mb-4 text-${primary}`}>
+                  تمدید اشتراک
+                </h3>
+                <SubscriptionDataForm
+                  formData={formData}
+                  handleInputChange={handleInputChange}
+                  errors={errors}
+                />
+              </div>
+            </form>
+          </div>
         </motion.div>
-      </AnimatePresence>
+      </motion.div>
     </>
   );
 }
