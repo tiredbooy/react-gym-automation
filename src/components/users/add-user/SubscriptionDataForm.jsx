@@ -5,6 +5,7 @@ import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import { useTheme } from "../../../context/ThemeContext";
+import { usePricing } from "../../../context/SubscriptionPricing";
 
 const sports = [
   { id: 1, label: "بدنسازی" },
@@ -18,13 +19,13 @@ const coaches = [
   {
     value: "ali",
     label: "علی محمدی",
-    vipPrice: 45000000,
+    vipPrice: 4500000,
     normalPrice: 1000000,
   },
   {
     value: "reza",
     label: "رضا حسینی",
-    vipPrice: 45000000,
+    vipPrice: 4500000,
     normalPrice: 1000000,
   },
 ];
@@ -43,8 +44,8 @@ const durations = [
 ];
 
 const subscriptionTypes = [
-  { value: "normal", label: "ماهانه (عادی)", basePrice: 2000000 },
-  { value: "vip", label: "ماهانه (ویژه)", basePrice: 3500000 },
+  { value: "normal", label: "ماهانه (عادی)", basePrice: 1400000 },
+  { value: "vip", label: "ماهانه (ویژه)", basePrice: 2300000 },
   { value: "session", label: "جلسه ای", basePrice: 200000 },
 ];
 
@@ -65,6 +66,7 @@ const availableLockers = Array.from({ length: 50 }, (_, i) => ({
 }));
 
 export default function SubscriptionDataForm() {
+  const { inputs, updateInput, pricing } = usePricing();
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
   const { primary, secondary, accent, background } = theme.colors;
@@ -103,8 +105,8 @@ export default function SubscriptionDataForm() {
       [name]: value,
     }));
 
-    // Clear error for this field if it exists
     if (formErrors[name]) {
+      // Clear error for this field if it exists
       setFormErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[name];
@@ -113,37 +115,85 @@ export default function SubscriptionDataForm() {
     }
   };
 
-  // Handle numeric input changes and format as numbers
   const handleNumericChange = (e) => {
     const { name, value } = e.target;
+    const numValue = value === "" ? 0 : parseInt(value, 10) || 0;
+    setFormData((prev) => ({ ...prev, [name]: numValue }));
+    const contextFieldMap = {
+      insurance_fee: "insurancePrice",
+      card_fee: "cardPrice",
+      discount: "discount",
+      coach_price: "coachPrice",
+    };
+    if (contextFieldMap[name]) {
+      updateInput(contextFieldMap[name], numValue);
+    }
+  };
+
+  // Calculate total_tuition
+  useEffect(() => {
+    let tuition = 0;
+    let total = 0;
+    if (formData.subscription_type) {
+      const selectedType = subscriptionTypes.find(
+        (type) => type.value === formData.subscription_type
+      );
+      if (selectedType) {
+        if (formData.subscription_type === "session") {
+          tuition = selectedType.basePrice * formData.sessions;
+        } else {
+          const selectedDuration = durations.find(
+            (d) => d.value === formData.duration
+          );
+          const months = selectedDuration ? selectedDuration.months : 0;
+          tuition = selectedType.basePrice * months;
+        }
+      }
+    }
+    total =
+      tuition +
+      parseInt(formData.coach_price || 0) +
+      parseInt(formData.insurance_fee || 0) +
+      parseInt(formData.card_fee || 0) -
+      parseInt(formData.discount || 0);
     setFormData((prev) => ({
       ...prev,
-      [name]: value === "" ? 0 : parseInt(value, 10) || 0,
+      total_tuition: tuition,
+      total_price: total,
     }));
-  };
+  }, [
+    formData.subscription_type,
+    formData.duration,
+    formData.sessions,
+    formData.coach_price,
+    formData.insurance_fee,
+    formData.card_fee,
+    formData.discount,
+  ]);
+
+  // Optional: Sync total_price with pricing.total
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, total_price: pricing.total }));
+  }, [pricing.total]);
 
   // Handle program type change
   const handleProgramTypeChange = (value) => {
-    // Update program type
-    setFormData((prev) => {
-      // Calculate new coach price based on new program type
-      let coachPrice = 0;
-      if (prev.coach) {
-        const selectedCoach = coaches.find(
-          (coach) => coach.value === prev.coach
-        );
-        if (selectedCoach) {
-          coachPrice =
-            value === true ? selectedCoach.vipPrice : selectedCoach.normalPrice;
-        }
+    let coachPrice = 0;
+    if (formData.coach) {
+      const selectedCoach = coaches.find(
+        (coach) => coach.value === formData.coach
+      );
+      if (selectedCoach) {
+        coachPrice =
+          value === true ? selectedCoach.vipPrice : selectedCoach.normalPrice;
       }
-
-      return {
-        ...prev,
-        programType: value,
-        coach_price: coachPrice,
-      };
-    });
+    }
+    updateInput("coachPrice", coachPrice); // Sync with PricingContext
+    setFormData((prev) => ({
+      ...prev,
+      programType: value,
+      coach_price: coachPrice,
+    }));
   };
 
   // Handle coach selection
@@ -171,11 +221,6 @@ export default function SubscriptionDataForm() {
   // Handle subscription type change
   const handleSubscriptionTypeChange = (e) => {
     const { value } = e.target;
-    const selectedType =
-      subscriptionTypes.find((type) => type.value === value) ||
-      subscriptionTypes[0];
-
-    // Recalculate coach price if a coach is selected
     let coachPrice = 0;
     if (formData.coach) {
       const selectedCoach = coaches.find(
@@ -186,8 +231,6 @@ export default function SubscriptionDataForm() {
           value === "vip" ? selectedCoach.vipPrice : selectedCoach.normalPrice;
       }
     }
-
-    // Reset locker number if changing from VIP to another type
     const newLockerNumber = value === "vip" ? formData.locker_number : null;
 
     setFormData((prev) => ({
@@ -196,6 +239,8 @@ export default function SubscriptionDataForm() {
       coach_price: coachPrice,
       locker_number: newLockerNumber,
     }));
+
+    updateInput("coachPrice", coachPrice); // Sync coach price with PricingContext
   };
 
   // Handle duration change and calculate end date
@@ -214,8 +259,25 @@ export default function SubscriptionDataForm() {
     if (formData.start_date && selectedDuration) {
       calculateEndDate(formData.start_date, selectedDuration.months);
     }
-  };
 
+    // Recalculate tuition for monthly subscriptions
+    if (
+      formData.subscription_type === "normal" ||
+      formData.subscription_type === "vip"
+    ) {
+      const selectedType = subscriptionTypes.find(
+        (type) => type.value === formData.subscription_type
+      );
+      if (selectedType && selectedDuration) {
+        const totalTuition = selectedType.basePrice * selectedDuration.months;
+        setFormData((prev) => ({
+          ...prev,
+          total_tuition: totalTuition,
+        }));
+        updateInput("price", totalTuition); // Sync tuition with PricingContext
+      }
+    }
+  };
   // Handle start date change
   const handleStartDateChange = (date) => {
     setFormData((prev) => ({
@@ -408,6 +470,7 @@ export default function SubscriptionDataForm() {
             <p className="text-red-500 text-xs mt-1">{formErrors.sport}</p>
           )}
         </div>
+
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             سانس
@@ -438,6 +501,7 @@ export default function SubscriptionDataForm() {
             </p>
           )}
         </div>
+
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             مربی
@@ -463,6 +527,7 @@ export default function SubscriptionDataForm() {
               ))}
           </select>
         </div>
+
         {formData.coach && formData.coach !== "" && (
           <>
             <div className="text-right">
@@ -499,6 +564,7 @@ export default function SubscriptionDataForm() {
             </div>
           </>
         )}
+
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             نوع عضویت
@@ -629,6 +695,7 @@ export default function SubscriptionDataForm() {
             <p className="text-red-500 text-xs mt-1">{formErrors.sessions}</p>
           )}
         </div>
+
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             تاریخ شروع
@@ -651,6 +718,7 @@ export default function SubscriptionDataForm() {
             <p className="text-red-500 text-xs mt-1">{formErrors.start_date}</p>
           )}
         </div>
+
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             تاریخ پایان
@@ -669,7 +737,17 @@ export default function SubscriptionDataForm() {
               transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
           />
         </div>
-        {/* Price Fields */}
+
+        <div className="text-right">
+          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
+            هزینه ی شهریه
+          </label>
+          <div
+            className={`w-full px-4 py-3 text-right bg-${secondary} border-2 border-${primary} rounded-xl text-${accent}`}
+          >
+            {formatCurrency(formData.total_tuition)} تومان
+          </div>
+        </div>
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             هزینه ی بیمه
@@ -681,8 +759,8 @@ export default function SubscriptionDataForm() {
             onChange={handleNumericChange}
             autoComplete="off"
             className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
+      focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+      transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="هزینه ی بیمه را وارد کنید"
           />
         </div>
@@ -697,8 +775,8 @@ export default function SubscriptionDataForm() {
             onChange={handleNumericChange}
             autoComplete="off"
             className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
+      focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+      transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="هزینه ی کارت را وارد کنید"
           />
         </div>
@@ -713,8 +791,8 @@ export default function SubscriptionDataForm() {
             onChange={handleNumericChange}
             autoComplete="off"
             className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
+      focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
+      transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="مبلغ تخفیف را وارد کنید"
           />
         </div>
@@ -722,7 +800,9 @@ export default function SubscriptionDataForm() {
         {/* Summary Fields */}
         <div className="col-span-full flex flex-row gap-24 w-full">
           <div className={`text-right w-full bg-${accent} p-4 rounded-xl`}>
-            <label className={`block mb-2 text-sm font-semibold text-${background}`}>
+            <label
+              className={`block mb-2 text-sm font-semibold text-${background}`}
+            >
               شهریه
             </label>
             <div className={`text-lg font-bold text-${background}`}>
@@ -730,12 +810,14 @@ export default function SubscriptionDataForm() {
             </div>
           </div>
 
-          <div className={`text-right w-full bg-${primary}  p-4 rounded-xl`}>
-            <label className={`block mb-2 text-sm font-semibold text-${background}`}>
+          <div className={`text-right w-full bg-${primary} p-4 rounded-xl`}>
+            <label
+              className={`block mb-2 text-sm font-semibold text-${background}`}
+            >
               مبلغ کل
             </label>
             <div className={`text-lg font-bold text-${background}`}>
-              {formatCurrency(formData.total_price)} تومان
+              {formatCurrency(pricing.total)} تومان
             </div>
           </div>
         </div>

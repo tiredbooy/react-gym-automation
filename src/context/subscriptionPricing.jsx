@@ -5,6 +5,9 @@ const INITIAL_INPUTS = {
   price: 0,
   tax: 0,
   coachPrice: 0,
+  insurancePrice: 0,
+  discount: 0,
+  cardPrice: 0,
 };
 
 // ---- CONTEXT ----
@@ -29,18 +32,41 @@ const parseNumber = (value) => {
 };
 
 // ---- PRICING CALCULATION HOOK ----
-const usePricingCalculation = ({ price = 0, tax = 0, coachPrice = 0 }) => {
+const usePricingCalculation = ({
+  price = 0,
+  tax = 0,
+  coachPrice = 0,
+  insurancePrice = 0,
+  discount = 0,
+  cardPrice = 0,
+}) => {
   const parsedPrice = parseNumber(price);
   const parsedTax = parseNumber(tax);
   const parsedCoachPrice = parseNumber(coachPrice);
+  const parsedInsurancePrice = parseNumber(insurancePrice);
+  const parsedDiscount = parseNumber(discount);
+  const parsedCardPrice = parseNumber(cardPrice);
 
   return useMemo(() => {
-    const subtotal = parsedPrice + parsedCoachPrice;
+    const baseSubtotal =
+      parsedPrice + parsedCoachPrice + parsedInsurancePrice + parsedCardPrice;
+
     const taxAmount = parsedTax ? (parsedTax / 100) * parsedPrice : 0;
+    const discountedAmount =
+      parsedDiscount > baseSubtotal ? baseSubtotal : parsedDiscount;
+
+    const subtotal = baseSubtotal - discountedAmount;
     const total = subtotal + taxAmount;
 
     return { subtotal, taxAmount, total };
-  }, [parsedPrice, parsedTax, parsedCoachPrice]);
+  }, [
+    parsedPrice,
+    parsedTax,
+    parsedCoachPrice,
+    parsedInsurancePrice,
+    parsedDiscount,
+    parsedCardPrice,
+  ]);
 };
 
 // ---- PROVIDER ----

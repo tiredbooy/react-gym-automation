@@ -18,7 +18,7 @@ export default function UsersItem() {
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isRenewal, setIsRenewal] = useState(true);
+  const [isRenewal, setIsRenewal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
