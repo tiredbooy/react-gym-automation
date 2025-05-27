@@ -16,6 +16,7 @@ import DatePicker from "react-multi-date-picker";
 import { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+import { usePricing } from "../../../context/SubscriptionPricing";
 
 export default function SubscriptionRenewalModal({ onSubmitUser, onClose }) {
   const { activeTheme, themes } = useTheme();
@@ -47,7 +48,7 @@ export default function SubscriptionRenewalModal({ onSubmitUser, onClose }) {
         transition={{ duration: 0.25 }}
         className={`fixed z-50 
           bg-${background} text-${accent} rounded-3xl shadow-2xl 
-          w-full max-w-6xl max-h-[90vh] overflow-y-auto p-8`}
+          w-full max-w-6xl h-auto overflow-y-scroll p-8`}
       >
         <Header onClose={onClose} />
         <UserInfo userData={userData} />
@@ -120,6 +121,8 @@ function SubscriptionInfo() {
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
+  const { inputs , updateInput , pricing } = usePricing();
+
   const [formData, setFormData] = useState({
     plan: "normal",
     sport: "body_bulding",
@@ -157,23 +160,28 @@ function SubscriptionInfo() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if(["price" , "tax" , "coachPrice"].includes(name)) {
+      updateInput(name, value)
+    }
+    
   };
 
-  const calculateTax = () => {
-    const price = Number(formData.price) || 0;
-    const coachPrice = Number(formData.coachPrice) || 0;
-    const tax = Number(formData.tax) || 0;
+  // const calculateTax = () => {
+  //   const price = Number(formData.price) || 0;
+  //   const coachPrice = Number(formData.coachPrice) || 0;
+  //   const tax = Number(formData.tax) || 0;
 
-    if (!price) return { taxPrice: 0, totalPrice: coachPrice }; // no base price, nothing to calculate
+  //   if (!price) return { taxPrice: 0, totalPrice: coachPrice }; // no base price, nothing to calculate
 
-    const taxPrice = (tax / 100) * price;
-    const totalPrice = price + taxPrice + coachPrice;
+  //   const taxPrice = (tax / 100) * price;
+  //   const totalPrice = price + taxPrice + coachPrice;
 
-    return {
-      taxPrice,
-      totalPrice,
-    };
-  };
+  //   return {
+  //     taxPrice,
+  //     totalPrice,
+  //   };
+  // };
 
   return (
     <motion.div
@@ -396,13 +404,14 @@ function SubscriptionInfo() {
         {formData.price && (
           <div>
             <span>شهریه : </span>
-            <span>{Number(formData?.price)?.toLocaleString("fa-IR")}</span>
+            <span>{pricing.subtotal.toLocaleString("fa-IR")}</span>
           </div>
         )}
         {formData.tax && (
           <div>
             <span>مالیات : </span>
-            <span>{calculateTax()?.taxPrice.toLocaleString("fa-IR")}</span>
+            {/* <span>{calculateTax()?.taxPrice.toLocaleString("fa-IR")}</span> */}
+            <span>{pricing.taxAmount.toLocaleString("fa-IR")}</span>
           </div>
         )}
         {formData.coachPrice && (
@@ -414,7 +423,8 @@ function SubscriptionInfo() {
         {formData.tax && (
           <div>
             <span>جمع کل : </span>
-            <span>{calculateTax()?.totalPrice.toLocaleString("fa-IR")}</span>
+            <span>{pricing.total.toLocaleString("fa-IR")}</span>
+            {/* <span>{calculateTax()?.totalPrice.toLocaleString("fa-IR")}</span> */}
           </div>
         )}
       </div>

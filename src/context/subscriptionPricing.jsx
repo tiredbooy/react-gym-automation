@@ -1,70 +1,76 @@
 import { createContext, useContext, useState, useMemo } from "react";
 
-// ---- Context Creation ---- //
-const SubscriptionPricingContext = createContext();
+// ---- TYPES ----
+const INITIAL_INPUTS = {
+  price: 0,
+  tax: 0,
+  coachPrice: 0,
+};
 
-// ---- Provider Component ---- //
-export const SubscriptionPricingProvider = ({ children }) => {
-  const [pricingInputs, setPricingInputs] = useState({
-    basePrice: 0,
-    coachPrice: 0,
-    tax: 0,
-    cardPrice: 0,
-    insurancePrice: 0,
-  });
+// ---- CONTEXT ----
+const PricingContext = createContext({
+  inputs: INITIAL_INPUTS,
+  updateInput: () => {
+    console.warn(
+      "PricingContext not initialized. Wrap your app in <PricingProvider>."
+    );
+  },
+  pricing: {
+    subtotal: 0,
+    taxAmount: 0,
+    total: 0,
+  },
+});
 
-  const pricing = useSubscriptionPricing(pricingInputs);
+// ---- UTILITIES ----
+const parseNumber = (value) => {
+  const num = Number(value);
+  return isNaN(num) || num < 0 ? 0 : num;
+};
 
-  const updatePricingInput = (name, value) => {
-    setPricingInputs((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+// ---- PRICING CALCULATION HOOK ----
+const usePricingCalculation = ({ price = 0, tax = 0, coachPrice = 0 }) => {
+  const parsedPrice = parseNumber(price);
+  const parsedTax = parseNumber(tax);
+  const parsedCoachPrice = parseNumber(coachPrice);
+
+  return useMemo(() => {
+    const subtotal = parsedPrice + parsedCoachPrice;
+    const taxAmount = parsedTax ? (parsedTax / 100) * parsedPrice : 0;
+    const total = subtotal + taxAmount;
+
+    return { subtotal, taxAmount, total };
+  }, [parsedPrice, parsedTax, parsedCoachPrice]);
+};
+
+// ---- PROVIDER ----
+export const PricingProvider = ({ children }) => {
+  const [inputs, setInputs] = useState(INITIAL_INPUTS);
+
+  const updateInput = (key, value) => {
+    if (!(key in INITIAL_INPUTS)) {
+      console.warn(`Invalid input key: "${key}"`);
+      return;
+    }
+    setInputs((prev) => ({ ...prev, [key]: value }));
   };
 
+  const pricing = usePricingCalculation(inputs);
+
   return (
-    <SubscriptionPricingContext.Provider
-      value={{ pricingInputs, updatePricingInput, pricing }}
-    >
+    <PricingContext.Provider value={{ inputs, updateInput, pricing }}>
       {children}
-    </SubscriptionPricingContext.Provider>
+    </PricingContext.Provider>
   );
 };
 
-// ---- Custom Hook to Use Context ---- //
-export const usePricingContext = () => useContext(SubscriptionPricingContext);
+// ---- CONSUMER HOOK ----
+export const usePricing = () => {
+  const context = useContext(PricingContext);
 
-// ---- Pricing Calculation Logic ---- //
-function useSubscriptionPricing({
-  basePrice = 0,
-  coachPrice = 0,
-  tax = 0,
-  cardPrice = 0,
-  insurancePrice = 0,
-}) {
-  const parsed = {
-    base: Number(basePrice) || 0,
-    coach: Number(coachPrice) || 0,
-    tax: Number(tax) || 0,
-    card: Number(cardPrice) || 0,
-    insurance: Number(insurancePrice) || 0,
-  };
+  if (!context || typeof context.updateInput !== "function") {
+    throw new Error("usePricing must be used within a <PricingProvider>");
+  }
 
-  return useMemo(() => {
-    const subtotal =
-      parsed.base + parsed.coach + parsed.card + parsed.insurance;
-
-    const taxAmount = parsed.tax
-      ? (parsed.tax / 100) * parsed.base
-      : 0;
-
-    const total = subtotal + taxAmount;
-
-    return {
-      subtotal,
-      taxAmount,
-      total,
-      breakdown: parsed,
-    };
-  }, [parsed.base, parsed.coach, parsed.tax, parsed.card, parsed.insurance]);
-}
+  return context;
+};
