@@ -15,6 +15,7 @@ function AddUserModal({ onOpen }) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.8 }} // darker overlay
+        exit={{ scale: 0.7 , opacity : 0 , x : -600  }}
         transition={{ duration: 0.3 }}
         className="fixed inset-0 bg-black"
         style={{ backdropFilter: "blur(12px)" }} // optional: slight blur for smoothness
@@ -22,8 +23,10 @@ function AddUserModal({ onOpen }) {
 
       {/* Modal */}
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.7 , opacity : 0 , x : -600 }}
+
         transition={{
           type: "spring",
           stiffness: 260,

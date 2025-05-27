@@ -5,7 +5,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useTheme } from "./context/ThemeContext";
-import { SubscriptionPricingProvider } from "./context/SubscriptionPricing";
 
 import Sidebar from "./components/reusables/Sidebar";
 import DashboardPage from "./pages/Dashboard";
@@ -43,14 +42,7 @@ export default function App() {
         <div className={`flex-1 bg-${theme.colors.background}`}>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
-            <Route
-              path="users"
-              element={
-                <SubscriptionPricingProvider>
-                  <UsersPage />
-                </SubscriptionPricingProvider>
-              }
-            />
+            <Route path="users" element={<UsersPage />} />
             <Route path="payments" element={<Payments />} />
             <Route path="lockers" element={<LockerManagementPage />} />
             <Route path="logs" element={<LogPage />} />

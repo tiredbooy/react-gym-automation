@@ -149,12 +149,13 @@ export default function UsersItem() {
 
   async function handleRenewal() {
     try {
-      const response = await fetchUserData(`http://localhost:8000/api/dynamic/?action=person&id=${selectedUserId}`);
+      const response = await fetchUserData(
+        `http://localhost:8000/api/dynamic/?action=person&id=${selectedUserId}`
+      );
       const data = await response.json();
 
       console.log(data);
-    }
-    catch(e) {
+    } catch (e) {
       console.log(e.meesage);
     }
   }
@@ -171,40 +172,52 @@ export default function UsersItem() {
         searchQueries={searchQueries}
         onChangeSearchQuery={setSearchQueries}
       />
-      {isAddUserOpen && (
-        <EditUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
-      )}
-      {isViewUserOpen && (
-        <ViewUserModal
-          personId={selectedUserId} // or from your state
-          onCloseModal={() => setIsViewUserOpen(false)}
-        />
-      )}
-      {isDeleting && (
-        <DeleteModal
-          onClose={() => setIsDeleting(false)}
-          onConfirm={handleDelete}
-          title="آیا از حذف این آیتم مطمئن هستید؟"
-          isLoading={isLoading}
-        >
-          این عملیات غیرقابل بازگشت است. آیا مطمئن هستید که می‌خواهید ادامه
-          دهید؟
-        </DeleteModal>
-      )}
-
       <AnimatePresence mode="wait">
-        {isRenewal && <SubscriptionRenewalModal onSubmitUser={handleRenewal} onClose={() => setIsRenewal(isOpen => !isOpen)} />}
+        {isAddUserOpen && (
+          <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
+        )}
+      </AnimatePresence>
+      <AnimatePresence mode="wait">
+        {isViewUserOpen && (
+          <ViewUserModal
+            personId={selectedUserId} // or from your state
+            onCloseModal={() => setIsViewUserOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence mode="wait">
+        {isDeleting && (
+          <DeleteModal
+            onClose={() => setIsDeleting(false)}
+            onConfirm={handleDelete}
+            title="آیا از حذف این آیتم مطمئن هستید؟"
+            isLoading={isLoading}
+          >
+            این عملیات غیرقابل بازگشت است. آیا مطمئن هستید که می‌خواهید ادامه
+            دهید؟
+          </DeleteModal>
+        )}
+      </AnimatePresence>
+      <AnimatePresence mode="wait">
+        {isRenewal && (
+          <SubscriptionRenewalModal
+            onSubmitUser={handleRenewal}
+            onClose={() => setIsRenewal((isOpen) => !isOpen)}
+          />
+        )}
       </AnimatePresence>
 
-      {isEditing && (
-        <EditUserModal
-          personId={selectedUserId} // or from your state
-          onCloseModal={() => {
-            setIsEditing(false);
-            fetchUserData();
-          }}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        {isEditing && (
+          <EditUserModal
+            personId={selectedUserId} // or from your state
+            onCloseModal={() => {
+              setIsEditing(false);
+              fetchUserData();
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {isLoading ? (
         <Loader
