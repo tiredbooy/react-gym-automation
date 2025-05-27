@@ -177,14 +177,16 @@ export default function UsersItem() {
           <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
         )}
       </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {isViewUserOpen && (
           <ViewUserModal
-            personId={selectedUserId} // or from your state
+            personId={selectedUserId}
             onCloseModal={() => setIsViewUserOpen(false)}
           />
         )}
       </AnimatePresence>
+      
       <AnimatePresence mode="wait">
         {isDeleting && (
           <DeleteModal
