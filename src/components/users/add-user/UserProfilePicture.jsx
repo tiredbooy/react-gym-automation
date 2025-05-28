@@ -3,8 +3,8 @@ import { Camera, Upload } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTheme } from "../../../context/ThemeContext";
 
-function UserProfilePicture() {
-  const [previewUrl, setPreviewUrl] = useState(null);
+function UserProfilePicture({ personImage, onPersonImageChange }) {
+  const [previewUrl, setPreviewUrl] = useState(personImage || null);
   const [dragActive, setDragActive] = useState(false);
   const [showWebcam, setShowWebcam] = useState(false);
 
@@ -14,28 +14,29 @@ function UserProfilePicture() {
   const fileInputRef = useRef(null);
 
   const { activeTheme, themes } = useTheme();
-    const theme = themes[activeTheme];
-    const { primary, secondary, accent, background } = theme.colors;
+  const theme = themes[activeTheme];
+  const { primary, secondary, accent, background } = theme.colors;
 
-  // Start webcam with debugging
+  // Sync previewUrl with personImage prop
+  useEffect(() => {
+    setPreviewUrl(personImage || null);
+  }, [personImage]);
+
+  // Start webcam
   const startWebcam = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
-      console.log("Stream:", stream, "Video tracks:", stream.getVideoTracks());
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current
           .play()
           .catch((err) => console.error("Play error:", err));
-        console.log("Video srcObject set:", videoRef.current.srcObject);
-      } else {
-        console.error("videoRef.current is null");
       }
       setShowWebcam(true);
     } catch (err) {
-      console.error("Error accessing webcam:", err.name, err.message);
-      alert(`Could not access webcam: ${err.message}`);
+      console.error("Error accessing webcam:", err);
+      alert(`دسترسی به وب‌کم ممکن نشد: ${err.message}`);
       setShowWebcam(false);
     }
   };
@@ -58,9 +59,8 @@ function UserProfilePicture() {
       context.drawImage(videoRef.current, 0, 0);
       const dataUrl = canvasRef.current.toDataURL("image/png");
       setPreviewUrl(dataUrl);
+      onPersonImageChange(dataUrl); // Pass base64 to parent
       stopWebcam();
-    } else {
-      console.error("Cannot capture: videoRef or canvasRef is null");
     }
   };
 
@@ -82,7 +82,9 @@ function UserProfilePicture() {
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = () => {
-        setPreviewUrl(reader.result);
+        const base64Data = reader.result;
+        setPreviewUrl(base64Data);
+        onPersonImageChange(base64Data); // Pass base64 to parent
       };
       reader.readAsDataURL(file);
     }
@@ -110,7 +112,9 @@ function UserProfilePicture() {
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = () => {
-        setPreviewUrl(reader.result);
+        const base64Data = reader.result;
+        setPreviewUrl(base64Data);
+        onPersonImageChange(base64Data); // Pass base64 to parent
       };
       reader.readAsDataURL(file);
     }
@@ -140,11 +144,13 @@ function UserProfilePicture() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className={`mb-4 relative w-32 h-32 rounded-full overflow-hidden flex items-center justify-center bg-${background} border-2 border-${primary}`}>
+      <div
+        className={`mb-4 relative w-32 h-32 rounded-full overflow-hidden flex items-center justify-center bg-${background} border-2 border-${primary}`}
+      >
         {previewUrl ? (
           <img
             src={previewUrl}
-            alt="Profile preview"
+            alt="پیش‌نمایش پروفایل"
             className="w-full h-full object-cover"
           />
         ) : (
@@ -153,25 +159,20 @@ function UserProfilePicture() {
       </div>
 
       <div className="flex gap-3">
-        {/* Webcam button */}
         <button
           onClick={handleWebcamClick}
           className={`cursor-pointer bg-${primary} hover:bg-opacity-90 text-${background} font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2`}
         >
           <Camera size={24} />
-          {/* <span className="">دوربین</span> */}
         </button>
 
-        {/* File upload button */}
         <button
           onClick={handleFileButtonClick}
           className={`cursor-pointer bg-${primary} hover:bg-opacity-90 text-${background} font-bold py-2 px-4 rounded-lg transition-all duration-300 flex items-center gap-2`}
         >
-            <Upload size={24} />
-          {/* <span className="">آپلود فایل</span> */}
+          <Upload size={24} />
         </button>
 
-        {/* Hidden file input */}
         <input
           type="file"
           ref={fileInputRef}
@@ -183,10 +184,9 @@ function UserProfilePicture() {
       </div>
 
       <p className={`mt-3 text-center text-xs text-${accent} opacity-70`}>
-        فرمت‌های قابل قبول: JPG، PNG، Avif , Webp
+        فرمت‌های قابل قبول: JPG، PNG، Avif، Webp
       </p>
 
-      {/* Webcam Modal */}
       {showWebcam && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-beige rounded-xl p-6 flex flex-col items-center">
@@ -204,13 +204,13 @@ function UserProfilePicture() {
                 onClick={captureImage}
                 className="bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg"
               >
-                Capture
+                ثبت تصویر
               </button>
               <button
                 onClick={stopWebcam}
                 className="bg-gray-500 hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg"
               >
-                Cancel
+                لغو
               </button>
             </div>
           </div>

@@ -5,13 +5,16 @@ import "./styles/main.css";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
 import { PricingProvider } from "./context/SubscriptionPricing";
+import { SubscriptionDataProvider } from "./context/UserSubscriptionApiContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ThemeProvider>
-      <PricingProvider>
-        <App />
-      </PricingProvider>
-    </ThemeProvider>
+    <SubscriptionDataProvider>
+      <ThemeProvider>
+        <PricingProvider>
+          <App />
+        </PricingProvider>
+      </ThemeProvider>
+    </SubscriptionDataProvider>
   </StrictMode>
 );

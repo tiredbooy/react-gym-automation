@@ -2,7 +2,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+import DateObject from "react-date-object";
 import { useTheme } from "../../../context/ThemeContext";
+
+function toEnglishDigits(str) {
+  return str.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+}
 
 export default function InsuranceDataInputs({
   formData,
@@ -28,22 +33,20 @@ export default function InsuranceDataInputs({
           </label>
           <input
             type="text"
-            name="insurance_number"
-            value={formData.insurance_number}
-            onChange={(e) =>
-              handleInputChange("insurance_number", e.target.value)
-            }
+            name="insurance_no"
+            value={formData.insurance_no}
+            onChange={(e) => handleInputChange("insurance_no", e.target.value)}
             className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
                     focus:outline-none focus:ring-2 focus:ring-${primary}/60 focus:border-transparent 
                     transition-all duration-300 hover:border-${primary}/30 text-${accent} placeholder-gray-400
-                    ${errors.insurance_number ? "border-errorRed" : ""}`}
+                    ${errors.insurance_no ? "border-errorRed" : ""}`}
             placeholder="شماره بیمه را وارد کنید"
-            aria-invalid={!!errors.insurance_number}
+            aria-invalid={!!errors.insurance_no}
             aria-label="شماره بیمه"
           />
-          {errors.insurance_number && (
+          {errors.insurance_no && (
             <p className="text-errorRed text-xs mt-1 text-right">
-              {errors.insurance_number}
+              {errors.insurance_no}
             </p>
           )}
         </div>
@@ -55,19 +58,32 @@ export default function InsuranceDataInputs({
             calendar={persian}
             locale={persian_fa}
             calendarPosition="bottom-right"
-            value={formData.insurance_start}
-            onChange={(date) => handleInputChange("insurance_start", date)}
+            value={
+              formData.ins_start_date
+                ? new DateObject({
+                    date: formData.birth_date,
+                    format: "YYYY/MM/DD",
+                    calendar: persian,
+                  })
+                : null
+            }
+            // onChange={(date) => handleInputChange("ins_start_date", date)}
+            onChange={(date) => {
+              const formatted = date?.format?.("YYYY/MM/DD") || "";
+              const englishFormatted = toEnglishDigits(formatted); // 🧼 Clean it
+              handleInputChange("ins_start_date", englishFormatted);
+            }}
             inputClass={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
                     focus:outline-none focus:ring-2 focus:ring-${primary}/60 focus:border-transparent 
                     transition-all duration-300 hover:border-${primary}/30 text-${accent} placeholder-gray-400
-                    ${errors.insurance_number ? "border-errorRed" : ""}`}
+                    ${errors.insurance_no ? "border-errorRed" : ""}`}
             placeholder="تاریخ شروع"
-            aria-invalid={!!errors.insurance_start}
+            aria-invalid={!!errors.ins_start_date}
             aria-label="تاریخ شروع بیمه"
           />
-          {errors.insurance_start && (
+          {errors.ins_start_date && (
             <p className="text-errorRed text-xs mt-1 text-right">
-              {errors.insurance_start}
+              {errors.ins_start_date}
             </p>
           )}
         </div>
@@ -79,19 +95,31 @@ export default function InsuranceDataInputs({
             calendar={persian}
             locale={persian_fa}
             calendarPosition="bottom-right"
-            value={formData.insurance_end}
-            onChange={(date) => handleInputChange("insurance_end", date)}
+            value={
+              formData.ins_end_date
+                ? new DateObject({
+                    date: formData.birth_date,
+                    format: "YYYY/MM/DD",
+                    calendar: persian,
+                  })
+                : null
+            }
+            onChange={(date) => {
+              const formatted = date?.format?.("YYYY/MM/DD") || "";
+              const englishFormatted = toEnglishDigits(formatted); // 🧼 Clean it
+              handleInputChange("ins_end_date", englishFormatted);
+            }}
             inputClass={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
                     focus:outline-none focus:ring-2 focus:ring-${primary}/60 focus:border-transparent 
                     transition-all duration-300 hover:border-${primary}/30 text-${accent} placeholder-gray-400
-                    ${errors.insurance_number ? "border-errorRed" : ""}`}
+                    ${errors.insurance_no ? "border-errorRed" : ""}`}
             placeholder="تاریخ پایان"
-            aria-invalid={!!errors.insurance_end}
+            aria-invalid={!!errors.ins_end_date}
             aria-label="تاریخ پایان بیمه"
           />
-          {errors.insurance_end && (
+          {errors.ins_end_date && (
             <p className="text-errorRed text-xs mt-1 text-right">
-              {errors.insurance_end}
+              {errors.ins_end_date}
             </p>
           )}
         </div>

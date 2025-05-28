@@ -10,25 +10,30 @@ import FormDataInputs from "./FormDataInputs";
 import InsuranceDataInputs from "./InsuranceDataInputs";
 import SubscriptionDataForm from "./SubscriptionDataForm";
 import { useTheme } from "../../../context/ThemeContext";
+import { useData } from "../../../context/UserSubscriptionApiContext";
 
-function AddUserForm({ onOpen }) {
+function AddUserForm({ onOpen, personImage }) {
+  const { handleAddUser } = useData();
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     mobile: "",
     national_code: "",
     birth_date: null,
+    person_image: personImage ? personImage : "",
+    thumbnail_image: personImage ? personImage : "",
     gender: "",
-    hasInsurance: false,
-    insurance_number: "",
-    insurance_start: null,
-    insurance_end: null,
+    has_insurance: false,
+    insurance_no: "",
+    ins_start_date: null,
+    ins_end_date: null,
     auth_method: "none", // Combined authentication method
   });
   const [errors, setErrors] = useState({});
   const [hardwareData, setHardwareData] = useState(""); // Mock hardware data
 
-   const { activeTheme, themes } = useTheme();
+  const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
   const { primary, secondary, accent, background } = theme.colors;
 
@@ -70,13 +75,13 @@ function AddUserForm({ onOpen }) {
     if (!formData.national_code) newErrors.national_code = "کد ملی الزامی است";
     if (!formData.birth_date) newErrors.birth_date = "تاریخ تولد الزامی است";
     if (!formData.gender) newErrors.gender = "جنسیت الزامی است";
-    if (formData.hasInsurance) {
-      if (!formData.insurance_number)
-        newErrors.insurance_number = "شماره بیمه الزامی است";
-      if (!formData.insurance_start)
-        newErrors.insurance_start = "تاریخ شروع بیمه الزامی است";
-      if (!formData.insurance_end)
-        newErrors.insurance_end = "تاریخ پایان بیمه الزامی است";
+    if (formData.has_insurance) {
+      if (!formData.insurance_no)
+        newErrors.insurance_no = "شماره بیمه الزامی است";
+      if (!formData.ins_start_date)
+        newErrors.ins_start_date = "تاریخ شروع بیمه الزامی است";
+      if (!formData.ins_end_date)
+        newErrors.ins_end_date = "تاریخ پایان بیمه الزامی است";
     }
     if (!formData.auth_method || formData.auth_method === "none") {
       newErrors.auth_method = "لطفا روش احراز هویت را انتخاب کنید";
@@ -84,6 +89,7 @@ function AddUserForm({ onOpen }) {
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       console.log("Form submitted:", { ...formData, hardwareData });
+      handleAddUser(formData);
       // Add API call or hardware data submission
     }
   };
@@ -106,21 +112,21 @@ function AddUserForm({ onOpen }) {
       {/* Insurance Check */}
       <div className="text-right col-span-full mt-4">
         <RadioGroup
-          name="hasInsurance"
-          value={formData.hasInsurance}
-          onChange={(value) => handleInputChange("hasInsurance", value)}
+          name="has_insurance"
+          value={formData.has_insurance}
+          onChange={(value) => handleInputChange("has_insurance", value)}
           options={[
             { value: true, label: "دارد" },
             { value: false, label: "ندارد" },
           ]}
           label="بیمه ورزشی"
           wrapperClass={`card bg-${secondary} p-4 rounded-xl`}
-          error={errors.hasInsurance}
+          error={errors.has_insurance}
         />
       </div>
 
       {/* Insurance Fields */}
-      {formData.hasInsurance && (
+      {formData.has_insurance && (
         <InsuranceDataInputs
           formData={formData}
           handleInputChange={handleInputChange}
@@ -154,7 +160,9 @@ function AddUserForm({ onOpen }) {
         </AnimatePresence>
       </div>
 
-      <div className={`border-t border-${primary} mt-8 pt-6 w-full flex flex-col gap-4`}>
+      <div
+        className={`border-t border-${primary} mt-8 pt-6 w-full flex flex-col gap-4`}
+      >
         <h2 className={`text-center text-2xl font-bold text-${primary}`}>
           اشتراک
         </h2>
@@ -164,7 +172,7 @@ function AddUserForm({ onOpen }) {
 
       <div className="flex flex-row gap-5 col-span-full">
         <motion.button
-          onClick={() => onOpen(isOpen => !isOpen)}
+          onClick={() => onOpen((isOpen) => !isOpen)}
           type="button"
           className={`mt-8 w-full sm:w-auto flex justify-center bg-red-700 hover:bg-red-700/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
           whileHover={{ scale: 1.05 }}

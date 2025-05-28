@@ -1,7 +1,12 @@
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+import DateObject from "react-date-object";
 import { useTheme } from "../../../context/ThemeContext";
+
+  function toEnglishDigits(str) {
+  return str.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+}
 
 export default function FormDataInputs({
   formData,
@@ -20,7 +25,7 @@ export default function FormDataInputs({
   const themedHover = `hover:border-${primary}/60`;
   const textColor = `text-${accent}`;
   const labelColor = `text-${accent}`;
-  const themeBack = `bg-${background}`
+  const themeBack = `bg-${background}`;
 
   const getInputClass = (hasError) =>
     `${inputBaseClasses} ${themedBorder} ${themedFocus} ${themedHover} ${textColor} ${themeBack} ${
@@ -126,8 +131,20 @@ export default function FormDataInputs({
           calendar={persian}
           locale={persian_fa}
           calendarPosition="bottom-right"
-          value={formData.birth_date}
-          onChange={(date) => handleInputChange("birth_date", date)}
+          value={
+            formData.birth_date
+              ? new DateObject({
+                  date: formData.birth_date,
+                  format: "YYYY/MM/DD",
+                  calendar: persian,
+                })
+              : null
+          }
+          onChange={(date) => {
+            const formatted = date?.format?.("YYYY/MM/DD") || "";
+            const englishFormatted = toEnglishDigits(formatted); // 🧼 Clean it
+            handleInputChange("birth_date", englishFormatted);
+          }}
           inputClass={getInputClass(errors.birth_date)}
           placeholder="تاریخ را انتخاب کنید"
           aria-invalid={!!errors.birth_date}
@@ -148,7 +165,9 @@ export default function FormDataInputs({
           name="gender"
           value={formData.gender}
           onChange={(e) => handleInputChange("gender", e.target.value)}
-          className={`${getInputClass(errors.gender)} appearance-none bg-${background}`}
+          className={`${getInputClass(
+            errors.gender
+          )} appearance-none bg-${background}`}
           aria-invalid={!!errors.gender}
         >
           <option value="" disabled>

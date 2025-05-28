@@ -3,11 +3,14 @@ import { UserPlus, X } from "lucide-react";
 import AddUserForm from "./AddUserForm";
 import UserProfilePicture from "./UserProfilePicture";
 import { useTheme } from "../../../context/ThemeContext";
+import { useState } from "react";
 
 function AddUserModal({ onOpen }) {
   const { activeTheme, themes } = useTheme();
     const theme = themes[activeTheme];
     const { primary, secondary, accent, background } = theme.colors;
+
+    const [personImage , serPersonImage] = useState();
 
   return (
     <>
@@ -56,9 +59,9 @@ function AddUserModal({ onOpen }) {
         </motion.header>
 
         <div className="flex flex-row gap-3 mt-5 ">
-          <AddUserForm onOpen={onOpen} />
+          <AddUserForm onOpen={onOpen} personImage={personImage} />
           {/* <div className="bg-red-500 w-1/5">w</div> */}
-          <UserProfilePicture />
+          <UserProfilePicture personImage={personImage} onPersonImageChange={serPersonImage} />
         </div>
       </motion.div>
     </>
