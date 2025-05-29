@@ -20,7 +20,7 @@ function AddUserModal({ onOpen }) {
         animate={{ opacity: 0.8 }} // darker overlay
         exit={{ scale: 0.7 , opacity : 0 , x : -600  }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-black"
+        className="fixed inset-0 bg-black z-50"
         style={{ backdropFilter: "blur(12px)" }} // optional: slight blur for smoothness
       />
 
@@ -35,7 +35,7 @@ function AddUserModal({ onOpen }) {
           stiffness: 260,
           damping: 20,
         }}
-        className={`bg-${background} my-8 p-8 overflow-auto rounded-2xl shadow-2xl w-full max-w-7xl mx-auto fixed inset-0 m-auto z-50`}
+        className={`bg-${background} my-8 p-8 overflow-auto rounded-2xl shadow-2xl w-full max-w-7xl mx-auto fixed inset-0 m-auto z-50 scroll-smooth`}
       >
         <motion.span
           onClick={() => onOpen((isOpen) => !isOpen)}
