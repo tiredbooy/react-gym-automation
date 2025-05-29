@@ -98,23 +98,6 @@ export default function SubscriptionDataForm() {
   // Form validity state
   const [formErrors, setFormErrors] = useState({});
 
-  // Handle input changes
-  const handleInputChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    if (formErrors[name]) {
-      // Clear error for this field if it exists
-      setFormErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
   const handleNumericChange = (e) => {
     const { name, value } = e.target;
     const numValue = value === "" ? 0 : parseInt(value, 10) || 0;
@@ -130,73 +113,6 @@ export default function SubscriptionDataForm() {
     }
   };
 
-  // Calculate total_tuition
-  useEffect(() => {
-    let tuition = 0;
-    let total = 0;
-    if (formData.subscription_type) {
-      const selectedType = subscriptionTypes.find(
-        (type) => type.value === formData.subscription_type
-      );
-      if (selectedType) {
-        if (formData.subscription_type === "session") {
-          tuition = selectedType.basePrice * formData.sessions;
-        } else {
-          const selectedDuration = durations.find(
-            (d) => d.value === formData.duration
-          );
-          const months = selectedDuration ? selectedDuration.months : 0;
-          tuition = selectedType.basePrice * months;
-        }
-      }
-    }
-    total =
-      tuition +
-      parseInt(formData.coach_price || 0) +
-      parseInt(formData.insurance_fee || 0) +
-      parseInt(formData.card_fee || 0) -
-      parseInt(formData.discount || 0);
-    setFormData((prev) => ({
-      ...prev,
-      total_tuition: tuition,
-      total_price: total,
-    }));
-  }, [
-    formData.subscription_type,
-    formData.duration,
-    formData.sessions,
-    formData.coach_price,
-    formData.insurance_fee,
-    formData.card_fee,
-    formData.discount,
-  ]);
-
-  // Optional: Sync total_price with pricing.total
-  useEffect(() => {
-    setFormData((prev) => ({ ...prev, total_price: pricing.total }));
-  }, [pricing.total]);
-
-  // Handle program type change
-  const handleProgramTypeChange = (value) => {
-    let coachPrice = 0;
-    if (formData.coach) {
-      const selectedCoach = coaches.find(
-        (coach) => coach.value === formData.coach
-      );
-      if (selectedCoach) {
-        coachPrice =
-          value === true ? selectedCoach.vipPrice : selectedCoach.normalPrice;
-      }
-    }
-    updateInput("coachPrice", coachPrice); // Sync with PricingContext
-    setFormData((prev) => ({
-      ...prev,
-      programType: value,
-      coach_price: coachPrice,
-    }));
-  };
-
-  // Handle coach selection
   const handleCoachSelect = (e) => {
     const { value } = e.target;
     const selectedCoach =
