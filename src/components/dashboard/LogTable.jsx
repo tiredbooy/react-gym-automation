@@ -5,13 +5,14 @@ import { useTheme } from "../../context/ThemeContext";
 export default function LogTable({ userData }) {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
+  const {primary , secondary , accent , background} = theme.colors;
 
   return (
-    <div className="max-h-96 overflow-y-auto">
-      <table className="table rounded-lg w-full">
+    <div className='max-h-96 overflow-y-auto'>
+      <table className={`table rounded-lg w-full bg-${background}`}>
         {/* head */}
         <thead
-          className={`bg-${theme.colors.secondary} text-${theme.colors.accent} border-transparent sticky top-0 z-10`}
+          className={`bg-${background}/70 text-${accent} border-transparent sticky top-0 z-10`}
         >
           <tr>
             <th>کد</th>
@@ -27,9 +28,9 @@ export default function LogTable({ userData }) {
           {userData.map((user, index) => (
             <tr
               key={user.id || index}
-              className={`border-b border-${theme.colors.accent} bg-${theme.colors.secondary} hover:bg-${theme.colors.background} transition duration-200`}
+              className={`border-b border-${accent} bg-${secondary} hover:bg-${background}/30 transition duration-200`}
             >
-              <td className="py-4 px-2">1</td>
+              <td className={`py-4 px-2 text-${accent}`}>1</td>
               <td className="py-4 px-2">
                 <div className="flex items-center gap-3">
                   <div className="avatar">
@@ -41,7 +42,7 @@ export default function LogTable({ userData }) {
                     </div>
                   </div>
                   <div>
-                    <div className="font-bold">
+                    <div className={`font-bold text-${accent}`}>
                       {user.first_name} {user.last_name}
                     </div>
                     <div className="text-sm opacity-50">{user.user_type}</div>
@@ -52,7 +53,7 @@ export default function LogTable({ userData }) {
                 {user.sport}
                 <br />
                 <span
-                  className={`badge badge-ghost badge-sm bg-${theme.colors.background} text-${theme.colors.accent} font-bold`}
+                  className={`badge badge-ghost badge-sm bg-${background} text-${accent} font-bold`}
                 >
                   {user.subscription_days} جلسه
                 </span>
