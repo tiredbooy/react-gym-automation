@@ -45,27 +45,27 @@ export default function LogTable({ userData }) {
                     <div className={`font-bold text-${accent}`}>
                       {user.first_name} {user.last_name}
                     </div>
-                    <div className="text-sm opacity-50">{user.user_type}</div>
+                    <div className={`text-sm opacity-50 text-${accent}`}>{user.user_type}</div>
                   </div>
                 </div>
               </td>
-              <td className="py-4 px-2">
+              <td className={`py-4 px-2 text-${accent}`}>
                 {user.sport}
                 <br />
                 <span
-                  className={`badge badge-ghost badge-sm bg-${background} text-${accent} font-bold`}
+                  className={`badge badge-ghost border-transparent badge-sm bg-${background} text-${accent} font-bold`}
                 >
                   {user.subscription_days} جلسه
                 </span>
               </td>
-              <td className="py-4 px-2">
+              <td className={`py-4 px-2 text-${accent}`}>
                 {new Date().toLocaleDateString("fa-IR")}
               </td>
-              <td className="py-4 px-2">
+              <td className={`py-4 px-2 text-${accent}`}>
                 {new Date().toLocaleDateString("fa-IR")}
               </td>
-              <td className="py-4 px-2">{user.locker}</td>
-              <td className="py-4 px-2">
+              <td className={`py-4 px-2 text-${accent}`}>{user.locker}</td>
+              <td className={`py-4 px-2 text-${accent}`}>
                 <div className="flex flex-row items-center justify-start gap-2">
                   <button className="text-green-500 font-bold">
                     <Repeat size={18} />
