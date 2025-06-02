@@ -1,105 +1,23 @@
 {
-  "themeSetting": {
-    "theme": "classic"
+  "themeSetting": {},
+  "addUserpreference": {
+    "first_name": false,
+    "last_name": true,
+    "phone_num": false,
+    "nation_code": false,
+    "birth_date": false,
+    "gender": false,
+    "insurance": false,
+    "auth_method": false
   },
-
-  "addUserPrefrence": {
-    "nationCode": true,
-    "phoneNum": true,
-    "birthDate": true,
-    "email": false
-  },
-
   "tokenSetting": "Token here",
-
-  "sportsPrice": [
-    {
-      "id": 1,
-      "name": "crossfit",
-      "price": 1400000
-    },
-    {
-      "id": 2,
-      "name": "bodybuilding",
-      "price": 1400000
-    }
-  ],
-
+  "sportsPrice": [],
   "personnel": {
-    "accessManagment": [
-      {
-        "id": 1,
-        "role": "manager",
-        "accessTo": ["manageServices", "manageUsers"]
-      },
-      {
-        "id": 2,
-        "role": "coach",
-        "accessTo": ["viewSchedule", "assignWorkouts"]
-      }
-    ],
-    "log": [
-      {
-        "id": "log1",
-        "userId": 1,
-        "userName": "مهدی کاظمی",
-        "lastLogin": "2024-05-25T14:32:00Z"
-      }
-    ]
+    "accessManagment": [],
+    "log": []
   },
-
-  "devicesManagment": [
-    {
-      "id": 1,
-      "deviceId": "DE-542",
-      "deviceType": "RFID",
-      "deviceSetting": {
-        "deviceGroup": "lockerRoom",
-        "deviceName": "device 1",
-        "devicePort": "COM3",
-        "deviceIp": "192.168.1.100",
-        "baud_rate": 9600,
-        "priority": 1,
-        "data_bits": 8,
-        "stop_bits": 1,
-        "timeout": 5000,
-        "protocol": "TCP"
-      }
-    }
-  ],
-
-  "deviceLog": [
-    {
-      "deviceId": "DE-542",
-      "deviceName": "device 1",
-      "isActive": true,
-      "lastModifyTime": "2024-05-25T14:30:00Z",
-      "detail": "device connected"
-    }
-  ],
-
-  "salonsManagment": [
-    {
-      "salonId": 1,
-      "salonName": "Salon 1",
-      "workHour": {
-        "saturday": ["06:00", "23:30"],
-        "sunday": ["06:00", "23:30"]
-      }
-    }
-  ],
-
-  "coachMangment": [
-    {
-      "coachId": 1,
-      "coachName": "احمد رضایی",
-      "coachShift": "morning",
-      "coachPhoneNum": "09123456789",
-      "coachNormalUser": 5,
-      "coachPrivateUser": 3,
-      "coachNormalPlanPrice": 1000000,
-      "coachPrivatePlanPrice": 5000000,
-      "coachSport": ["crossfit", "bodybuilding"]
-    }
-  ]
+  "devicesManagment": [],
+  "deviceLog": [],
+  "salonsManagment": [],
+  "coachMangment": []
 }

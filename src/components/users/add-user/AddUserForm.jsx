@@ -6,10 +6,10 @@ import FormDataInputs from "./FormDataInputs";
 import InsuranceDataInputs from "./InsuranceDataInputs";
 import SubscriptionDataForm from "./SubscriptionDataForm";
 import { useTheme } from "../../../context/ThemeContext";
-import { useData } from "../../../context/UserSubscriptionApiContext";
+import { useUser } from "../../../context/UserApiContext";
 
 function AddUserForm({ onOpen, personImage }) {
-  const { isLoading , handleAddUser } = useData();
+  const { isLoading , handleAddUser } = useUser();
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
@@ -125,7 +125,7 @@ function AddUserForm({ onOpen, personImage }) {
           handleInputChange={handleInputChange}
           errors={errors}
         />
-        <div className="text-right col-span-full mt-4">
+        <div className="mt-4 text-right col-span-full">
           <RadioGroup
             name="has_insurance"
             value={formData.has_insurance}

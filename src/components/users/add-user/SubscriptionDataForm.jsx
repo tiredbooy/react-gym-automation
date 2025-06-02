@@ -6,7 +6,7 @@ import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import { useTheme } from "../../../context/ThemeContext";
 import { usePricing } from "../../../context/SubscriptionPricing";
-import { useData } from "../../../context/UserSubscriptionApiContext";
+import { useUser } from "../../../context/UserApiContext";
 
 const sports = [
   { id: 1, label: "بدنسازی" },
@@ -67,7 +67,7 @@ const availableLockers = Array.from({ length: 50 }, (_, i) => ({
 }));
 
 export default function SubscriptionDataForm() {
-  const { isLoading , userID } = useData();
+  const { isLoading , userID } = useUser();
   const { inputs, updateInput, pricing } = usePricing();
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
@@ -443,7 +443,7 @@ export default function SubscriptionDataForm() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             رشته ورزشی
@@ -469,7 +469,7 @@ export default function SubscriptionDataForm() {
             ))}
           </select>
           {formErrors.sport && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.sport}</p>
+            <p className="mt-1 text-xs text-red-500">{formErrors.sport}</p>
           )}
         </div>
 
@@ -498,7 +498,7 @@ export default function SubscriptionDataForm() {
             ))}
           </select>
           {formErrors.session_time && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="mt-1 text-xs text-red-500">
               {formErrors.session_time}
             </p>
           )}
@@ -594,7 +594,7 @@ export default function SubscriptionDataForm() {
             ))}
           </select>
           {formErrors.subscription_type && (
-            <p className="text-red-500 text-xs mt-1">
+            <p className="mt-1 text-xs text-red-500">
               {formErrors.subscription_type}
             </p>
           )}
@@ -627,7 +627,7 @@ export default function SubscriptionDataForm() {
               aria-label="شماره کمد"
             />
             {formErrors.locker_number && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="mt-1 text-xs text-red-500">
                 {formErrors.locker_number}
               </p>
             )}
@@ -661,7 +661,7 @@ export default function SubscriptionDataForm() {
             ))}
           </select>
           {formErrors.duration && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.duration}</p>
+            <p className="mt-1 text-xs text-red-500">{formErrors.duration}</p>
           )}
         </div>
 
@@ -694,7 +694,7 @@ export default function SubscriptionDataForm() {
             ))}
           </select>
           {formErrors.sessions && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.sessions}</p>
+            <p className="mt-1 text-xs text-red-500">{formErrors.sessions}</p>
           )}
         </div>
 
@@ -717,7 +717,7 @@ export default function SubscriptionDataForm() {
             aria-label="تاریخ شروع"
           />
           {formErrors.start_date && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.start_date}</p>
+            <p className="mt-1 text-xs text-red-500">{formErrors.start_date}</p>
           )}
         </div>
 
@@ -800,7 +800,7 @@ export default function SubscriptionDataForm() {
         </div>
 
         {/* Summary Fields */}
-        <div className="col-span-full flex flex-row gap-24 w-full">
+        <div className="flex flex-row w-full gap-24 col-span-full">
           <div className={`text-right w-full bg-${accent} p-4 rounded-xl`}>
             <label
               className={`block mb-2 text-sm font-semibold text-${background}`}

@@ -1,40 +1,86 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Button from "../../reusables/Button";
 import { useTheme } from "../../../context/ThemeContext";
 
 const settingsList = [
-  "کد ملی",
-  "شماره تماس",
-  "تاریخ تولد",
-  "جنسیت",
-  "بیمه ورزشی",
-  "روش احراز هویت",
+  { label: "نام", key: "first_name" },
+  { label: "نام خانوادگی", key: "last_name" },
+  { label: "شماره تماس", key: "phone_num" },
+  { label: "کد ملی", key: "nation_code" },
+  { label: "تاریخ تولد", key: "birth_date" },
+  { label: "جنسیت", key: "gender" },
+  { label: "بیمه ورزشی", key: "insurance" },
+  { label: "روش احراز هویت", key: "auth_method" },
 ];
 
 function AddUserDefaultSetting() {
   const { activeTheme, themes } = useTheme();
-  const [checkedSettings, setCheckedSettings] = useState({});
-
+  const [preferences, setPreferences] = useState({
+    first_name: true,
+    last_name: true,
+    phone_num: true,
+    nation_code: true,
+    birth_date: true,
+    gender: true,
+    insurance: true,
+    auth_method: true,
+  });
   const theme = themes[activeTheme];
 
+  // Load preferences from local JSON server
+  useEffect(() => {
+    async function loadPreferences() {
+      try {
+        const res = await fetch("http://localhost:3000/addUserpreference");
+        const data = await res.json();
+        if (data.addUserPrefrence) {
+          setPreferences(data.addUserPrefrence);
+        }
+      } catch (err) {
+        console.error("Error loading preferences:", err);
+      }
+    }
+    loadPreferences();
+  }, []);
+
+  // Toggle setting and update API
   const toggleSetting = (label) => {
-    setCheckedSettings((prev) => ({
-      ...prev,
-      [label]: !prev[label],
-    }));
+    const setting = settingsList.find((item) => item.label === label);
+    if (!setting) return;
+
+    const updatedPreferences = {
+      ...preferences,
+      [setting.key]: !preferences[setting.key],
+    };
+
+    setPreferences(updatedPreferences);
+
+    fetch("http://localhost:3000/addUserpreference", {
+      method: "PUT", // Use PUT to replace the entire object
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedPreferences), // Send raw preferences object
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Updated successfully", data);
+      })
+      .catch((err) => {
+        console.error("Update error:", err);
+      });
   };
 
   return (
-    <div className="bg-gradiant-to-t shadow-md w-full p-4 rounded-xl flex flex-col gap-6">
+    <div className="flex flex-col w-full gap-6 p-4 shadow-md bg-gradient-to-t rounded-xl">
       <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>
         تنظیمات ثبت نام کاربر
       </h1>
 
-      <div className="w-full px-2 flex flex-wrap gap-4">
-        {settingsList.map((label) => {
-          const isChecked = !!checkedSettings[label];
+      <div className="flex flex-wrap w-full gap-4 px-2">
+        {settingsList.map(({ label, key }) => {
+          const isChecked = !!preferences[key];
 
           return (
             <button
@@ -43,12 +89,11 @@ function AddUserDefaultSetting() {
               className={`flex items-center gap-2 p-2 rounded-lg text-${theme.colors.accent} transition-colors duration-200`}
             >
               <div
-                className={`w-5 h-5 border-${theme.colors.primary} border-2 rounded-full flex items-center justify-center transition-colors duration-200 
-                                ${
-                                  isChecked
-                                    ? `bg-${theme.colors.primary}`
-                                    : `border-${theme.colors.primary}`
-                                }`}
+                className={`w-5 h-5 border-${theme.colors.primary} border-2 rounded-full flex items-center justify-center ${
+                  isChecked
+                    ? `bg-${theme.colors.primary}`
+                    : `border-${theme.colors.primary}`
+                }`}
               >
                 <AnimatePresence>
                   {isChecked && (
@@ -67,7 +112,9 @@ function AddUserDefaultSetting() {
                   )}
                 </AnimatePresence>
               </div>
-              <span className={`"text-${theme.colors.accent} text-sm"`}>{label}</span>
+              <span className={`text-${theme.colors.accent} text-sm`}>
+                {label}
+              </span>
             </button>
           );
         })}

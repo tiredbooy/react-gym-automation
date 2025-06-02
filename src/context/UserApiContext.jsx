@@ -121,10 +121,10 @@ function SubscriptionDataProvider({ children }) {
   );
 }
 
-function useData() {
+function useUser() {
   const context = useContext(SubscriptionDataContext);
   if (context === undefined) throw new Error("unknown provider");
   return context;
 }
 
-export { SubscriptionDataProvider, useData };
+export { SubscriptionDataProvider, useUser };
