@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import os from 'node:os'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -12,10 +13,17 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    minWidth : 800,
+    minHeight : 600,
+    // transparent : true,
+    // frame : false,
+    // backgroundColor: '#00000000',
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
-      nodeIntegration: false,
+    nodeIntegration: false,
+    sandbox: true,
+    nodeIntegrationInWorker: false,
     },
   });
 

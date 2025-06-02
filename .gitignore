@@ -1,3 +1,7 @@
+# ================================
+# FRONTEND (Vite + React + Electron)
+# ================================
+
 # Logs
 logs
 *.log
@@ -7,18 +11,133 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node modules
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
 *.local
 
-# Editor directories and files
+# Vite cache
+.vite/
+
+# Electron cache / artifacts
+out/
+release/
+*.asar
+
+# dotenv environment variables
+.env
+.env.*.local
+
+# ================================
+# BACKEND (Django)
+# ================================
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django stuff:
+*.sqlite3
+*.pyc
+*.pyo
+*.pyd
+*.db
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+
+# dotenv
+.env
+.env.*
+
+# Coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# PyCharm
+.idea/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pytest
+.pytest_cache/
+
+# ================================
+# IDEs and OS files
+# ================================
+
+# VSCode
 .vscode/*
 !.vscode/extensions.json
-.idea
+
+# macOS
 .DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Visual Studio
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Linux
+*~
+
+# ================================
+# OTHER
+# ================================
+
+# Backup files
+*.bak
+*.tmp
+*.temp
+
+# Logs or debug folders
+debug/
+tmp/
+temp/
