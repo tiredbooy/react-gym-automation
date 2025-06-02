@@ -16,16 +16,7 @@ const settingsList = [
 
 function AddUserDefaultSetting() {
   const { activeTheme, themes } = useTheme();
-  const [preferences, setPreferences] = useState({
-    first_name: true,
-    last_name: true,
-    phone_num: true,
-    nation_code: true,
-    birth_date: true,
-    gender: true,
-    insurance: true,
-    auth_method: true,
-  });
+  const [preferences, setPreferences] = useState({}); // Empty object to avoid errors
   const theme = themes[activeTheme];
 
   // Load preferences from local JSON server
@@ -34,9 +25,7 @@ function AddUserDefaultSetting() {
       try {
         const res = await fetch("http://localhost:3000/addUserpreference");
         const data = await res.json();
-        if (data.addUserPrefrence) {
-          setPreferences(data.addUserPrefrence);
-        }
+        setPreferences(data); // Set state directly with response data
       } catch (err) {
         console.error("Error loading preferences:", err);
       }
@@ -49,19 +38,20 @@ function AddUserDefaultSetting() {
     const setting = settingsList.find((item) => item.label === label);
     if (!setting) return;
 
-    const updatedPreferences = {
-      ...preferences,
-      [setting.key]: !preferences[setting.key],
-    };
+    // Ensure all keys are included, with fallback to false if undefined
+    const updatedPreferences = settingsList.reduce((acc, { key }) => ({
+      ...acc,
+      [key]: key === setting.key ? !preferences[key] : preferences[key] ?? false,
+    }), {});
 
     setPreferences(updatedPreferences);
 
     fetch("http://localhost:3000/addUserpreference", {
-      method: "PUT", // Use PUT to replace the entire object
+      method: "PUT", // Replace entire object
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedPreferences), // Send raw preferences object
+      body: JSON.stringify(updatedPreferences), // Send full object
     })
       .then((res) => res.json())
       .then((data) => {
@@ -80,7 +70,7 @@ function AddUserDefaultSetting() {
 
       <div className="flex flex-wrap w-full gap-4 px-2">
         {settingsList.map(({ label, key }) => {
-          const isChecked = !!preferences[key];
+          const isChecked = !!preferences[key]; // False if undefined
 
           return (
             <button

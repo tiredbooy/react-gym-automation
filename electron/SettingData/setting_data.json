@@ -1,16 +1,18 @@
 {
   "themeSetting": {},
   "addUserpreference": {
-    "first_name": false,
+    "first_name": true,
     "last_name": true,
-    "phone_num": false,
-    "nation_code": false,
+    "phone_num": true,
+    "nation_code": true,
     "birth_date": false,
     "gender": false,
     "insurance": false,
     "auth_method": false
   },
-  "tokenSetting": "Token here",
+  "tokenSetting": {
+    "token": "qy2516wfuwnaw251"
+  },
   "sportsPrice": [],
   "personnel": {
     "accessManagment": [],
