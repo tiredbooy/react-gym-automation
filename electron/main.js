@@ -1,9 +1,9 @@
 import { app, BrowserWindow, Menu } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import os from 'node:os'
+import { spawn } from "node:child_process";
+import { platform } from "node:os";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -52,7 +52,7 @@ function startJsonServer() {
   ensureJsonFile();
   const jsonPath = path.join(__dirname, "SettingData", "setting_data.json");
 
-  const isWin = process.platform === "win32";
+  const isWin = platform() === "win32";
   const cmd = isWin ? "npx.cmd" : "npx";
 
   jsonServerProcess = spawn(
@@ -61,6 +61,7 @@ function startJsonServer() {
     {
       stdio: "inherit",
       shell: true,
+      windowsHide : true,
     }
   );
 
