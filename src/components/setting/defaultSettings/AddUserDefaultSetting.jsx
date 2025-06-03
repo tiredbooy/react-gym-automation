@@ -63,7 +63,7 @@ function AddUserDefaultSetting() {
   };
 
   return (
-    <div className="flex flex-col w-full gap-6 p-4 shadow-md bg-gradient-to-t rounded-xl">
+    <div className={`flex flex-col w-full gap-6 p-4 shadow-md bg-gradient-to-l from-${theme.colors.secondary} rounded-xl`}>
       <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>
         تنظیمات ثبت نام کاربر
       </h1>

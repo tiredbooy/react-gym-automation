@@ -4,7 +4,9 @@ import { motion } from "framer-motion";
 import { useTheme } from "../../../context/ThemeContext";
 
 function UserProfilePicture({ personImage, onPersonImageChange }) {
-  const [previewUrl, setPreviewUrl] = useState(personImage || null);
+  const [previewUrl, setPreviewUrl] = useState(
+    personImage ? `data:image/jpeg;base64,${personImage}` : null
+  );
   const [dragActive, setDragActive] = useState(false);
   const [showWebcam, setShowWebcam] = useState(false);
 
@@ -17,21 +19,19 @@ function UserProfilePicture({ personImage, onPersonImageChange }) {
   const theme = themes[activeTheme];
   const { primary, secondary, accent, background } = theme.colors;
 
-  // Sync previewUrl with personImage prop
   useEffect(() => {
-    setPreviewUrl(personImage || null);
+    if (personImage && !personImage.startsWith("data:")) {
+      setPreviewUrl(`data:image/jpeg;base64,${personImage}`);
+    }
   }, [personImage]);
 
-  // Start webcam
   const startWebcam = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current
-          .play()
-          .catch((err) => console.error("Play error:", err));
+        await videoRef.current.play();
       }
       setShowWebcam(true);
     } catch (err) {
@@ -41,7 +41,6 @@ function UserProfilePicture({ personImage, onPersonImageChange }) {
     }
   };
 
-  // Stop webcam
   const stopWebcam = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -50,47 +49,42 @@ function UserProfilePicture({ personImage, onPersonImageChange }) {
     setShowWebcam(false);
   };
 
-  // Capture image from webcam
   const captureImage = () => {
     if (videoRef.current && canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       canvasRef.current.width = videoRef.current.videoWidth;
       canvasRef.current.height = videoRef.current.videoHeight;
       context.drawImage(videoRef.current, 0, 0);
-      const dataUrl = canvasRef.current.toDataURL("image/png");
+      const dataUrl = canvasRef.current.toDataURL("image/jpeg");
       setPreviewUrl(dataUrl);
-      onPersonImageChange(dataUrl); // Pass base64 to parent
+      onPersonImageChange(dataUrl.split(",")[1]);
       stopWebcam();
     }
   };
 
-  // Handle webcam button click
   const handleWebcamClick = (e) => {
     e.preventDefault();
     startWebcam();
   };
 
-  // Handle file input button click
   const handleFileButtonClick = (e) => {
     e.preventDefault();
     fileInputRef.current.click();
   };
 
-  // Handle file change for direct uploads
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = () => {
-        const base64Data = reader.result;
-        setPreviewUrl(base64Data);
-        onPersonImageChange(base64Data); // Pass base64 to parent
+        const dataUrl = reader.result;
+        setPreviewUrl(dataUrl);
+        onPersonImageChange(dataUrl.split(",")[1]);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Drag and drop handlers
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -107,20 +101,18 @@ function UserProfilePicture({ personImage, onPersonImageChange }) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = () => {
-        const base64Data = reader.result;
-        setPreviewUrl(base64Data);
-        onPersonImageChange(base64Data); // Pass base64 to parent
+        const dataUrl = reader.result;
+        setPreviewUrl(dataUrl);
+        onPersonImageChange(dataUrl.split(",")[1]);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Ensure video stream is assigned after modal mounts
   useEffect(() => {
     if (showWebcam && videoRef.current && streamRef.current) {
       videoRef.current.srcObject = streamRef.current;
@@ -128,7 +120,6 @@ function UserProfilePicture({ personImage, onPersonImageChange }) {
     }
   }, [showWebcam]);
 
-  // Cleanup webcam on unmount
   useEffect(() => {
     return () => stopWebcam();
   }, []);
@@ -151,7 +142,7 @@ function UserProfilePicture({ personImage, onPersonImageChange }) {
           <img
             src={previewUrl}
             alt="پیش‌نمایش پروفایل"
-            className="w-full h-full object-cover"
+            className="object-cover w-full h-full"
           />
         ) : (
           <Camera size={48} className={`text-${primary} opacity-70`} />
@@ -188,27 +179,27 @@ function UserProfilePicture({ personImage, onPersonImageChange }) {
       </p>
 
       {showWebcam && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-beige rounded-xl p-6 flex flex-col items-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="flex flex-col items-center p-6 bg-beige rounded-xl">
             <video
               ref={videoRef}
               autoPlay
               playsInline
               width="320"
               height="240"
-              className="w-80 h-60 bg-black rounded mb-4"
+              className="mb-4 bg-black rounded w-80 h-60"
             />
             <canvas ref={canvasRef} className="hidden" />
             <div className="flex gap-4">
               <button
                 onClick={captureImage}
-                className="bg-darkBlue hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg"
+                className="px-4 py-2 font-medium rounded-lg bg-darkBlue hover:bg-opacity-90 text-offWhite"
               >
                 ثبت تصویر
               </button>
               <button
                 onClick={stopWebcam}
-                className="bg-gray-500 hover:bg-opacity-90 text-offWhite font-medium py-2 px-4 rounded-lg"
+                className="px-4 py-2 font-medium bg-gray-500 rounded-lg hover:bg-opacity-90 text-offWhite"
               >
                 لغو
               </button>

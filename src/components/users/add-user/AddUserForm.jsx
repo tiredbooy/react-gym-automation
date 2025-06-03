@@ -58,6 +58,7 @@ function AddUserForm({ onOpen, personImage }) {
     }));
   }, [personImage]);
 
+
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
