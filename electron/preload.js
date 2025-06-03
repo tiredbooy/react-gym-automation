@@ -1,19 +1,62 @@
-// preload.js
-import { contextBridge, ipcRenderer } from "electron";
+const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electron", {
-  // You can add specific APIs or functions here
-  send: (channel, data) => {
-    // whitelist channels
-    const validChannels = ["some-channel"];
-    if (validChannels.includes(channel)) {
-      ipcRenderer.send(channel, data);
-    }
+  // Window Controls
+  minimize: () => ipcRenderer.invoke("window-minimize"),
+  maximizeOrRestore: () => ipcRenderer.invoke("window-maximize-or-restore"),
+  close: () => ipcRenderer.invoke("window-close"),
+
+  // Window State Listeners
+  onWindowMaximized: (callback) => {
+    const subscription = () => callback();
+    ipcRenderer.on("window-is-maximized", subscription);
+    return () =>
+      ipcRenderer.removeListener("window-is-maximized", subscription);
   },
-  receive: (channel, func) => {
-    const validChannels = ["some-channel"];
-    if (validChannels.includes(channel)) {
-      ipcRenderer.on(channel, (event, ...args) => func(...args));
-    }
+  onWindowUnmaximized: (callback) => {
+    const subscription = () => callback();
+    ipcRenderer.on("window-is-unmaximized", subscription);
+    return () =>
+      ipcRenderer.removeListener("window-is-unmaximized", subscription);
   },
+
+  // Window Information
+  getWindowState: () => ipcRenderer.invoke("get-window-state"),
+
+  // Application Controls
+  restart: () => ipcRenderer.invoke("app-restart"),
+  clearCache: () => ipcRenderer.invoke("clear-cache"),
+});
+
+// Prevent navigation to external URLs for security
+window.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("click", (e) => {
+    if (
+      e.target.tagName === "A" &&
+      e.target.href &&
+      e.target.href.startsWith("http")
+    ) {
+      e.preventDefault();
+      if (window.electron?.openExternal) {
+        window.electron.openExternal(e.target.href);
+      }
+    }
+  });
+});
+
+// Global error handler
+window.addEventListener("error", (e) => {
+  if (window.electron?.logError) {
+    window.electron.logError(
+      "Renderer Error",
+      e.error.stack || e.error.message
+    );
+  }
+});
+
+// Unhandled promise rejection handler
+window.addEventListener("unhandledrejection", (e) => {
+  if (window.electron?.logError) {
+    window.electron.logError("Unhandled Promise Rejection", e.reason);
+  }
 });

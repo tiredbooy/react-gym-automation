@@ -17,6 +17,8 @@ import { Toaster } from "react-hot-toast";
 // import LogsPage from './pages/Logs';
 // import SettingsPage from './pages/Settings';
 
+// import Titlebar from "./components/titleBar/CustomTitleBar";
+
 // Setings
 import DefaultSetting from "./components/setting/defaultSettings/DefaultSetting";
 import SupportSettings from "./components/setting/SupportSetting";
@@ -33,6 +35,7 @@ export default function App() {
   return (
     <Router>
       <Toaster position="top-center" />
+      {/* <Titlebar /> */}
 
       <div className="flex min-h-screen">
         {/* Static Sidebar */}
