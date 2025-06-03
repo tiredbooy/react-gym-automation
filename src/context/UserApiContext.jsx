@@ -8,6 +8,8 @@ const initialState = {
   isLoading: false,
   error: "",
   userID: null,
+  shift: localStorage.getItem("shift"),
+  filteredUser: [],
 };
 
 const BASE_URL = "http://localhost:8000/api/dynamic/?action=person";
@@ -32,7 +34,7 @@ function reducer(state, action) {
 }
 
 function SubscriptionDataProvider({ children }) {
-  const [{ user, isLoading, error, userID }, dispatch] = useReducer(
+  const [{ user, isLoading, error, userID, shift , filteredUser }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -44,14 +46,14 @@ function SubscriptionDataProvider({ children }) {
       full_name: `${formData?.first_name} ${formData?.last_name}`,
       gender: formData.gender,
       national_code: formData.national_code,
-      nidentify : '',
+      nidentify: "",
       birth_date: formData.birth_date,
       mobile: formData.mobile,
       has_insurance: formData.has_insurance,
       insurance_no: formData.insurance_no,
       ins_start_date: formData.ins_start_date,
       ins_end_date: formData.ins_end_date,
-      shift: 1,
+      shift,
     };
 
     try {
@@ -107,6 +109,39 @@ function SubscriptionDataProvider({ children }) {
 
   function handleEditUser(formData) {}
 
+  async function handleFilterUser(nameQuery, idQuery) {
+    const gender = shift === 1 ? "M" : "F";
+
+    let url = `http://localhost:8000/api/dynamic/?action=person`;
+
+    if (idQuery) {
+      url += `&id=${encodeURIComponent(idQuery)}`;
+    }
+
+    if (nameQuery) {
+      url += `&full_name=${encodeURIComponent(nameQuery)}`;
+    }
+
+    if (!idQuery && !nameQuery) {
+      toast.error('برای جستوجو نام و یا کد کاربر را وارد کنید')
+      return;
+    }
+
+    // Include gender if needed
+    url += `&gender=${gender}`;
+
+    try{ 
+      const response = await fetch(url);
+      const data = await response.json();
+
+      console.log('data:', data);
+    }
+    catch(e) {
+      toast.error(e.message)
+    }
+    
+  }
+
   function handleRenewalSub(formData) {}
 
   return (
@@ -116,9 +151,11 @@ function SubscriptionDataProvider({ children }) {
         isLoading,
         error,
         userID,
+        filteredUser,
         handleAddUser,
         handleEditUser,
         handleRenewalSub,
+        handleFilterUser
       }}
     >
       {children}

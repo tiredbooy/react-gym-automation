@@ -10,6 +10,7 @@ export default function UserPageHeader({
   searchQueries,
   onChangeSearchQuery,
   searchRef,
+  handleFilter
 }) {
   const [originalUsers, setOriginalUsers] = useState([]);
 
@@ -68,6 +69,7 @@ export default function UserPageHeader({
         <Button
           bgColor={`bg-${theme.colors.primary}`}
           txtColor={`text-${theme.colors.background}`}
+          onClick={() => handleFilter()}
         >
           جستجو
         </Button>

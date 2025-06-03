@@ -12,8 +12,11 @@ import toast from "react-hot-toast";
 import DeleteModal from "../reusables/DeleteModal";
 import SubscriptionRenewalModal from "./renewal/SubscriptionRenewal";
 import { AnimatePresence } from "framer-motion";
+import { useUser } from "../../context/UserApiContext";
 
 export default function UsersItem() {
+  const { handleFilterUser  } = useUser();
+
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -97,23 +100,27 @@ export default function UsersItem() {
     fetchUserData();
   }, [shift, currentPage]);
 
-  const filteredUsers = useMemo(() => {
-    return users.filter((user) => {
-      const normalize = (str) =>
-        str?.trim().replace(/\s+/g, " ").toLowerCase() || "";
+  // const filteredUsers = useMemo(() => {
+  //   return users.filter((user) => {
+  //     const normalize = (str) =>
+  //       str?.trim().replace(/\s+/g, " ").toLowerCase() || "";
 
-      const fullName = normalize(user.full_name);
-      const searchName = normalize(searchQueries.person_name);
+  //     const fullName = normalize(user.full_name);
+  //     const searchName = normalize(searchQueries.person_name);
 
-      const matchesName = searchName ? fullName.includes(searchName) : true;
+  //     const matchesName = searchName ? fullName.includes(searchName) : true;
 
-      const matchesId = searchQueries.id
-        ? String(user.id) === String(searchQueries.id)
-        : true;
+  //     const matchesId = searchQueries.id
+  //       ? String(user.id) === String(searchQueries.id)
+  //       : true;
 
-      return matchesName && matchesId;
-    });
-  }, [users, searchQueries]);
+  //     return matchesName && matchesId;
+  //   });
+  // }, [users, searchQueries]);
+
+  function handleFilter() {
+    handleFilterUser(searchQueries.person_name , searchQueries.person_id)
+  }
 
   async function handleDelete() {
     try {
@@ -167,6 +174,7 @@ export default function UsersItem() {
         onAddUserModal={setIsAddUserOpen}
         searchQueries={searchQueries}
         onChangeSearchQuery={setSearchQueries}
+        handleFilter={handleFilter}
       />
       <AnimatePresence mode="wait">
         {isAddUserOpen && (
@@ -228,7 +236,7 @@ export default function UsersItem() {
         </Loader>
       ) : (
         <UserTable
-          users={filteredUsers}
+          users={users}
           onOpenViewUser={() => setIsViewUserOpen((isOpen) => !isOpen)}
           onChangeSlectedUserId={setSelectedUserId}
           onDeleting={setIsDeleting}
