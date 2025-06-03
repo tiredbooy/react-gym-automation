@@ -30,7 +30,7 @@ function ViewUserModal({ onCloseModal, personId }) {
     if (!personId) return;
 
     fetch(
-      `http://localhost:8000/api/dynamic/?action=person&person_id=${personId}`
+      `http://localhost:8000/api/dynamic/?action=person&id=${personId}`
     )
       .then((res) => res.json())
       .then((res) => {
@@ -73,7 +73,7 @@ function ViewUserModal({ onCloseModal, personId }) {
         exit={{ scale: 0.1, opacity: 0, x: -600 }}
         transition={{ duration: 0.25 }}
         onClick={onCloseModal}
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
       />
 
       <motion.div
@@ -90,7 +90,7 @@ function ViewUserModal({ onCloseModal, personId }) {
         ) : (
           <>
             {/* Header */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">مشاهده اطلاعات کاربر</h2>
               <div className="flex gap-3">
                 {editMode ? (
@@ -129,13 +129,13 @@ function ViewUserModal({ onCloseModal, personId }) {
             </div>
 
             {/* User Info */}
-            <div className="flex gap-8 items-start mb-8 flex-wrap">
+            <div className="flex flex-wrap items-start gap-8 mb-8">
               <img
                 src={imageSrc}
                 alt="user"
-                className="w-36 h-36 rounded-2xl border-4 border-gray-300 object-cover"
+                className="object-cover border-4 border-gray-300 w-36 h-36 rounded-2xl"
               />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-right flex-1">
+              <div className="grid flex-1 grid-cols-1 gap-4 text-right md:grid-cols-2">
                 <UserInfo
                   editable={editMode}
                   value={form?.person_id}
@@ -204,7 +204,7 @@ function ViewUserModal({ onCloseModal, personId }) {
                 {(form?.subscriptions || []).map((sub, i) => (
                   <div
                     key={i + 1}
-                    className="bg-white/80 rounded-lg p-4 shadow flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                    className="flex flex-col gap-4 p-4 rounded-lg shadow bg-white/80 md:flex-row md:items-center md:justify-between"
                   >
                     <div className="space-y-1 text-right">
                       <div className="font-semibold">{sub.sport}</div>
@@ -238,7 +238,7 @@ function UserInfo({ icon, label, value, editable, onChange }) {
       {editable ? (
         <input
           type="text"
-          className="bg-white/70 border border-gray-300 rounded px-2 py-1 text-sm flex-1"
+          className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded bg-white/70"
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
         />

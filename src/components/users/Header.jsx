@@ -17,7 +17,7 @@ export default function UserPageHeader({
   const theme = themes[activeTheme];
 
   return (
-    <div className="flex flex-col gap-5 items-center py-4">
+    <div className="flex flex-col items-center gap-5 py-4">
       <div className="w-full text-start">
         <h1 className={`text-${theme.colors.primary} font-bold text-4xl`}>
           کاربرها
@@ -35,7 +35,7 @@ export default function UserPageHeader({
         </motion.button>
       </div>
 
-      <div className="w-full flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center w-full gap-2">
         <motion.input
           className={`w-24 rounded-xl px-4 py-2 border border-${theme.colors.primary} bg-${theme.colors.background} text-${theme.colors.primary} placeholder:text-${theme.colors.primary} outline-none transition-all duration-300 focus:border-${theme.colors.primary} focus:ring-2 focus:ring-${theme.colors.primary}/60 shadow-sm`}
           placeholder="کد کاربر"

@@ -37,16 +37,16 @@ export default function UserTable({
             <tr
               key={index}
               onDoubleClick={() => {
-                onChangeSlectedUserId(user.person_id);
+                onChangeSlectedUserId(user.id);
                 onOpenViewUser();
               }}
               className={`bg-${secondary} text-${accent} hover:bg-${background} hover:brightness-110 transition duration-150`}
             >
-              <td className="py-4 px-2">{index + 1}</td>
-              <td className="py-4 px-2">
+              <td className="px-2 py-4">{index + 1}</td>
+              <td className="px-2 py-4">
                 <div className="flex items-center gap-3">
                   <div className="avatar">
-                    <div className="mask mask-squircle h-12 w-12">
+                    <div className="w-12 h-12 mask mask-squircle">
                       <img
                         src={user.thumbnail_image}
                         alt="Avatar"
@@ -66,7 +66,7 @@ export default function UserTable({
                   </div>
                 </div>
               </td>
-              <td className="py-4 px-2 text-${accent}">{user?.person_id}</td>
+              <td className="py-4 px-2 text-${accent}">{user?.id}</td>
               <td className="py-4 px-2 text-${accent}">
                 {user.sport}
                 <br />
@@ -79,14 +79,14 @@ export default function UserTable({
               <td className="py-4 px-2 text-${accent}">{user?.birth_date}</td>
               <td className="py-4 px-2 text-${accent}">{user?.mobile}</td>
               <td className="py-4 px-2 text-${accent}">{user?.locker}</td>
-              <td className="py-4 px-2">
+              <td className="px-2 py-4">
                 <div className="flex flex-row items-center justify-start gap-2">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => {
                       onOpenViewUser();
-                      onChangeSlectedUserId(user.person_id);
+                      onChangeSlectedUserId(user.id);
                     }}
                     className={`text-${primary} font-bold`}
                   >
@@ -95,11 +95,11 @@ export default function UserTable({
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className="text-green-500 font-bold"
+                    className="font-bold text-green-500"
                     onClick={() => {
                       onRenewal((isOpen) => !isOpen);
-                      onChangeSlectedUserId(user.person_id);
-                      console.log("User ID : ", user.person_id);
+                      onChangeSlectedUserId(user.id);
+                      console.log("User ID : ", user.id);
                     }}
                   >
                     <Repeat size={18} />
@@ -107,10 +107,10 @@ export default function UserTable({
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className="text-yellow-500 font-bold"
+                    className="font-bold text-yellow-500"
                     onClick={() => {
                       onEdting((isOpen) => !isOpen);
-                      onChangeSlectedUserId(user.person_id);
+                      onChangeSlectedUserId(user.id);
                     }}
                   >
                     <SquarePen size={18} />
@@ -118,10 +118,10 @@ export default function UserTable({
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className="text-red-500 font-bold"
+                    className="font-bold text-red-500"
                     onClick={() => {
                       onDeleting((isOpen) => !isOpen);
-                      onChangeSlectedUserId(user.person_id);
+                      onChangeSlectedUserId(user.id);
                     }}
                   >
                     <Trash2 size={18} />
