@@ -6,6 +6,7 @@ const SubscriptionDataContext = createContext();
 const initialState = {
   users: [], // List of all users
   filteredUsers: [], // Filtered users based on search
+  currentPage : 1,
   totalPages: null, // Total pages for pagination
   isLoading: false, // Loading state for async operations
   error: "", // Error messages
@@ -26,11 +27,13 @@ function reducer(state, action) {
         isLoading: false,
       };
     case "users/filtered":
-      return { ...state, filteredUsers: action.payload, isLoading: false };
+      return { ...state, filteredUsers: action.payload.processedUsers, totalPages : action.payload.totalPages , isLoading: false };
     case "user/added":
       return { ...state, userID: action.payload, isLoading: false };
     case "shift/updated":
       return { ...state, shift: action.payload };
+    case "filters/reset" : 
+      return { ...state , filteredUsers : state.users , totalPages : state.totalPages, isLoading : false }
     case "error":
       return { ...state, isLoading: false, error: action.payload };
     default:
@@ -40,7 +43,7 @@ function reducer(state, action) {
 
 function SubscriptionDataProvider({ children }) {
   const [
-    { users, filteredUsers, totalPages, isLoading, error, userID, shift },
+    { users, filteredUsers, totalPages, isLoading, error, userID, shift , currentPage },
     dispatch,
   ] = useReducer(reducer, initialState);
 
@@ -145,7 +148,7 @@ function SubscriptionDataProvider({ children }) {
       dispatch({ type: "startOperation" });
       let url = `http://localhost:8000/api/dynamic/?action=person&gender=${
         shift === "1" ? "M" : "F"
-      }`;
+      }&page=${currentPage}&limit=24`;
       if (idQuery) url += `&id=${encodeURIComponent(idQuery)}`;
       if (nameQuery) url += `&full_name=${encodeURIComponent(nameQuery)}`;
 
@@ -169,11 +172,18 @@ function SubscriptionDataProvider({ children }) {
           : null,
       }));
 
-      dispatch({ type: "users/filtered", payload: processedUsers });
+      dispatch({ type: "users/filtered", payload: {
+        processedUsers,
+        totalPages : data.total_pages,
+      } });
     } catch (e) {
       dispatch({ type: "error", payload: e.message });
       toast.error("Failed to filter users. Please try again.");
     }
+  }
+
+  function handleResetFilters() {
+    dispatch({ type : 'filters/reset' })
   }
 
   // Update shift and sync with localStorage
@@ -196,6 +206,7 @@ function SubscriptionDataProvider({ children }) {
         handleAddUser,
         handleFilterUser,
         updateShift,
+        handleResetFilters
       }}
     >
       {children}

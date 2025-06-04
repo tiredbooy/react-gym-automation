@@ -7,7 +7,7 @@ import { useState, useCallback } from "react";
 
 function UserPageHeader({ onAddUserModal, searchRef }) {
   const { activeTheme, themes } = useTheme();
-  const { handleFilterUser } = useUser();
+  const { handleFilterUser, handleResetFilters } = useUser();
   const theme = themes[activeTheme];
   const [searchQueries, setSearchQueries] = useState({
     person_name: "",
@@ -19,6 +19,14 @@ function UserPageHeader({ onAddUserModal, searchRef }) {
       typeof updater === "function" ? updater(prev) : updater
     );
   }, []);
+
+  function handleReset() {
+    handleResetFilters();
+    setSearchQueries({
+      person_id: null,
+      person_name: "",
+    });
+  }
 
   const handleSearch = () => {
     handleFilterUser(searchQueries.person_name, searchQueries.person_id);
@@ -78,13 +86,13 @@ function UserPageHeader({ onAddUserModal, searchRef }) {
         >
           جستجو
         </Button>
-        {/* <Button
+        <Button
           bgColor={`bg-${theme.colors.primary}`}
           txtColor={`text-${theme.colors.background}`}
           onClick={handleReset}
         >
           ریست
-        </Button> */}
+        </Button>
       </div>
     </div>
   );
