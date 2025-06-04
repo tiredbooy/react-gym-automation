@@ -11,6 +11,7 @@ import Loader from "../reusables/Loader";
 import DeleteModal from "../reusables/DeleteModal";
 import SubscriptionRenewalModal from "./renewal/SubscriptionRenewal";
 import { AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 
 function UsersItem() {
   const { fetchUsers, filteredUsers, totalPages, isLoading, shift } = useUser();
