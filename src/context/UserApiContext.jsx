@@ -4,41 +4,95 @@ import toast from "react-hot-toast";
 const SubscriptionDataContext = createContext();
 
 const initialState = {
-  user: {},
-  isLoading: false,
-  error: "",
-  userID: null,
-  shift: localStorage.getItem("shift"),
-  filteredUser: [],
+  users: [], // List of all users
+  filteredUsers: [], // Filtered users based on search
+  totalPages: null, // Total pages for pagination
+  isLoading: false, // Loading state for async operations
+  error: "", // Error messages
+  userID: null, // Selected user ID
+  shift: localStorage.getItem("shift") || "1", // Shift (M/F filter)
 };
-
-const BASE_URL = "http://localhost:8000/api/dynamic/?action=person";
 
 function reducer(state, action) {
   switch (action.type) {
-    case "user/added":
-      return { ...state, userID: action.payload };
-    case "startOpration":
-      break;
-    case "addUser":
-      break;
-    case "editUser":
-      break;
-    case "renewalSub":
-      break;
+    case "startOperation":
+      return { ...state, isLoading: true, error: "" };
     case "users/loaded":
-      break;
+      return {
+        ...state,
+        users: action.payload.users,
+        filteredUsers: action.payload.users, // Reset filtered users
+        totalPages: action.payload.totalPages,
+        isLoading: false,
+      };
+    case "users/filtered":
+      return { ...state, filteredUsers: action.payload, isLoading: false };
+    case "user/added":
+      return { ...state, userID: action.payload, isLoading: false };
+    case "shift/updated":
+      return { ...state, shift: action.payload };
     case "error":
-      break;
+      return { ...state, isLoading: false, error: action.payload };
+    default:
+      return state;
   }
 }
 
 function SubscriptionDataProvider({ children }) {
-  const [{ user, isLoading, error, userID, shift , filteredUser }, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [
+    { users, filteredUsers, totalPages, isLoading, error, userID, shift },
+    dispatch,
+  ] = useReducer(reducer, initialState);
 
+  // Fetch all users
+  async function fetchUsers(page = 1) {
+    try {
+      dispatch({ type: "startOperation" });
+      const queryParams = new URLSearchParams({
+        action: "person",
+        order_by: "latest",
+        gender: shift === "1" ? "M" : "F",
+        page,
+        limit: "24",
+      });
+
+      const response = await fetch(
+        `http://localhost:8000/api/dynamic/?${queryParams.toString()}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch users");
+
+      const data = await response.json();
+      const sortedData = data.items?.sort(
+        (a, b) => new Date(b.creation_datetime) - new Date(a.creation_datetime)
+      );
+
+      const processedUsers = sortedData.map((user) => ({
+        ...user,
+        thumbnail_image: user.thumbnail_image
+          ? `data:image/jpeg;base64,${user.thumbnail_image.replace(
+              /^.*\/9j\//,
+              "/9j/"
+            )}`
+          : null,
+        person_image: user.person_image
+          ? `data:image/jpeg;base64,${user.person_image.replace(
+              /^.*\/9j\//,
+              "/9j/"
+            )}`
+          : null,
+      }));
+
+      dispatch({
+        type: "users/loaded",
+        payload: { users: processedUsers, totalPages: data.total_pages },
+      });
+    } catch (e) {
+      dispatch({ type: "error", payload: e.message });
+      toast.error("Failed to fetch users. Please try again later.");
+    }
+  }
+
+  // Add a new user
   async function handleAddUser(formData) {
     const userData = {
       first_name: formData?.first_name,
@@ -57,105 +111,91 @@ function SubscriptionDataProvider({ children }) {
     };
 
     try {
-      const response = await fetch(`${BASE_URL}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
+      dispatch({ type: "startOperation" });
+      const response = await fetch(
+        `http://localhost:8000/api/dynamic/?action=person`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        }
+      );
 
-      if (!response.ok && response.status === 200) return;
+      if (!response.ok) throw new Error("Failed to add user");
 
       const data = await response.json();
-
-      console.log("Data:", data);
-
-      dispatch({ type: "user/added", payload: userData.person_id });
+      dispatch({ type: "user/added", payload: data.person_id });
       toast.success("کاربر با موفقیت ثبت شد");
+      await fetchUsers(); // Refresh user list
     } catch (e) {
-      toast.error(" هنگام ثبت کاربر خطایی رخ داد");
-    } finally {
+      dispatch({ type: "error", payload: e.message });
+      toast.error("هنگام ثبت کاربر خطایی رخ داد");
     }
   }
 
-  // function handleSubscriptionPost(data , id) {
-  //   const membershipData = {
-  //       member_id: 15,
-  //       card_no: "555555555",
-  //       person: 200,
-  //       role_id: 1,
-  //       user: 20,
-  //       shift: 3,
-  //       is_black_list: false,
-  //       box_radif_no: "B555",
-  //       has_finger: true,
-  //       membership_datetime: "2025-05-01T00:00:00Z",
-  //       modifier: "admin",
-  //       modification_datetime: "2025-05-21T10:00:00Z",
-  //       is_family: false,
-  //       max_debit: "1500.00",
-  //       minutiae: null,
-  //       minutiae2: null,
-  //       minutiae3: null,
-  //       salary: "6000.00",
-  //       face_template_1: null,
-  //       face_template_2: null,
-  //       face_template_3: null,
-  //       face_template_4: null,
-  //       face_template_5: null
-  //    }
-  // }
-
-  function handleEditUser(formData) {}
-
+  // Filter users
   async function handleFilterUser(nameQuery, idQuery) {
-    const gender = shift === 1 ? "M" : "F";
-
-    let url = `http://localhost:8000/api/dynamic/?action=person`;
-
-    if (idQuery) {
-      url += `&id=${encodeURIComponent(idQuery)}`;
-    }
-
-    if (nameQuery) {
-      url += `&full_name=${encodeURIComponent(nameQuery)}`;
-    }
-
-    if (!idQuery && !nameQuery) {
-      toast.error('برای جستوجو نام و یا کد کاربر را وارد کنید')
+    if (!nameQuery && !idQuery) {
+      // Reset to all users if inputs are empty
+      dispatch({ type: "users/filtered", payload: users });
       return;
     }
 
-    // Include gender if needed
-    url += `&gender=${gender}`;
+    try {
+      dispatch({ type: "startOperation" });
+      let url = `http://localhost:8000/api/dynamic/?action=person&gender=${
+        shift === "1" ? "M" : "F"
+      }`;
+      if (idQuery) url += `&id=${encodeURIComponent(idQuery)}`;
+      if (nameQuery) url += `&full_name=${encodeURIComponent(nameQuery)}`;
 
-    try{ 
       const response = await fetch(url);
-      const data = await response.json();
+      if (!response.ok) throw new Error("Failed to filter users");
 
-      console.log('data:', data);
+      const data = await response.json();
+      const processedUsers = data.items.map((user) => ({
+        ...user,
+        thumbnail_image: user.thumbnail_image
+          ? `data:image/jpeg;base64,${user.thumbnail_image.replace(
+              /^.*\/9j\//,
+              "/9j/"
+            )}`
+          : null,
+        person_image: user.person_image
+          ? `data:image/jpeg;base64,${user.person_image.replace(
+              /^.*\/9j\//,
+              "/9j/"
+            )}`
+          : null,
+      }));
+
+      dispatch({ type: "users/filtered", payload: processedUsers });
+    } catch (e) {
+      dispatch({ type: "error", payload: e.message });
+      toast.error("Failed to filter users. Please try again.");
     }
-    catch(e) {
-      toast.error(e.message)
-    }
-    
   }
 
-  function handleRenewalSub(formData) {}
+  // Update shift and sync with localStorage
+  function updateShift(newShift) {
+    localStorage.setItem("shift", newShift);
+    dispatch({ type: "shift/updated", payload: newShift });
+  }
 
   return (
     <SubscriptionDataContext.Provider
       value={{
-        user,
+        users,
+        filteredUsers,
+        totalPages,
         isLoading,
         error,
         userID,
-        filteredUser,
+        shift,
+        fetchUsers,
         handleAddUser,
-        handleEditUser,
-        handleRenewalSub,
-        handleFilterUser
+        handleFilterUser,
+        updateShift,
       }}
     >
       {children}
@@ -165,7 +205,8 @@ function SubscriptionDataProvider({ children }) {
 
 function useUser() {
   const context = useContext(SubscriptionDataContext);
-  if (context === undefined) throw new Error("unknown provider");
+  if (context === undefined)
+    throw new Error("SubscriptionDataContext used outside provider");
   return context;
 }
 
