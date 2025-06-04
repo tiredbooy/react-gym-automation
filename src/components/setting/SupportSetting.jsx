@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ActionButtons from "./device-managment/ActionButtons";
-// import { motion } from "framer-motion";
-import Button from "../reusables/Button";
+import { motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
 import toast from "react-hot-toast";
 import { CloudCog } from "lucide-react";
@@ -9,7 +7,6 @@ import { CloudCog } from "lucide-react";
 export default function SupportSettings() {
   const [token, setToken] = useState("");
   const isDisabled = token.trim() ? false : true;
-  console.log("isDisabled : ",isDisabled)
 
   const { activeTheme , themes } = useTheme();
   const theme = themes[activeTheme];
@@ -49,11 +46,14 @@ export default function SupportSettings() {
 };
 
   return (
-    <div className="flex flex-col gap-5">
+    <motion.div initial={{ scale : 0.1 , opacity : 0 }} animate={{ scale : 1 , opacity : 1 }}  className="flex flex-col gap-5">
       <div className={`bg-${theme.colors.secondary} p-6 rounded-2xl shadow-md text-${theme.colors.primary}`}>
-        <h2 className="mb-4 text-xl font-bold text-right">
+        <motion.div initial={{ scale : 0.1 , opacity : 0 }} animate={{ scale : 1 , opacity : 1 }} className="flex flex-row items-center gap-2 py-1 mb-4">
+        <CloudCog />
+          <h2 className="text-xl font-bold text-right">
           تنظیمات امنیت و پشتیبانی
         </h2>
+        </motion.div>
         <div className="mb-4">
           <label className="block mb-2 text-sm text-right">
             توکن اختصاصی باشگاه
@@ -74,6 +74,6 @@ export default function SupportSettings() {
           ذخیره تنظیمات
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

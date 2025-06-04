@@ -63,7 +63,7 @@ function AddUserDefaultSetting() {
   };
 
   return (
-    <div className={`flex flex-col w-full gap-6 p-4 shadow-md bg-gradient-to-l from-${theme.colors.secondary} rounded-xl`}>
+    <motion.div initial={{ x : 400 , opacity : 0 }} animate={{ x : 0 , opacity : 1  }} transition={{ type : 'spring' }} className={`flex flex-col w-full gap-6 p-4 shadow-md bg-gradient-to-l from-${theme.colors.secondary} rounded-xl`}>
       <h1 className={`font-bold text-2xl text-${theme.colors.accent} mb-2`}>
         تنظیمات ثبت نام کاربر
       </h1>
@@ -109,7 +109,7 @@ function AddUserDefaultSetting() {
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
