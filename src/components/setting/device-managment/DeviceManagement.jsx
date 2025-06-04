@@ -355,7 +355,10 @@ const DeviceManagementPage = () => {
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ y : -100 , opacity : 0 , scale : 0.95 }}
+      animate={{ y : 0 , opacity : 1 , scale : 1 }}
+      transition={{ duration : 0.25  }}
       className={`min-h-screen bg-gradient-to-bl from-${theme.colors.secondary} flex flex-col rounded-xl items-center justify-start p-4 space-y-6`}
     >
       <DeviceForm onAddDevice={handleAddDevice} />
@@ -395,7 +398,7 @@ const DeviceManagementPage = () => {
         title={confirmAction?.title}
         message={confirmAction?.message}
       />
-    </div>
+    </motion.div>
   );
 };
 

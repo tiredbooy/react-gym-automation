@@ -54,7 +54,10 @@ class DynamicAPIView(APIView):
 
         for key, value in request.query_params.items():
             if key not in ['action', 'id', 'page', 'limit', 'order_by']:
-                filters &= Q(**{key: value})
+                if key == 'full_name':
+                    filters &= Q(full_name__icontains=value)
+                else:
+                    filters &= Q(**{key: value})
 
         queryset = model.objects.filter(filters)
 
@@ -91,7 +94,28 @@ class DynamicAPIView(APIView):
         if not model:
             return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(model)(data=request.data)
+        data = request.data.copy()
+
+        # If id is not manually set, auto-assign the next free one
+        if 'id' not in data or data['id'] in [None, '']:
+            # Use the lowest unused ID starting from 1
+            existing_ids = set(model.objects.values_list('id', flat=True))
+            new_id = 1
+            while new_id in existing_ids:
+                new_id += 1
+            data['id'] = new_id
+
+        else:
+            try:
+                base_id = int(data['id'])
+            except ValueError:
+                return Response({'error': 'Invalid ID format'}, status=status.HTTP_400_BAD_REQUEST)
+
+            while model.objects.filter(id=base_id).exists():
+                base_id += 1
+            data['id'] = base_id
+
+        serializer = self.get_serializer(model)(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

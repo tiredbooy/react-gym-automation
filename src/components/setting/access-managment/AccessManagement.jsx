@@ -50,7 +50,9 @@ export default function AccessManagement() {
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ y : -80 , opacity : 0 }}
+      animate={{ y : 0 , opacity : 1 }}
       className={`bg-gradient-to-bl from-${theme.colors.secondary} p-6 rounded-2xl shadow-lg max-w-6xl mx-auto text-${theme.colors.primary}`}
     >
       <h2
@@ -129,7 +131,7 @@ export default function AccessManagement() {
         transition={{ duration: 0.6 }}
       >
         <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h3 className="flex items-center gap-2 mb-4 text-xl font-semibold">
             <Shield className={`text-${theme.colors.primary}`} size={20} /> مدیریت نقش‌ها
           </h3>
 
@@ -155,7 +157,7 @@ export default function AccessManagement() {
               className={`bg-${theme.colors.secondary} rounded-xl p-4 mb-4 shadow-md`}
               whileHover={{ scale: 1.02 }}
             >
-              <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <span className="font-bold">{role.name}</span>
                 <button
                   onClick={() => handleDeleteRole(role.id)}
@@ -177,6 +179,6 @@ export default function AccessManagement() {
         {/* Staff Management */}
         <UserManagement roles={roles} />
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

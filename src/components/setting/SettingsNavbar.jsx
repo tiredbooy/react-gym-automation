@@ -20,7 +20,7 @@ export default function SettingsNavbar() {
 
 
   return (
-    <div className="overflow-x-auto mb-6 flex justify-center">
+    <motion.div initial={{ x : -600 , opacity : 0 }} animate={{ x : 0 , opacity : 1 }} className="flex justify-center mb-6 overflow-x-auto">
       <div
         className={`flex gap-2 w-max md:gap-4 rounded-xl bg-${
           theme.colors.secondary
@@ -55,6 +55,6 @@ export default function SettingsNavbar() {
           </NavLink>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

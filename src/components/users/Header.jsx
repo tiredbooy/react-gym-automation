@@ -12,7 +12,6 @@ export default function UserPageHeader({
   searchRef,
   handleFilter
 }) {
-  const [originalUsers, setOriginalUsers] = useState([]);
 
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
