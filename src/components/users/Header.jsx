@@ -78,6 +78,13 @@ function UserPageHeader({ onAddUserModal, searchRef }) {
         >
           جستجو
         </Button>
+        {/* <Button
+          bgColor={`bg-${theme.colors.primary}`}
+          txtColor={`text-${theme.colors.background}`}
+          onClick={handleReset}
+        >
+          ریست
+        </Button> */}
       </div>
     </div>
   );

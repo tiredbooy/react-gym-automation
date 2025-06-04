@@ -28,7 +28,7 @@ function UsersItem() {
   // Fetch users on mount, page change, or shift change
   useEffect(() => {
     fetchUsers(currentPage);
-  }, [ currentPage, shift]);
+  }, [currentPage, shift]);
 
   // Handle delete
   async function handleDelete() {
@@ -52,9 +52,14 @@ function UsersItem() {
     <div className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
       <UserPageHeader searchRef={searchRef} onAddUserModal={setIsAddUserOpen} />
       <AnimatePresence mode="wait">
-        {isAddUserOpen && <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />}
+        {isAddUserOpen && (
+          <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
+        )}
         {isViewUserOpen && (
-          <ViewUserModal personId={selectedUserId} onCloseModal={() => setIsViewUserOpen(false)} />
+          <ViewUserModal
+            personId={selectedUserId}
+            onCloseModal={() => setIsViewUserOpen(false)}
+          />
         )}
         {isDeleting && (
           <DeleteModal
@@ -63,7 +68,8 @@ function UsersItem() {
             title="آیا از حذف این آیتم مطمئن هستید؟"
             isLoading={isLoading}
           >
-            این عملیات غیرقابل بازگشت است. آیا مطمئن هستید که می‌خواهید ادامه دهید؟
+            این عملیات غیرقابل بازگشت است. آیا مطمئن هستید که می‌خواهید ادامه
+            دهید؟
           </DeleteModal>
         )}
         {isEditing && (
