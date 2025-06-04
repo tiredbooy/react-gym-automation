@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, memo } from "react";
 import { useTheme } from "../../context/ThemeContext";
 
 import AddUserModal from "./add-user/AddUserModal";
@@ -14,8 +14,8 @@ import SubscriptionRenewalModal from "./renewal/SubscriptionRenewal";
 import { AnimatePresence } from "framer-motion";
 import { useUser } from "../../context/UserApiContext";
 
-export default function UsersItem() {
-  const { handleFilterUser  } = useUser();
+function UsersItem() {
+  const { handleFilterUser } = useUser();
 
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
@@ -33,10 +33,7 @@ export default function UsersItem() {
   const [shift, setShift] = useState(
     JSON.parse(localStorage.getItem("shift")) || 2
   );
-  const [searchQueries, setSearchQueries] = useState({
-    person_name: "",
-    person_id: null,
-  });
+  
   const [totalPage, setTotalPage] = useState(null);
 
   function handleKeyDown(e) {
@@ -45,8 +42,10 @@ export default function UsersItem() {
     }
   }
 
+  
+
   // Inside your component
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -94,7 +93,7 @@ export default function UsersItem() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage]);
 
   useEffect(() => {
     fetchUserData();
@@ -118,9 +117,6 @@ export default function UsersItem() {
   //   });
   // }, [users, searchQueries]);
 
-  function handleFilter() {
-    handleFilterUser(searchQueries.person_name , searchQueries.person_id)
-  }
 
   async function handleDelete() {
     try {
@@ -172,9 +168,7 @@ export default function UsersItem() {
       <UserPageHeader
         searchRef={searchRef}
         onAddUserModal={setIsAddUserOpen}
-        searchQueries={searchQueries}
-        onChangeSearchQuery={setSearchQueries}
-        handleFilter={handleFilter}
+
       />
       <AnimatePresence mode="wait">
         {isAddUserOpen && (
@@ -253,3 +247,5 @@ export default function UsersItem() {
     </div>
   );
 }
+
+export default UsersItem;
