@@ -7,9 +7,9 @@ const UserTable = memo(
   ({
     users,
     onOpenViewUser,
-    onChangeSlectedUserId,
+    onChangeSelectedUserId,
     onDeleting,
-    onEdting,
+    onEditing,
     onRenewal,
   }) => {
     const { activeTheme, themes } = useTheme();
@@ -39,7 +39,7 @@ const UserTable = memo(
               <tr
                 key={index}
                 onDoubleClick={() => {
-                  onChangeSlectedUserId(user.id);
+                  onChangeSelectedUserId(user.id);
                   onOpenViewUser();
                 }}
                 className={`bg-${secondary} text-${accent} hover:bg-${background} hover:brightness-110 transition duration-150`}
@@ -88,7 +88,7 @@ const UserTable = memo(
                       whileTap={{ scale: 0.9 }}
                       onClick={() => {
                         onOpenViewUser();
-                        onChangeSlectedUserId(user.id);
+                        onChangeSelectedUserId(user.id);
                       }}
                       className={`text-${primary} font-bold`}
                     >
@@ -100,7 +100,7 @@ const UserTable = memo(
                       className="font-bold text-green-500"
                       onClick={() => {
                         onRenewal((isOpen) => !isOpen);
-                        onChangeSlectedUserId(user.id);
+                        onChangeSelectedUserId(user.id);
                         console.log("User ID : ", user.id);
                       }}
                     >
@@ -111,8 +111,8 @@ const UserTable = memo(
                       whileTap={{ scale: 0.9 }}
                       className="font-bold text-yellow-500"
                       onClick={() => {
-                        onEdting((isOpen) => !isOpen);
-                        onChangeSlectedUserId(user.id);
+                        onEditing((isOpen) => !isOpen);
+                        onChangeSelectedUserId(user.id);
                       }}
                     >
                       <SquarePen size={18} />
@@ -123,7 +123,7 @@ const UserTable = memo(
                       className="font-bold text-red-500"
                       onClick={() => {
                         onDeleting((isOpen) => !isOpen);
-                        onChangeSlectedUserId(user.id);
+                        onChangeSelectedUserId(user.id);
                       }}
                     >
                       <Trash2 size={18} />

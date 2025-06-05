@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
 import { useMemo } from "react";
 
-const Pagination = useMemo(function Pagination({
+function Pagination({
   currentPage,
   totalPages,
   onPageChange,
@@ -120,6 +120,6 @@ const Pagination = useMemo(function Pagination({
       </motion.button>
     </div>
   );
-});
+}
 
 export default Pagination;

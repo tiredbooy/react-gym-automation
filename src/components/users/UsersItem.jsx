@@ -100,6 +100,7 @@ function UsersItem() {
           <SubscriptionRenewalModal
             onSubmitUser={() => {}}
             onClose={() => setIsRenewal(false)}
+            userID={selectedUserId}
           />
         )}
       </AnimatePresence>
@@ -117,7 +118,7 @@ function UsersItem() {
         <UserTable
           users={filteredUsers}
           onOpenViewUser={() => setIsViewUserOpen(true)}
-          onChangeSlectedUserId={setSelectedUserId}
+          onChangeSelectedUserId={setSelectedUserId}
           onEditing={setIsEditing}
           onRenewal={setIsRenewal}
           onDeleting={setIsDeleting}

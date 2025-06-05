@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -18,16 +18,53 @@ import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import { usePricing } from "../../../context/SubscriptionPricing";
 
-export default function SubscriptionRenewalModal({ onSubmitUser, onClose }) {
+export default function SubscriptionRenewalModal({
+  onSubmitUser,
+  onClose,
+  userID,
+}) {
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
-  const userData = {
-    first_name: "مهدی",
-    last_name: "کاظمی",
-    person_image: "https://randomuser.me/api/portraits/men/76.jpg",
-    id: 12,
-  };
+  const [userData, setUserData] = useState({
+    first_name: "",
+    last_name: "",
+    person_image: "",
+    id: null,
+  });
+
+  // const userData = {
+  //   first_name: "مهدی",
+  //   last_name: "کاظمی",
+  //   person_image: "https://randomuser.me/api/portraits/men/76.jpg",
+  //   id: 12,
+  // };
+
+  const getUserData = useCallback(
+    async function getUserData() {
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/dynamic/?action=person&id=${userID}`
+      );
+      const data = await response.json();
+      const receivedData = data.items[0];
+      setUserData({
+        first_name: receivedData?.first_name,
+        last_name: receivedData?.last_name,
+        person_image: receivedData.person_image
+      ? `data:image/jpeg;base64,${receivedData.person_image.replace(
+          /^.*\/9j\//,
+          "/9j/"
+        )}`
+      : null,
+        id: receivedData?.id,
+      });
+    },
+    [userID]
+  );
+
+  useEffect(() => {
+    getUserData();
+  }, [getUserData]);
 
   return (
     <>
@@ -37,18 +74,18 @@ export default function SubscriptionRenewalModal({ onSubmitUser, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-md z-50"
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
         onClick={onClose}
       />
       <motion.div
         key="modal"
-        initial={{ opacity: 0, scale: 0.1 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.1 }}
+        initial={{ opacity: 0, scale: 0.1, x: -700 }}
+        animate={{ opacity: 1, scale: 1, x: 0 }}
+        exit={{ opacity: 0, scale: 0.1, x: -700 }}
         transition={{ duration: 0.25 }}
         className={`fixed z-50 
           bg-${background} text-${accent} rounded-3xl shadow-2xl 
-          w-full max-w-6xl h-auto overflow-y-scroll p-8`}
+          w-full max-w-6xl h-[70%] overflow-y-scroll p-8`}
       >
         <Header onClose={onClose} />
         <UserInfo userData={userData} />
@@ -121,7 +158,7 @@ function SubscriptionInfo() {
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
-  const { inputs , updateInput , pricing } = usePricing();
+  const { inputs, updateInput, pricing } = usePricing();
 
   const [formData, setFormData] = useState({
     plan: "normal",
@@ -161,10 +198,9 @@ function SubscriptionInfo() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
-    if(["price" , "tax" , "coachPrice"].includes(name)) {
-      updateInput(name, value)
+    if (["price", "tax", "coachPrice"].includes(name)) {
+      updateInput(name, value);
     }
-    
   };
 
   // const calculateTax = () => {
@@ -190,7 +226,7 @@ function SubscriptionInfo() {
       transition={{ duration: 0.3 }}
       className="p-4 space-y-4"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-2 px-1">
+      <div className="grid grid-cols-1 gap-4 px-1 py-2 md:grid-cols-2 lg:grid-cols-3">
         {/* Plan */}
         <div className="flex flex-col">
           <label className={`text-sm font-medium text-right text-${accent}`}>
@@ -434,7 +470,7 @@ function SubscriptionInfo() {
         <motion.button
           whileTap={{ scale: 0.97 }}
           whileHover={{ scale: 1.02 }}
-          className="bg-primary text-white font-bold py-2 px-6 rounded-xl hover:bg-opacity-90 transition"
+          className="px-6 py-2 font-bold text-white transition bg-primary rounded-xl hover:bg-opacity-90"
           onClick={(e) => {
             e.preventDefault();
             // toast.success("تمدید با موفقیت ثبت شد");
