@@ -270,7 +270,7 @@ function SubscriptionDataProvider({ children }) {
         if (!response.ok) throw new Error("Failed to add user");
 
         const data = await response.json();
-        dispatch({ type: "user/added", payload: data.person_id });
+        dispatch({ type: "user/added", payload: data.id });
         toast.success("کاربر با موفقیت ثبت شد");
 
         // Refresh current view
@@ -283,23 +283,57 @@ function SubscriptionDataProvider({ children }) {
         }
       } catch (e) {
         dispatch({ type: "error", payload: e.message });
-        toast.error("هنگام ثبت کاربر خطایی رخ داد");
+        toast.error(e.message);
       }
     },
     [fetchUsers, handleFilterUser]
   );
 
   // FIXED: Simplified reset
-  const handleResetFilters = useCallback(async function handleResetFilters() {
-    dispatch({ type: "filters/reset" });
-    fetchUsers(currentPage)
-  }, [fetchUsers]);
+  const handleResetFilters = useCallback(
+    async function handleResetFilters() {
+      dispatch({ type: "filters/reset" });
+      fetchUsers(currentPage);
+    },
+    [fetchUsers , currentPage]
+  );
 
   // FIXED: Simple shift update
   const updateShift = useCallback(function updateShift(newShift) {
     localStorage.setItem("shift", newShift);
     dispatch({ type: "shift/updated", payload: newShift });
   }, []);
+
+  const handleSubscription = useCallback(
+    async function handleSubscription(formData) {
+      const data = {
+        // member_id: 15,    IDK what is This
+        card_no: formData.card_no ? formData.card_no : null,
+        person: userID,
+        role_id: 1,
+        user: 20,
+        shift,
+        is_black_list: false,
+        box_radif_no: "B555",
+        has_finger: formData.authMethod === 'finger' ? true : false,
+        membership_datetime: "2025-05-01T00:00:00Z",
+        modifier: "admin",
+        modification_datetime: "2025-05-21T10:00:00Z",
+        is_family: false,
+        max_debit: "1500.00",
+        minutiae: formData.fingerMinutiae1 ? formData.fingerMinutiae1 : null,
+        minutiae2: formData.fingerMinutiae2 ? formData.fingerMinutiae2 : null,
+        minutiae3: formData.fingerMinutiae3 ? formData.fingerMinutiae3 : null,
+        // salary: "6000.00",  IDK what is This
+        face_template_1: formData.face_template_1 ? formData.face_template : null,
+        face_template_2: formData.face_template_1 ? formData.face_template : null,
+        face_template_3: formData.face_template_1 ? formData.face_template : null,
+        face_template_4: formData.face_template_1 ? formData.face_template : null,
+        face_template_5: formData.face_template_1 ? formData.face_template : null,
+      };
+    },
+    [userID , shift]
+  );
 
   // FIXED: Memoize value properly with only primitive values and stable functions
   const value = useMemo(
@@ -319,6 +353,7 @@ function SubscriptionDataProvider({ children }) {
       handlePageChange,
       updateShift,
       handleResetFilters,
+      handleSubscription,
     }),
     [
       // Only include primitive values that actually change
@@ -338,6 +373,7 @@ function SubscriptionDataProvider({ children }) {
       handlePageChange,
       updateShift,
       handleResetFilters,
+      handleSubscription,
     ]
   );
 

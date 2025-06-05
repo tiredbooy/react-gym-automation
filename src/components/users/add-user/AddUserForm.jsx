@@ -12,6 +12,7 @@ function AddUserForm({ onOpen, personImage }) {
   const { isLoading , handleAddUser } = useUser();
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
+  const { handleSubscription } = useUser();
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -214,6 +215,7 @@ function AddUserForm({ onOpen, personImage }) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300 }}
+            onClick={() => handleSubscription()}
           >
             ثبت نام کاربر
           </motion.button>
