@@ -5,7 +5,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useUser } from "../../context/UserApiContext";
 import { useState, useCallback } from "react";
 
-function UserPageHeader({ onAddUserModal, searchRef }) {
+function UserPageHeader({ onAddUserModal, searchRef , currentPage }) {
   const { activeTheme, themes } = useTheme();
   const { handleFilterUser, handleResetFilters } = useUser();
   const theme = themes[activeTheme];
@@ -28,9 +28,9 @@ function UserPageHeader({ onAddUserModal, searchRef }) {
     });
   }
 
-  const handleSearch = () => {
-    handleFilterUser(searchQueries.person_name, searchQueries.person_id);
-  };
+  const handleSearch = useCallback(() => {
+    handleFilterUser(searchQueries.person_name, searchQueries.person_id , currentPage);
+  },[currentPage , handleFilterUser , searchQueries.person_id , searchQueries.person_name])
 
   return (
     <div className="flex flex-col items-center gap-5 py-4">

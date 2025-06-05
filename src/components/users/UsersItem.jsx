@@ -29,7 +29,7 @@ function UsersItem() {
   // Fetch users on mount, page change, or shift change
   useEffect(() => {
     fetchUsers(currentPage);
-  }, [currentPage, shift]);
+  }, [currentPage, shift , fetchUsers]);
 
   // Handle delete
   async function handleDelete() {
@@ -51,7 +51,7 @@ function UsersItem() {
 
   return (
     <div className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
-      <UserPageHeader searchRef={searchRef} onAddUserModal={setIsAddUserOpen} />
+      <UserPageHeader searchRef={searchRef} onAddUserModal={setIsAddUserOpen} currentPage={currentPage} />
       <AnimatePresence mode="wait">
         {isAddUserOpen && (
           <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
