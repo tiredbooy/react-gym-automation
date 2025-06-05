@@ -5,10 +5,11 @@ import { useTheme } from "../../context/ThemeContext";
 import { useUser } from "../../context/UserApiContext";
 import { useState, useCallback } from "react";
 
-function UserPageHeader({ onAddUserModal, searchRef , currentPage }) {
+function UserPageHeader({ onAddUserModal, searchRef }) {
   const { activeTheme, themes } = useTheme();
   const { handleFilterUser, handleResetFilters } = useUser();
   const theme = themes[activeTheme];
+
   const [searchQueries, setSearchQueries] = useState({
     person_name: "",
     person_id: null,
@@ -20,17 +21,18 @@ function UserPageHeader({ onAddUserModal, searchRef , currentPage }) {
     );
   }, []);
 
-  function handleReset() {
+  const handleReset = useCallback(() => {
     handleResetFilters();
     setSearchQueries({
       person_id: null,
       person_name: "",
     });
-  }
+  }, [handleResetFilters]);
 
   const handleSearch = useCallback(() => {
-    handleFilterUser(searchQueries.person_name, searchQueries.person_id , currentPage);
-  },[currentPage , handleFilterUser , searchQueries.person_id , searchQueries.person_name])
+    // Always start from page 1 when searching
+    handleFilterUser(searchQueries.person_name, searchQueries.person_id, 1);
+  }, [handleFilterUser, searchQueries.person_id, searchQueries.person_name]);
 
   return (
     <div className="flex flex-col items-center gap-5 py-4">
@@ -61,6 +63,11 @@ function UserPageHeader({ onAddUserModal, searchRef , currentPage }) {
               person_id: e.target.value ? Number(e.target.value) : null,
             }))
           }
+          onKeyDown={(e) => {
+            if(e.key === 'Enter') {
+              handleSearch();
+            }
+          }}
         />
         <div className="relative w-full group">
           <Search
@@ -77,6 +84,11 @@ function UserPageHeader({ onAddUserModal, searchRef , currentPage }) {
                 person_name: e.target.value,
               }))
             }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
           />
         </div>
         <Button

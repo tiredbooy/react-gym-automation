@@ -14,22 +14,32 @@ import { AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
 function UsersItem() {
-  const { fetchUsers, filteredUsers, totalPages, isLoading, shift } = useUser();
+  const {
+    fetchUsers,
+    filteredUsers,
+    totalPages,
+    isLoading,
+    shift,
+    currentPage,
+    handlePageChange,
+    isFiltered,
+  } = useUser();
+
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isViewUserOpen, setIsViewUserOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isRenewal, setIsRenewal] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const searchRef = useRef();
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
-  // Fetch users on mount, page change, or shift change
+  // FIXED: Only fetch on mount and when shift changes
+  // Remove fetchUsers from dependencies to prevent loops
   useEffect(() => {
-    fetchUsers(currentPage);
-  }, [currentPage, shift , fetchUsers]);
+    fetchUsers(1);
+  }, [shift , fetchUsers]); // Only depend on shift, not fetchUsers
 
   // Handle delete
   async function handleDelete() {
@@ -40,8 +50,11 @@ function UsersItem() {
         { method: "DELETE" }
       );
       if (!response.ok) throw new Error("Failed to delete user");
+
       toast.success(`کاربر ${selectedUserId} با موفقیت حذف شد`);
-      fetchUsers(currentPage); // Refresh users
+
+      // Refresh current page
+      await handlePageChange(currentPage);
     } catch (e) {
       toast.error("خطا در حذف کاربر");
     } finally {
@@ -51,7 +64,8 @@ function UsersItem() {
 
   return (
     <div className={`bg-${theme.colors.background} py-12 px-8 text-center`}>
-      <UserPageHeader searchRef={searchRef} onAddUserModal={setIsAddUserOpen} currentPage={currentPage} />
+      <UserPageHeader searchRef={searchRef} onAddUserModal={setIsAddUserOpen} />
+
       <AnimatePresence mode="wait">
         {isAddUserOpen && (
           <AddUserModal isOpen={isAddUserOpen} onOpen={setIsAddUserOpen} />
@@ -78,13 +92,13 @@ function UsersItem() {
             personId={selectedUserId}
             onCloseModal={() => {
               setIsEditing(false);
-              fetchUsers(currentPage);
+              handlePageChange(currentPage);
             }}
           />
         )}
         {isRenewal && (
           <SubscriptionRenewalModal
-            onSubmitUser={() => {}} // Implement if needed
+            onSubmitUser={() => {}}
             onClose={() => setIsRenewal(false)}
           />
         )}
@@ -101,7 +115,7 @@ function UsersItem() {
         </Loader>
       ) : (
         <UserTable
-          users={filteredUsers} // Use filteredUsers from context
+          users={filteredUsers}
           onOpenViewUser={() => setIsViewUserOpen(true)}
           onChangeSlectedUserId={setSelectedUserId}
           onEditing={setIsEditing}
@@ -109,11 +123,12 @@ function UsersItem() {
           onDeleting={setIsDeleting}
         />
       )}
+
       <Pagination
         className="mt-5"
         currentPage={currentPage}
         totalPages={totalPages}
-        onPageChange={(page) => setCurrentPage(page)}
+        onPageChange={handlePageChange}
       />
     </div>
   );
