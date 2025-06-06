@@ -29,15 +29,14 @@ function ViewUserModal({ onCloseModal, personId }) {
   useEffect(() => {
     if (!personId) return;
 
-    fetch(
-      `http://localhost:8000/api/dynamic/?action=person&id=${personId}`
-    )
+    fetch(`http://localhost:8000/api/dynamic/?action=person&id=${personId}`)
       .then((res) => res.json())
       .then((res) => {
         const userData = res.items?.[0];
         setUser(userData);
         setForm(userData);
         if (userData?.person_image) {
+          console.log("Image Length ", userData?.person_image.length);
           setImageSrc(
             `data:image/jpeg;base64,${userData.person_image.replace(
               /^.*\/9j\//,

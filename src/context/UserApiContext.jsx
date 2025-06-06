@@ -12,6 +12,7 @@ const SubscriptionDataContext = createContext();
 
 const initialState = {
   users: [],
+  userFullName: "",
   filteredUsers: [],
   currentPage: 1,
   totalPages: 0,
@@ -61,7 +62,12 @@ function reducer(state, action) {
       };
 
     case "user/added":
-      return { ...state, userID: action.payload, isLoading: false };
+      return {
+        ...state,
+        userID: action.payload.userID,
+        userFullName: action.payload.fullName,
+        isLoading: false,
+      };
 
     case "shift/updated":
       return {
@@ -77,7 +83,6 @@ function reducer(state, action) {
         ...state,
         filteredUsers: state.users,
         currentPage: 1,
-        // totalPages : state.totalPages,
         isLoading: false,
         isFiltered: false,
         currentFilters: { nameQuery: "", idQuery: null },
@@ -91,29 +96,45 @@ function reducer(state, action) {
   }
 }
 
-// Helper function to process user images - OUTSIDE component to prevent recreating
+// Improved image processing function
 const processUserImages = (users) => {
-  return users.map((user) => ({
-    ...user,
-    thumbnail_image: user.thumbnail_image
-      ? `data:image/jpeg;base64,${user.thumbnail_image.replace(
-          /^.*\/9j\//,
-          "/9j/"
-        )}`
-      : null,
-    person_image: user.person_image
-      ? `data:image/jpeg;base64,${user.person_image.replace(
-          /^.*\/9j\//,
-          "/9j/"
-        )}`
-      : null,
-  }));
+  return users.map((user) => {
+    const processImage = (imageData) => {
+      if (!imageData) return null;
+
+      // Remove any existing data URL prefix if present
+      const cleanBase64 = imageData.replace(
+        /^data:image\/[a-zA-Z]*;base64,/,
+        ""
+      );
+
+      // Detect image format based on base64 signature
+      let mimeType = "image/jpeg"; // default
+
+      if (cleanBase64.startsWith("/9j/")) {
+        mimeType = "image/jpeg";
+      } else if (cleanBase64.startsWith("iVBORw0KGgo")) {
+        mimeType = "image/png";
+      } else if (cleanBase64.startsWith("R0lGODlh")) {
+        mimeType = "image/gif";
+      } else if (cleanBase64.startsWith("UklGR")) {
+        mimeType = "image/webp";
+      }
+      // Add more format detection as needed
+
+      return `data:${mimeType};base64,${cleanBase64}`;
+    };
+
+    return {
+      ...user,
+      thumbnail_image: processImage(user.thumbnail_image),
+      person_image: processImage(user.person_image),
+    };
+  });
 };
 
 function SubscriptionDataProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  // Use refs to store latest values without causing re-renders
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -128,97 +149,131 @@ function SubscriptionDataProvider({ children }) {
     currentPage,
     isFiltered,
     currentFilters,
+    userFullName,
   } = state;
 
-  // FIXED: Remove all dependencies that cause circular references
-  const fetchUsers = useCallback(
-    async function fetchUsers(page = 1) {
-      try {
-        dispatch({ type: "startOperation" });
+  // Optimized fetchUsers with better error handling
+  const fetchUsers = useCallback(async function fetchUsers(page = 1) {
+    try {
+      dispatch({ type: "startOperation" });
 
-        const currentShift = stateRef.current.shift;
-        const queryParams = new URLSearchParams({
-          action: "person",
-          order_by: "latest",
-          gender: currentShift === "1" ? "M" : "F",
-          page: page.toString(),
-          limit: "24",
-        });
+      const currentShift = stateRef.current.shift;
+      const queryParams = new URLSearchParams({
+        action: "person",
+        order_by: "latest",
+        gender: currentShift === "1" ? "M" : "F",
+        page: page.toString(),
+        limit: "24",
+      });
 
-        const response = await fetch(
-          `http://localhost:8000/api/dynamic/?${queryParams.toString()}`
-        );
+      const response = await fetch(
+        `http://localhost:8000/api/dynamic/?${queryParams.toString()}`,
+        {
+          signal: AbortSignal.timeout(10000), // 10 second timeout
+        }
+      );
 
-        if (!response.ok) throw new Error("Failed to fetch users");
-
-        const data = await response.json();
-        const sortedData = data.items?.sort(
-          (a, b) =>
-            new Date(b.creation_datetime) - new Date(a.creation_datetime)
-        );
-
-        const processedUsers = processUserImages(sortedData);
-
-        dispatch({
-          type: "users/loaded",
-          payload: {
-            users: processedUsers,
-            totalPages: data.total_pages,
-            page,
-          },
-        });
-      } catch (e) {
-        dispatch({ type: "error", payload: e.message });
-        toast.error("Failed to fetch users. Please try again later.");
-      }
-    },
-    [] // NO dependencies - use stateRef instead
-  );
-
-  // FIXED: Remove circular dependencies
-  const handleFilterUser = useCallback(
-    async function handleFilterUser(nameQuery, idQuery, page = 1) {
-      // If no filters, reset to all users
-      if (!nameQuery && !idQuery) {
-        dispatch({ type: "filters/reset" });
-        return;
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      try {
-        dispatch({ type: "startOperation" });
+      const data = await response.json();
 
-        const currentShift = stateRef.current.shift;
-        let url = `http://localhost:8000/api/dynamic/?action=person&gender=${
-          currentShift === "1" ? "M" : "F"
-        }&page=${page}&limit=24`;
-
-        if (idQuery) url += `&id=${encodeURIComponent(idQuery)}`;
-        if (nameQuery) url += `&full_name=${encodeURIComponent(nameQuery)}`;
-
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Failed to filter users");
-
-        const data = await response.json();
-        const processedUsers = processUserImages(data.items);
-
-        dispatch({
-          type: "users/filtered",
-          payload: {
-            users: processedUsers,
-            totalPages: data.total_pages,
-            page,
-            filters: { nameQuery, idQuery },
-          },
-        });
-      } catch (e) {
-        dispatch({ type: "error", payload: e.message });
-        toast.error("Failed to filter users. Please try again.");
+      // Validate response structure
+      if (!data.items || !Array.isArray(data.items)) {
+        throw new Error("Invalid response format");
       }
-    },
-    [] // NO dependencies
-  );
 
-  // FIXED: Simplified page change handler
+      // Ensure we always have an array for processing
+      const items = Array.isArray(data.items) ? data.items : [];
+      const sortedData = items.sort(
+        (a, b) => new Date(b.creation_datetime) - new Date(a.creation_datetime)
+      );
+
+      const processedUsers = processUserImages(sortedData);
+
+      dispatch({
+        type: "users/loaded",
+        payload: {
+          users: processedUsers,
+          totalPages: data.total_pages || 1,
+          page,
+        },
+      });
+    } catch (e) {
+      const errorMessage =
+        e.name === "AbortError"
+          ? "Request timeout. Please try again."
+          : e.message || "Failed to fetch users";
+
+      dispatch({ type: "error", payload: errorMessage });
+      toast.error(errorMessage);
+    }
+  }, []);
+
+  // Optimized filter function with debouncing capability
+  const handleFilterUser = useCallback(async function handleFilterUser(
+    nameQuery,
+    idQuery,
+    page = 1
+  ) {
+    if (!nameQuery && !idQuery) {
+      dispatch({ type: "filters/reset" });
+      return;
+    }
+
+    try {
+      dispatch({ type: "startOperation" });
+
+      const currentShift = stateRef.current.shift;
+      const params = new URLSearchParams({
+        action: "person",
+        gender: currentShift === "1" ? "M" : "F",
+        page: page.toString(),
+        limit: "24",
+      });
+
+      if (idQuery) params.append("id", idQuery);
+      if (nameQuery) params.append("full_name", nameQuery);
+
+      const response = await fetch(
+        `http://localhost:8000/api/dynamic/?${params.toString()}`,
+        {
+          signal: AbortSignal.timeout(10000),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Ensure we always have an array
+      const items = Array.isArray(data.items) ? data.items : [];
+      const processedUsers = processUserImages(items);
+
+      dispatch({
+        type: "users/filtered",
+        payload: {
+          users: processedUsers,
+          totalPages: data.total_pages || 1,
+          page,
+          filters: { nameQuery, idQuery },
+        },
+      });
+    } catch (e) {
+      const errorMessage =
+        e.name === "AbortError"
+          ? "Request timeout. Please try again."
+          : e.message || "Failed to filter users";
+
+      dispatch({ type: "error", payload: errorMessage });
+      toast.error(errorMessage);
+    }
+  },
+  []);
+
   const handlePageChange = useCallback(
     async function handlePageChange(page) {
       dispatch({ type: "page/changed", payload: page });
@@ -232,13 +287,46 @@ function SubscriptionDataProvider({ children }) {
         await fetchUsers(page);
       }
     },
-    [handleFilterUser, fetchUsers] // Only depend on the stable functions
+    [handleFilterUser, fetchUsers]
   );
 
-  // FIXED: Simplified add user
   const handleAddUser = useCallback(
     async function handleAddUser(formData) {
       const currentShift = stateRef.current.shift;
+
+      // Debug logging
+      console.log("=== DEBUG: handleAddUser ===");
+      console.log("FormData received:", {
+        ...formData,
+        person_image: formData.person_image
+          ? `${formData.person_image.substring(0, 50)}...`
+          : null,
+        thumbnail_image: formData.thumbnail_image
+          ? `${formData.thumbnail_image.substring(0, 50)}...`
+          : null,
+      });
+
+      // Validate and clean image data
+      const cleanImageData = (imageData) => {
+        if (!imageData) return null;
+
+        // Remove data URL prefix if present
+        const cleanBase64 = imageData.replace(
+          /^data:image\/[a-zA-Z]*;base64,/,
+          ""
+        );
+
+        // Validate base64
+        try {
+          atob(cleanBase64.substring(0, 100)); // Test decode first 100 chars
+          console.log("Image validation passed, length:", cleanBase64.length);
+          return cleanBase64;
+        } catch (e) {
+          console.error("Invalid base64 image data:", e);
+          return null;
+        }
+      };
+
       const userData = {
         first_name: formData?.first_name,
         last_name: formData?.last_name,
@@ -246,6 +334,8 @@ function SubscriptionDataProvider({ children }) {
         gender: formData.gender,
         national_code: formData.national_code,
         nidentify: "",
+        person_image: cleanImageData(formData.person_image),
+        thumbnail_image: cleanImageData(formData.thumbnail_image),
         birth_date: formData.birth_date,
         mobile: formData.mobile,
         has_insurance: formData.has_insurance,
@@ -255,22 +345,69 @@ function SubscriptionDataProvider({ children }) {
         shift: currentShift,
       };
 
+      console.log("Final userData being sent:", {
+        ...userData,
+        person_image: userData.person_image
+          ? `${userData.person_image.substring(0, 50)}... (length: ${
+              userData.person_image.length
+            })`
+          : null,
+        thumbnail_image: userData.thumbnail_image
+          ? `${userData.thumbnail_image.substring(0, 50)}... (length: ${
+              userData.thumbnail_image.length
+            })`
+          : null,
+      });
+
       try {
         dispatch({ type: "startOperation" });
+
+        // Calculate payload size
+        const payloadSize = JSON.stringify(userData).length;
+        console.log(
+          "Payload size:",
+          `${(payloadSize / 1024 / 1024).toFixed(2)} MB`
+        );
+
+        if (payloadSize > 10 * 1024 * 1024) {
+          // 10MB warning
+          console.warn("Large payload detected, might cause issues");
+        }
 
         const response = await fetch(
           `http://localhost:8000/api/dynamic/?action=person`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
             body: JSON.stringify(userData),
+            signal: AbortSignal.timeout(30000), // Extended timeout for large images
           }
         );
 
-        if (!response.ok) throw new Error("Failed to add user");
+        console.log("Response status:", response.status);
+        console.log(
+          "Response headers:",
+          Object.fromEntries(response.headers.entries())
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Server error response:", errorText);
+          throw new Error(
+            `HTTP ${response.status}: ${response.statusText} - ${errorText}`
+          );
+        }
 
         const data = await response.json();
-        dispatch({ type: "user/added", payload: data.id });
+        console.log("Server response data:", data);
+
+        dispatch({
+          type: "user/added",
+          payload: { userID: data.id, fullName: data.full_name },
+        });
         toast.success("کاربر با موفقیت ثبت شد");
 
         // Refresh current view
@@ -282,23 +419,31 @@ function SubscriptionDataProvider({ children }) {
           await fetchUsers(1);
         }
       } catch (e) {
-        dispatch({ type: "error", payload: e.message });
-        toast.error(e.message);
+        console.error("=== ERROR in handleAddUser ===");
+        console.error("Error type:", e.name);
+        console.error("Error message:", e.message);
+        console.error("Full error:", e);
+
+        const errorMessage =
+          e.name === "AbortError"
+            ? "Upload timeout. Please try again."
+            : e.message || "Failed to add user";
+
+        dispatch({ type: "error", payload: errorMessage });
+        toast.error(errorMessage);
       }
     },
     [fetchUsers, handleFilterUser]
   );
 
-  // FIXED: Simplified reset
   const handleResetFilters = useCallback(
     async function handleResetFilters() {
       dispatch({ type: "filters/reset" });
-      fetchUsers(currentPage);
+      await fetchUsers(1); // Always go to page 1 when resetting
     },
-    [fetchUsers , currentPage]
+    [fetchUsers]
   );
 
-  // FIXED: Simple shift update
   const updateShift = useCallback(function updateShift(newShift) {
     localStorage.setItem("shift", newShift);
     dispatch({ type: "shift/updated", payload: newShift });
@@ -306,38 +451,37 @@ function SubscriptionDataProvider({ children }) {
 
   const handleSubscription = useCallback(
     async function handleSubscription(formData) {
-      const data = {
-        // member_id: 15,    IDK what is This
-        card_no: formData.card_no ? formData.card_no : null,
+      const memberData = {
         person: userID,
         role_id: 1,
         user: 20,
         shift,
         is_black_list: false,
         box_radif_no: "B555",
-        has_finger: formData.authMethod === 'finger' ? true : false,
         membership_datetime: "2025-05-01T00:00:00Z",
         modifier: "admin",
         modification_datetime: "2025-05-21T10:00:00Z",
         is_family: false,
         max_debit: "1500.00",
-        minutiae: formData.fingerMinutiae1 ? formData.fingerMinutiae1 : null,
-        minutiae2: formData.fingerMinutiae2 ? formData.fingerMinutiae2 : null,
-        minutiae3: formData.fingerMinutiae3 ? formData.fingerMinutiae3 : null,
-        // salary: "6000.00",  IDK what is This
-        face_template_1: formData.face_template_1 ? formData.face_template : null,
-        face_template_2: formData.face_template_1 ? formData.face_template : null,
-        face_template_3: formData.face_template_1 ? formData.face_template : null,
-        face_template_4: formData.face_template_1 ? formData.face_template : null,
-        face_template_5: formData.face_template_1 ? formData.face_template : null,
       };
+
+      const paymentData = {
+        user: 1,
+        payment_status: "Completed",
+        full_name: userFullName,
+      };
+
+      console.log("userFullName:", userFullName);
+      console.log("memberData:", memberData);
+      console.log("paymentData:", paymentData);
     },
-    [userID , shift]
+    [userID, shift, userFullName]
   );
 
-  // FIXED: Memoize value properly with only primitive values and stable functions
+  // Memoized context value - only recalculates when dependencies actually change
   const value = useMemo(
     () => ({
+      // State values
       users,
       filteredUsers,
       totalPages,
@@ -347,6 +491,7 @@ function SubscriptionDataProvider({ children }) {
       shift,
       currentPage,
       isFiltered,
+      // Stable function references
       fetchUsers,
       handleAddUser,
       handleFilterUser,
@@ -356,7 +501,6 @@ function SubscriptionDataProvider({ children }) {
       handleSubscription,
     }),
     [
-      // Only include primitive values that actually change
       users,
       filteredUsers,
       totalPages,
@@ -366,7 +510,6 @@ function SubscriptionDataProvider({ children }) {
       shift,
       currentPage,
       isFiltered,
-      // Functions are stable now with empty deps
       fetchUsers,
       handleAddUser,
       handleFilterUser,
