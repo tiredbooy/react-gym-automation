@@ -82,7 +82,7 @@ export default function SubscriptionDataForm() {
     coach_price: 0,
     subscription_type: "",
     duration: "",
-    sessions: 0,
+    // sessions: 0,
     start_date: null,
     end_date: null,
     locker_number: null, // New field for VIP lockers
@@ -829,3 +829,5 @@ export default function SubscriptionDataForm() {
     </motion.form>
   );
 }
+
+
