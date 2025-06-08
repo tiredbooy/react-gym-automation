@@ -33,7 +33,7 @@ export default function FormDataInputs({
     }`;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {/* Full Name */}
       <div className="text-right">
         <label className={`block mb-2 text-sm font-semibold ${labelColor}`}>
@@ -50,7 +50,7 @@ export default function FormDataInputs({
           aria-invalid={!!errors.first_name}
         />
         {errors.first_name && (
-          <p className="text-errorRed text-xs mt-1 text-right">
+          <p className="mt-1 text-xs text-right text-errorRed">
             {errors.first_name}
           </p>
         )}
@@ -72,7 +72,7 @@ export default function FormDataInputs({
           aria-invalid={!!errors.last_name}
         />
         {errors.last_name && (
-          <p className="text-errorRed text-xs mt-1 text-right">
+          <p className="mt-1 text-xs text-right text-errorRed">
             {errors.last_name}
           </p>
         )}
@@ -94,7 +94,7 @@ export default function FormDataInputs({
           aria-invalid={!!errors.mobile}
         />
         {errors.mobile && (
-          <p className="text-errorRed text-xs mt-1 text-right">
+          <p className="mt-1 text-xs text-right text-errorRed">
             {errors.mobile}
           </p>
         )}
@@ -116,7 +116,7 @@ export default function FormDataInputs({
           aria-invalid={!!errors.national_code}
         />
         {errors.national_code && (
-          <p className="text-errorRed text-xs mt-1 text-right">
+          <p className="mt-1 text-xs text-right text-errorRed">
             {errors.national_code}
           </p>
         )}
@@ -150,7 +150,7 @@ export default function FormDataInputs({
           aria-invalid={!!errors.birth_date}
         />
         {errors.birth_date && (
-          <p className="text-errorRed text-xs mt-1 text-right">
+          <p className="mt-1 text-xs text-right text-errorRed">
             {errors.birth_date}
           </p>
         )}
@@ -177,7 +177,7 @@ export default function FormDataInputs({
           <option value="F">زن</option>
         </select>
         {errors.gender && (
-          <p className="text-errorRed text-xs mt-1 text-right">
+          <p className="mt-1 text-xs text-right text-errorRed">
             {errors.gender}
           </p>
         )}

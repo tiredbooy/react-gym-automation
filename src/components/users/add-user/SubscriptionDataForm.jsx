@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import RadioGroup from "../../reusables/RadioGroup";
+import { useReducer, useEffect } from "react";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+import DateObject from "react-date-object";
 import { useTheme } from "../../../context/ThemeContext";
 import { usePricing } from "../../../context/SubscriptionPricing";
 import { useUser } from "../../../context/UserApiContext";
 
+// Data constants
 const sports = [
   { id: 1, label: "بدنسازی" },
   { id: 2, label: "کراسفیت" },
@@ -17,12 +18,7 @@ const sports = [
 
 const coaches = [
   { value: "", label: "بدون مربی", vipPrice: 0, normalPrice: 0 },
-  {
-    value: "ali",
-    label: "علی محمدی",
-    vipPrice: 4500000,
-    normalPrice: 1000000,
-  },
+  { value: "ali", label: "علی محمدی", vipPrice: 4500000, normalPrice: 1000000 },
   {
     value: "reza",
     label: "رضا حسینی",
@@ -60,378 +56,370 @@ const sessions = [
   { value: 30, label: "۳۰ جلسه" },
 ];
 
-// Available lockers for VIP members
-const availableLockers = Array.from({ length: 50 }, (_, i) => ({
-  value: i + 1,
-  label: `شماره ${i + 1}`,
-}));
+// Utility functions
+const toEnglishDigits = (str) =>
+  str.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+
+const formatCurrency = (amount) =>
+  new Intl.NumberFormat("fa-IR").format(amount);
+
+const calculateEndDate = (startDate, months) => {
+  if (!startDate) return null;
+  const endDate = new DateObject(startDate);
+  endDate.month += months;
+  return toEnglishDigits(endDate.format("YYYY/MM/DD"));
+};
+
+// Reducer
+const initialState = {
+  sport: "",
+  session_time: "",
+  coach: "",
+  programType: null,
+  coach_price: 0,
+  subscription_type: "",
+  duration: "",
+  minutiae: null,
+  minutiae2: null,
+  minutiae3: null,
+  face_template_1: null,
+  face_template_2: null,
+  face_template_3: null,
+  face_template_4: null,
+  face_template_5: null,
+  paid_method: null,
+  start_date: null,
+  end_date: null,
+  locker_number: null,
+  insurance_fee: 0,
+  card_fee: 50000,
+  discount: 0,
+  total_tuition: 0,
+  total_price: 0,
+  errors: {},
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "UPDATE_FIELD":
+      return {
+        ...state,
+        [action.field]: action.value,
+        errors: { ...state.errors, [action.field]: null },
+      };
+    case "UPDATE_NUMERIC":
+      return { ...state, [action.field]: action.value };
+    case "SET_ERRORS":
+      return { ...state, errors: action.errors };
+    case "UPDATE_TOTALS":
+      return {
+        ...state,
+        total_tuition: action.tuition,
+        total_price: action.total,
+      };
+    default:
+      return state;
+  }
+};
+
+// Components
+const SelectField = ({
+  label,
+  name,
+  value,
+  options,
+  onChange,
+  error,
+  disabled,
+}) => {
+  const { activeTheme, themes } = useTheme();
+  const { primary, secondary, accent } = themes[activeTheme].colors;
+
+  return (
+    <div className="text-right">
+      <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
+        {label}
+      </label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className={`w-full px-4 py-3 text-right bg-${secondary} border-2 rounded-xl text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent transition-all duration-300 hover:border-${primary}/40 appearance-none ${
+          error ? "border-red-500" : `border-${primary}`
+        } ${disabled ? "opacity-50" : ""}`}
+        aria-label={label}
+      >
+        <option value="" disabled>{`انتخاب ${label}`}</option>
+        {options.map((option) => (
+          <option
+            key={option.value || option.id}
+            value={option.value || option.label}
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+    </div>
+  );
+};
+
+const NumberField = ({ label, name, value, onChange, error }) => {
+  const { activeTheme, themes } = useTheme();
+  const { primary, accent } = themes[activeTheme].colors;
+
+  return (
+    <div className="text-right">
+      <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
+        {label}
+      </label>
+      <input
+        type="number"
+        name={name}
+        value={value}
+        onChange={onChange}
+        className={`w-full px-4 py-3 text-right bg-transparent border-2 rounded-xl text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60 focus:border-transparent transition-all duration-300 hover:border-${primary}/30 appearance-none ${
+          error ? "border-red-500" : `border-${primary}`
+        }`}
+        placeholder={`وارد کردن ${label}`}
+      />
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+    </div>
+  );
+};
+
+const DateField = ({ label, value, onChange, error }) => {
+  const { activeTheme, themes } = useTheme();
+  const { primary, secondary, accent } = themes[activeTheme].colors;
+
+  return (
+    <div className="text-right">
+      <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
+        {label}
+      </label>
+      <DatePicker
+        calendar={persian}
+        locale={persian_fa}
+        digits="en"
+        calendarPosition="bottom-right"
+        value={
+          value
+            ? new DateObject({
+                date: value,
+                format: "YYYY/MM/DD",
+                calendar: persian,
+              })
+            : null
+        }
+        onChange={onChange}
+        inputClass={`w-full px-4 py-3 text-right border-2 bg-${secondary} rounded-xl focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400 ${
+          error ? "border-red-500" : `border-${primary}`
+        }`}
+        placeholder={`انتخاب ${label}`}
+        aria-label={label}
+      />
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+    </div>
+  );
+};
 
 export default function SubscriptionDataForm() {
-  const { isLoading , userID } = useUser();
+  const { isLoading, userID, handleSubscription } = useUser();
   const { inputs, updateInput, pricing } = usePricing();
   const { activeTheme, themes } = useTheme();
-  const theme = themes[activeTheme];
-  const { primary, secondary, accent, background } = theme.colors;
+  const { primary, secondary, accent, background } = themes[activeTheme].colors;
 
-  // Main form state
-  const [formData, setFormData] = useState({
-    sport: "",
-    session_time: "",
-    coach: "",
-    programType: null,
-    coach_price: 0,
-    subscription_type: "",
-    duration: "",
-    // sessions: 0,
-    start_date: null,
-    end_date: null,
-    locker_number: null, // New field for VIP lockers
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-    // Added new price fields
-    insurance_fee: 0,
-    card_fee: 50000, // Default card fee
-    discount: 0,
-
-    // Calculated fields
-    total_tuition: 0,
-    total_price: 0,
-  });
-
-  // Form validity state
-  const [formErrors, setFormErrors] = useState({});
-
-  // Handle input changes
-  const handleInputChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    if (formErrors[name]) {
-      // Clear error for this field if it exists
-      setFormErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+  // Calculate totals
+  useEffect(() => {
+    let tuition = 0;
+    const selectedType = subscriptionTypes.find(
+      (type) => type.value === state.subscription_type
+    );
+    if (selectedType) {
+      if (state.subscription_type === "session") {
+        tuition = selectedType.basePrice * state.sessions;
+      } else {
+        const selectedDuration = durations.find(
+          (d) => d.value === state.duration
+        );
+        tuition = selectedType.basePrice * (selectedDuration?.months || 0);
+      }
     }
+    const total =
+      tuition +
+      state.coach_price +
+      state.insurance_fee +
+      state.card_fee -
+      state.discount;
+    dispatch({ type: "UPDATE_TOTALS", tuition, total });
+    updateInput("price", tuition);
+  }, [
+    state.subscription_type,
+    state.duration,
+    state.sessions,
+    state.coach_price,
+    state.insurance_fee,
+    state.card_fee,
+    state.discount,
+  ]);
+
+  // Sync with context
+  useEffect(() => {
+    dispatch({
+      type: "UPDATE_TOTALS",
+      tuition: state.total_tuition,
+      total: pricing.total,
+    });
+  }, [pricing.total]);
+
+  // Handlers
+  const handleInputChange = (field, value) => {
+    dispatch({ type: "UPDATE_FIELD", field, value });
   };
 
   const handleNumericChange = (e) => {
     const { name, value } = e.target;
     const numValue = value === "" ? 0 : parseInt(value, 10) || 0;
-    setFormData((prev) => ({ ...prev, [name]: numValue }));
+    dispatch({ type: "UPDATE_NUMERIC", field: name, value: numValue });
     const contextFieldMap = {
       insurance_fee: "insurancePrice",
       card_fee: "cardPrice",
       discount: "discount",
       coach_price: "coachPrice",
     };
-    if (contextFieldMap[name]) {
-      updateInput(contextFieldMap[name], numValue);
-    }
+    if (contextFieldMap[name]) updateInput(contextFieldMap[name], numValue);
   };
 
-  // Calculate total_tuition
-  useEffect(() => {
-    let tuition = 0;
-    let total = 0;
-    if (formData.subscription_type) {
-      const selectedType = subscriptionTypes.find(
-        (type) => type.value === formData.subscription_type
-      );
-      if (selectedType) {
-        if (formData.subscription_type === "session") {
-          tuition = selectedType.basePrice * formData.sessions;
-        } else {
-          const selectedDuration = durations.find(
-            (d) => d.value === formData.duration
-          );
-          const months = selectedDuration ? selectedDuration.months : 0;
-          tuition = selectedType.basePrice * months;
-        }
-      }
-    }
-    total =
-      tuition +
-      parseInt(formData.coach_price || 0) +
-      parseInt(formData.insurance_fee || 0) +
-      parseInt(formData.card_fee || 0) -
-      parseInt(formData.discount || 0);
-    setFormData((prev) => ({
-      ...prev,
-      total_tuition: tuition,
-      total_price: total,
-    }));
-  }, [
-    formData.subscription_type,
-    formData.duration,
-    formData.sessions,
-    formData.coach_price,
-    formData.insurance_fee,
-    formData.card_fee,
-    formData.discount,
-  ]);
-
-  // Optional: Sync total_price with pricing.total
-  useEffect(() => {
-    setFormData((prev) => ({ ...prev, total_price: pricing.total }));
-  }, [pricing.total]);
-
-  // Handle program type change
-  const handleProgramTypeChange = (value) => {
-    let coachPrice = 0;
-    if (formData.coach) {
-      const selectedCoach = coaches.find(
-        (coach) => coach.value === formData.coach
-      );
-      if (selectedCoach) {
-        coachPrice =
-          value === true ? selectedCoach.vipPrice : selectedCoach.normalPrice;
-      }
-    }
-    updateInput("coachPrice", coachPrice); // Sync with PricingContext
-    setFormData((prev) => ({
-      ...prev,
-      programType: value,
-      coach_price: coachPrice,
-    }));
-  };
-
-  // Handle coach selection
   const handleCoachSelect = (e) => {
     const { value } = e.target;
     const selectedCoach =
       coaches.find((coach) => coach.value === value) || coaches[0];
-
-    // Calculate coach price based on program type if coach is selected
-    let coachPrice = 0;
-    if (value) {
-      coachPrice =
-        formData.programType === true
-          ? selectedCoach.vipPrice
-          : selectedCoach.normalPrice;
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      coach: value,
-      coach_price: coachPrice,
-    }));
+    const coachPrice = value
+      ? state.programType
+        ? selectedCoach.vipPrice
+        : selectedCoach.normalPrice
+      : 0;
+    dispatch({ type: "UPDATE_FIELD", field: "coach", value });
+    dispatch({
+      type: "UPDATE_NUMERIC",
+      field: "coach_price",
+      value: coachPrice,
+    });
+    updateInput("coachPrice", coachPrice);
   };
 
-  // Handle subscription type change
+  const handleProgramTypeChange = (value) => {
+    const selectedCoach = coaches.find((coach) => coach.value === state.coach);
+    const coachPrice = selectedCoach
+      ? value
+        ? selectedCoach.vipPrice
+        : selectedCoach.normalPrice
+      : 0;
+    dispatch({ type: "UPDATE_FIELD", field: "programType", value });
+    dispatch({
+      type: "UPDATE_NUMERIC",
+      field: "coach_price",
+      value: coachPrice,
+    });
+    updateInput("coachPrice", coachPrice);
+  };
+
   const handleSubscriptionTypeChange = (e) => {
     const { value } = e.target;
-    let coachPrice = 0;
-    if (formData.coach) {
-      const selectedCoach = coaches.find(
-        (coach) => coach.value === formData.coach
-      );
-      if (selectedCoach) {
-        coachPrice =
-          value === "vip" ? selectedCoach.vipPrice : selectedCoach.normalPrice;
-      }
-    }
-    const newLockerNumber = value === "vip" ? formData.locker_number : null;
-
-    setFormData((prev) => ({
-      ...prev,
-      subscription_type: value,
-      coach_price: coachPrice,
-      locker_number: newLockerNumber,
-    }));
-
-    updateInput("coachPrice", coachPrice); // Sync coach price with PricingContext
+    const selectedCoach = coaches.find((coach) => coach.value === state.coach);
+    const coachPrice = selectedCoach
+      ? value === "vip"
+        ? selectedCoach.vipPrice
+        : selectedCoach.normalPrice
+      : 0;
+    const locker_number = value === "vip" ? state.locker_number : null;
+    dispatch({ type: "UPDATE_FIELD", field: "subscription_type", value });
+    dispatch({
+      type: "UPDATE_NUMERIC",
+      field: "coach_price",
+      value: coachPrice,
+    });
+    dispatch({
+      type: "UPDATE_FIELD",
+      field: "locker_number",
+      value: locker_number,
+    });
+    updateInput("coachPrice", coachPrice);
   };
 
-  // Handle duration change and calculate end date
   const handleDurationChange = (e) => {
     const { value } = e.target;
-    const selectedDuration = durations.find(
-      (duration) => duration.value === value
-    );
-
-    setFormData((prev) => ({
-      ...prev,
-      duration: value,
-    }));
-
-    // If start date is selected, calculate end date
-    if (formData.start_date && selectedDuration) {
-      calculateEndDate(formData.start_date, selectedDuration.months);
-    }
-
-    // Recalculate tuition for monthly subscriptions
-    if (
-      formData.subscription_type === "normal" ||
-      formData.subscription_type === "vip"
-    ) {
-      const selectedType = subscriptionTypes.find(
-        (type) => type.value === formData.subscription_type
-      );
-      if (selectedType && selectedDuration) {
-        const totalTuition = selectedType.basePrice * selectedDuration.months;
-        setFormData((prev) => ({
-          ...prev,
-          total_tuition: totalTuition,
-        }));
-        updateInput("price", totalTuition); // Sync tuition with PricingContext
+    dispatch({ type: "UPDATE_FIELD", field: "duration", value });
+    if (state.start_date) {
+      const selectedDuration = durations.find((d) => d.value === value);
+      if (selectedDuration) {
+        const endDate = calculateEndDate(
+          new DateObject({
+            date: state.start_date,
+            format: "YYYY/MM/DD",
+            calendar: persian,
+          }),
+          selectedDuration.months
+        );
+        dispatch({ type: "UPDATE_FIELD", field: "end_date", value: endDate });
       }
     }
   };
-  // Handle start date change
-  const handleStartDateChange = (date) => {
-    setFormData((prev) => ({
-      ...prev,
-      start_date: date,
-    }));
 
-    // If duration is selected, calculate end date
-    if (date && formData.duration) {
+  const handleStartDateChange = (dateObject) => {
+    if (!dateObject) return;
+    const jalaliDate = dateObject.format("YYYY/MM/DD");
+    const englishDate = toEnglishDigits(jalaliDate);
+    dispatch({ type: "UPDATE_FIELD", field: "start_date", value: englishDate });
+    if (state.duration) {
       const selectedDuration = durations.find(
-        (d) => d.value === formData.duration
+        (d) => d.value === state.duration
       );
       if (selectedDuration) {
-        calculateEndDate(date, selectedDuration.months);
+        const endDate = calculateEndDate(dateObject, selectedDuration.months);
+        dispatch({ type: "UPDATE_FIELD", field: "end_date", value: endDate });
       }
     }
   };
 
-  // Calculate end date based on start date and duration
-  const calculateEndDate = (startDate, months) => {
-    if (!startDate) return;
-
-    // Clone the date object
-    const endDate = { ...startDate };
-
-    // Convert month and add duration months
-    let newMonth = endDate.month + months;
-    let yearAdd = Math.floor((newMonth - 1) / 12);
-    newMonth = ((newMonth - 1) % 12) + 1;
-
-    endDate.month = newMonth;
-    endDate.year += yearAdd;
-
-    setFormData((prev) => ({
-      ...prev,
-      end_date: endDate,
-    }));
-  };
-
-  // Format Persian date to string
-  const formatPersianDate = (date) => {
-    if (!date) return "";
-
-    // Format Persian date
-    return `${date.day}/${date.month}/${date.year}`;
-  };
-
-  // Calculate total price whenever relevant fields change
-  useEffect(() => {
-    let tuition = 0;
-    let total = 0;
-
-    // Calculate tuition based on subscription type
-    if (formData.subscription_type) {
-      const selectedType = subscriptionTypes.find(
-        (type) => type.value === formData.subscription_type
-      );
-
-      if (selectedType) {
-        if (formData.subscription_type === "session") {
-          // For session-based subscription, multiply by number of sessions
-          tuition = selectedType.basePrice * formData.sessions;
-        } else {
-          // For monthly subscriptions, multiply by number of months
-          const selectedDuration = durations.find(
-            (d) => d.value === formData.duration
-          );
-          const months = selectedDuration ? selectedDuration.months : 0;
-          tuition = selectedType.basePrice * months;
-        }
-      }
-    }
-
-    // Calculate total price
-    total =
-      tuition +
-      parseInt(formData.coach_price || 0) +
-      parseInt(formData.insurance_fee || 0) +
-      parseInt(formData.card_fee || 0) -
-      parseInt(formData.discount || 0);
-
-    setFormData((prev) => ({
-      ...prev,
-      total_tuition: tuition,
-      total_price: total,
-    }));
-  }, [
-    formData.subscription_type,
-    formData.duration,
-    formData.sessions,
-    formData.coach_price,
-    formData.insurance_fee,
-    formData.card_fee,
-    formData.discount,
-  ]);
-
-  // Format currency (Rial/Toman)
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("fa-IR").format(amount);
-  };
-
-  // Validate form before submission
   const validateForm = () => {
     const errors = {};
-
-    // Required fields based on subscription type
-    if (!formData.sport) errors.sport = "لطفا رشته ورزشی را انتخاب کنید";
-    if (!formData.session_time)
-      errors.session_time = "لطفا سانس را انتخاب کنید";
-    if (!formData.subscription_type)
+    if (!state.sport) errors.sport = "لطفا رشته ورزشی را انتخاب کنید";
+    if (!state.session_time) errors.session_time = "لطفا سانس را انتخاب کنید";
+    if (!state.subscription_type)
       errors.subscription_type = "لطفا نوع عضویت را انتخاب کنید";
-
-    // Required fields for monthly subscriptions
-    if (
-      formData.subscription_type === "normal" ||
-      formData.subscription_type === "vip"
-    ) {
-      if (!formData.duration) errors.duration = "لطفا مدت زمان را انتخاب کنید";
-    }
-
-    // Required fields for session-based subscription
-    if (formData.subscription_type === "session") {
-      if (!formData.sessions)
-        errors.sessions = "لطفا تعداد جلسات را انتخاب کنید";
-    }
-
-    // Check start date
-    if (!formData.start_date)
-      errors.start_date = "لطفا تاریخ شروع را انتخاب کنید";
-
-    // VIP specific validation - locker number required
-    if (formData.subscription_type === "vip" && !formData.locker_number) {
+    if (["normal", "vip"].includes(state.subscription_type) && !state.duration)
+      errors.duration = "لطفا مدت زمان را انتخاب کنید";
+    if (state.subscription_type === "session" && !state.sessions)
+      errors.sessions = "لطفا تعداد جلسات را انتخاب کنید";
+    if (!state.start_date) errors.start_date = "لطفا تاریخ شروع را انتخاب کنید";
+    if (state.subscription_type === "vip" && !state.locker_number)
       errors.locker_number = "لطفا شماره کمد را انتخاب کنید";
-    }
-
     return errors;
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Validate form
     const errors = validateForm();
-
     if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
+      dispatch({ type: "SET_ERRORS", errors });
       return;
     }
 
+    // Map state to match handleSubscription expected format
+    const formData = {
+      ...state,
+      fingerMinutiae1: state.minutiae,
+      fingerMinutiae2: state.minutiae2,
+      fingerMinutiae3: state.minutiae3,
+      face_template: state.face_template_1, // Map face_template_1 to face_template
+    };
+
+    handleSubscription(formData);
     console.log("Form submitted:", formData);
-    // Here you would typically send the data to a server
     alert("فرم با موفقیت ثبت شد");
   };
 
@@ -444,362 +432,158 @@ export default function SubscriptionDataForm() {
       transition={{ duration: 0.3 }}
     >
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            رشته ورزشی
-          </label>
-          <select
-            name="sport"
-            value={formData.sport}
-            onChange={(e) => handleInputChange("sport", e.target.value)}
-            className={`w-full px-4 py-3 text-right border-2 bg-${secondary} ${
-              formErrors.sport ? "border-red-500" : `border-${primary}`
-            } rounded-xl
-              text-${accent}  focus:outline-none focus:ring-2 focus:ring-${primary}
-              focus:border-transparent transition-all duration-300 hover:border-${primary}/40 appearance-none`}
-            aria-label="رشته ورزشی"
-          >
-            <option className="text-gray-400" value="" disabled>
-              رشته ورزشی را انتخاب کنید
-            </option>
-            {sports.map((sport) => (
-              <option key={sport.id} value={sport.label}>
-                {sport.label}
-              </option>
-            ))}
-          </select>
-          {formErrors.sport && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.sport}</p>
-          )}
-        </div>
-
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            سانس
-          </label>
-          <select
-            name="session_time"
-            value={formData.session_time}
-            onChange={(e) => handleInputChange("session_time", e.target.value)}
-            className={`w-full px-4 py-3 text-right border-2 bg-${secondary} ${
-              formErrors.session_time ? "border-red-500" : `border-${primary}`
-            } rounded-xl
-              text-${accent}  focus:outline-none focus:ring-2 focus:ring-${primary}
-              focus:border-transparent transition-all duration-300 hover:border-${primary}/40 appearance-none`}
-            aria-label="سانس"
-          >
-            <option className="text-gray-400" value="" disabled>
-              سانس را انتخاب کنید
-            </option>
-            {sessionTimes.map((time) => (
-              <option key={time.value} value={time.value}>
-                {time.label}
-              </option>
-            ))}
-          </select>
-          {formErrors.session_time && (
-            <p className="mt-1 text-xs text-red-500">
-              {formErrors.session_time}
-            </p>
-          )}
-        </div>
-
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            مربی
-          </label>
-          <select
-            name="coach"
-            value={formData.coach}
-            onChange={handleCoachSelect}
-            className={`w-full px-4 py-3 text-right bg-transparent border-2 border-${primary} rounded-xl
-              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
-              focus:border-transparent transition-all duration-300 hover:border-${primary}/30 appearance-none`}
-            aria-label="مربی"
-          >
-            <option className="text-gray-400" value="">
-              بدون مربی
-            </option>
-            {coaches
-              .filter((coach) => coach.value !== "")
-              .map((coach) => (
-                <option key={coach.value} value={coach.value}>
-                  {coach.label}
-                </option>
-              ))}
-          </select>
-        </div>
-
-        {formData.coach && formData.coach !== "" && (
+        <SelectField
+          label="رشته ورزشی"
+          name="sport"
+          value={state.sport}
+          options={sports}
+          onChange={(e) => handleInputChange("sport", e.target.value)}
+          error={state.errors.sport}
+        />
+        <SelectField
+          label="سانس"
+          name="session_time"
+          value={state.session_time}
+          options={sessionTimes}
+          onChange={(e) => handleInputChange("session_time", e.target.value)}
+          error={state.errors.session_time}
+        />
+        <SelectField
+          label="مربی"
+          name="coach"
+          value={state.coach}
+          options={coaches}
+          onChange={handleCoachSelect}
+        />
+        {state.coach && state.coach !== "" && (
           <>
-            <div className="text-right">
-              <RadioGroup
-                name="programType"
-                value={formData.programType}
-                onChange={handleProgramTypeChange}
-                options={[
-                  { value: true, label: "خصوصی" },
-                  { value: false, label: "برنامه" },
-                ]}
-                label="نوع برنامه"
-                wrapperClass={`card bg-gradient-to-l shadow from-${background} to-${secondary} p-4 rounded-xl`}
-              />
-            </div>
-
             <div className="text-right">
               <label
                 className={`block mb-2 text-sm font-semibold text-${accent}`}
               >
-                هزینه ی برنامه
+                نوع برنامه
               </label>
-              <input
-                type="number"
-                name="coach_price"
-                value={formData.coach_price}
-                onChange={handleNumericChange}
-                autoComplete="off"
-                className={`w-full px-4 py-3 text-right bg-transparent border-2 border-${primary} rounded-xl
-              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
-              focus:border-transparent transition-all duration-300 hover:border-${primary}/30 appearance-none`}
-                placeholder="هزینه ی برنامه را وارد کنید"
-              />
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="programType"
+                    value={true}
+                    checked={state.programType === true}
+                    onChange={() => handleProgramTypeChange(true)}
+                    className="ml-2"
+                  />
+                  خصوصی
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="programType"
+                    value={false}
+                    checked={state.programType === false}
+                    onChange={() => handleProgramTypeChange(false)}
+                    className="ml-2"
+                  />
+                  برنامه
+                </label>
+              </div>
             </div>
+            <NumberField
+              label="هزینه برنامه"
+              name="coach_price"
+              value={state.coach_price}
+              onChange={handleNumericChange}
+            />
           </>
         )}
-
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            نوع عضویت
-          </label>
-          <select
-            name="subscription_type"
-            value={formData.subscription_type}
-            onChange={handleSubscriptionTypeChange}
-            className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
-              formErrors.subscription_type
-                ? "border-red-500"
-                : `border-${primary}`
-            } rounded-xl
-              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
-              focus:border-transparent transition-all duration-300 hover:border-${primary}/30 appearance-none`}
-            aria-label="نوع عضویت"
-          >
-            <option className={`text-${accent}`} value="" disabled>
-              نوع عضویت خود را انتخاب کنید
-            </option>
-            {subscriptionTypes.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-          {formErrors.subscription_type && (
-            <p className="mt-1 text-xs text-red-500">
-              {formErrors.subscription_type}
-            </p>
-          )}
-        </div>
-        {/* VIP-specific locker number field */}
-        {formData.subscription_type === "vip" && (
-          <div className="text-right">
-            <label
-              className={`block mb-2 text-sm font-semibold text-${accent}`}
-            >
-              شماره کمد
-            </label>
-            <input
-              type="number"
-              name="locker_number"
-              value={formData.locker_number || ""}
-              onChange={(e) =>
-                handleInputChange(
-                  "locker_number",
-                  e.target.value ? parseInt(e.target.value, 10) : null
-                )
-              }
-              className={`w-full px-4 py-3 text-right bg-transparent border-2 ${
-                formErrors.locker_number
-                  ? "border-red-500"
-                  : `border-${primary}`
-              } rounded-xl
-                text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}/60
-                focus:border-transparent transition-all duration-300 hover:border-${primary}/60 appearance-none`}
-              aria-label="شماره کمد"
-            />
-            {formErrors.locker_number && (
-              <p className="mt-1 text-xs text-red-500">
-                {formErrors.locker_number}
-              </p>
-            )}
-          </div>
-        )}
-
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            مدت زمان
-          </label>
-          <select
-            name="duration"
-            value={formData.duration}
-            onChange={handleDurationChange}
-            className={`w-full px-4 py-3 text-right bg-${secondary} border-2 ${
-              formErrors.duration ? "border-red-500" : `border-${primary}`
-            } rounded-xl 
-              text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}
-              focus:border-transparent transition-all duration-300 hover:border-${primary} appearance-none
-              ${formData.subscription_type === "session" ? "opacity-50" : ""}`}
-            aria-label="مدت زمان"
-            disabled={formData.subscription_type === "session"}
-          >
-            <option className={`text-${accent}`} value="" disabled>
-              مدت زمان را انتخاب کنید
-            </option>
-            {durations.map((duration) => (
-              <option key={duration.value} value={duration.value}>
-                {duration.label}
-              </option>
-            ))}
-          </select>
-          {formErrors.duration && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.duration}</p>
-          )}
-        </div>
-
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            تعداد جلسات
-          </label>
-          <select
-            name="sessions"
-            value={formData.sessions}
+        <SelectField
+          label="نوع عضویت"
+          name="subscription_type"
+          value={state.subscription_type}
+          options={subscriptionTypes}
+          onChange={handleSubscriptionTypeChange}
+          error={state.errors.subscription_type}
+        />
+        {state.subscription_type === "vip" && (
+          <NumberField
+            label="شماره کمد"
+            name="locker_number"
+            value={state.locker_number || ""}
             onChange={(e) =>
-              handleInputChange("sessions", parseInt(e.target.value, 10))
+              handleInputChange(
+                "locker_number",
+                e.target.value ? parseInt(e.target.value, 10) : null
+              )
             }
-            className={`w-full px-4 py-3 text-right bg-${secondary} border-2 ${
-              formErrors.sessions ? "border-red-500" : `border-${primary}`
-            } rounded-xl
-             text-${accent} focus:outline-none focus:ring-2 focus:ring-${primary}
-              focus:border-transparent transition-all duration-300 hover:border-${primary} appearance-none
-              ${formData.subscription_type !== "session" ? "opacity-50" : ""}`}
-            aria-label="تعداد جلسات"
-            disabled={formData.subscription_type !== "session"}
-          >
-            <option className="text-gray-400" value="0" disabled>
-              تعداد جلسات را انتخاب کنید
-            </option>
-            {sessions.map((session) => (
-              <option key={session.value} value={session.value}>
-                {session.label}
-              </option>
-            ))}
-          </select>
-          {formErrors.sessions && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.sessions}</p>
-          )}
-        </div>
-
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            تاریخ شروع
-          </label>
-          <DatePicker
-            calendar={persian}
-            locale={persian_fa}
-            calendarPosition="bottom-right"
-            value={formData.start_date}
-            onChange={handleStartDateChange}
-            inputClass={`w-full px-4 py-3 text-right border-2 bg-${secondary} ${
-              formErrors.start_date ? "border-red-500" : `border-${primary}`
-            } rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
-            placeholder="تاریخ شروع را انتخاب کنید"
-            aria-label="تاریخ شروع"
+            error={state.errors.locker_number}
           />
-          {formErrors.start_date && (
-            <p className="mt-1 text-xs text-red-500">{formErrors.start_date}</p>
-          )}
-        </div>
-
+        )}
+        <SelectField
+          label="مدت زمان"
+          name="duration"
+          value={state.duration}
+          options={durations}
+          onChange={handleDurationChange}
+          error={state.errors.duration}
+          disabled={state.subscription_type === "session"}
+        />
+        <SelectField
+          label="تعداد جلسات"
+          name="sessions"
+          value={state.sessions}
+          options={sessions}
+          onChange={(e) =>
+            handleInputChange("sessions", parseInt(e.target.value, 10))
+          }
+          error={state.errors.sessions}
+          disabled={state.subscription_type !== "session"}
+        />
+        <DateField
+          label="تاریخ شروع"
+          value={state.start_date}
+          onChange={handleStartDateChange}
+          error={state.errors.start_date}
+        />
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             تاریخ پایان
           </label>
           <input
             type="text"
-            name="subscription_end_date"
-            value={
-              formData.end_date ? formatPersianDate(formData.end_date) : ""
-            }
+            value={state.end_date || ""}
             readOnly
+            className={`w-full px-4 py-3 text-right border-2 bg-${secondary} border-${primary} rounded-xl focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
             placeholder="تاریخ پایان"
-            autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-${secondary} border-${primary} rounded-xl 
-              focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-              transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
           />
         </div>
-
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            هزینه ی شهریه
+            هزینه شهریه
           </label>
           <div
             className={`w-full px-4 py-3 text-right bg-${secondary} border-2 border-${primary} rounded-xl text-${accent}`}
           >
-            {formatCurrency(formData.total_tuition)} تومان
+            {formatCurrency(state.total_tuition)} تومان
           </div>
         </div>
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            هزینه ی بیمه
-          </label>
-          <input
-            type="number"
-            name="insurance_fee"
-            value={formData.insurance_fee}
-            onChange={handleNumericChange}
-            autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
-      focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-      transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
-            placeholder="هزینه ی بیمه را وارد کنید"
-          />
-        </div>
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            هزینه ی کارت
-          </label>
-          <input
-            type="number"
-            name="card_fee"
-            value={formData.card_fee}
-            onChange={handleNumericChange}
-            autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
-      focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-      transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
-            placeholder="هزینه ی کارت را وارد کنید"
-          />
-        </div>
-        <div className="text-right">
-          <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
-            تخفیف
-          </label>
-          <input
-            type="number"
-            name="discount"
-            value={formData.discount}
-            onChange={handleNumericChange}
-            autoComplete="off"
-            className={`w-full px-4 py-3 text-right border-2 bg-transparent border-${primary} rounded-xl 
-      focus:outline-none focus:ring-2 focus:ring-${primary} focus:border-transparent 
-      transition-all duration-300 hover:border-${primary} text-${accent} placeholder-gray-400`}
-            placeholder="مبلغ تخفیف را وارد کنید"
-          />
-        </div>
-
-        {/* Summary Fields */}
+        <NumberField
+          label="هزینه بیمه"
+          name="insurance_fee"
+          value={state.insurance_fee}
+          onChange={handleNumericChange}
+        />
+        <NumberField
+          label="هزینه کارت"
+          name="card_fee"
+          value={state.card_fee}
+          onChange={handleNumericChange}
+        />
+        <NumberField
+          label="تخفیف"
+          name="discount"
+          value={state.discount}
+          onChange={handleNumericChange}
+        />
         <div className="flex flex-row w-full gap-24 col-span-full">
           <div className={`text-right w-full bg-${accent} p-4 rounded-xl`}>
             <label
@@ -808,13 +592,13 @@ export default function SubscriptionDataForm() {
               شهریه
             </label>
             <div className={`text-lg font-bold text-${background}`}>
-              {formatCurrency(formData.total_tuition)} تومان
+              {formatCurrency(state.total_tuition)} تومان
             </div>
           </div>
-
-          <div onClick={() => {
-            console.log(userID)
-          }} className={`text-right w-full bg-${primary} p-4 rounded-xl`}>
+          <div
+            onClick={() => console.log(userID)}
+            className={`text-right w-full bg-${primary} p-4 rounded-xl`}
+          >
             <label
               className={`block mb-2 text-sm font-semibold text-${background}`}
             >
@@ -826,8 +610,12 @@ export default function SubscriptionDataForm() {
           </div>
         </div>
       </div>
+      <button
+        type="submit"
+        className={`mt-6 px-6 py-3 bg-${primary} text-${background} rounded-xl hover:bg-${primary}/80 transition-colors`}
+      >
+        ثبت فرم
+      </button>
     </motion.form>
   );
 }
-
-
