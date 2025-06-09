@@ -1,5 +1,5 @@
 // GymPaymentLogsPage.jsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Filter, Calendar, FileDown } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -18,7 +18,7 @@ const PaymentTableHeader = () => {
       <tr>
         <th className="p-3 text-right">ردیف</th>
         <th className="p-3 text-right">نام عضو</th>
-        <th className="p-3 text-right">نوع عضویت</th>
+        <th className="p-3 text-right">مدت اشتراک</th>
         <th className="p-3 text-right">مبلغ پرداختی</th>
         <th className="p-3 text-right">تاریخ پرداخت</th>
         <th className="p-3 text-right">وضعیت</th>
@@ -32,6 +32,20 @@ const PaymentTableRow = ({ payment }) => {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
   const { primary, secondary, accent, background } = theme.colors;
+  let paymentMethod ;
+
+  switch(payment.paid_method) {
+    case 'cash' : 
+      paymentMethod = 'نقدی'
+      break;
+    case 'card' : 
+      paymentMethod = 'کارتخوان';
+      break;
+    case 'card-to-card' : 
+      paymentMethod = 'کارت به کارت';
+      break;
+    default : paymentMethod = 'نامشخص';
+  }
 
   return (
     <motion.tr
@@ -41,49 +55,61 @@ const PaymentTableRow = ({ payment }) => {
       className={`bg-${secondary}/40 text-${accent} hover:bg-${background}/20 transition cursor-pointer rounded-lg`}
     >
       <td className="p-3 text-right">{payment.id}</td>
-      <td className="p-3 text-right">{payment.name}</td>
-      <td className="p-3 text-right">{payment.membership}</td>
-      <td className="p-3 text-right text-green-600 font-medium">
-        {payment.amount} تومان
+      <td className="p-3 text-right">{payment?.full_name}</td>
+      <td className="p-3 text-right">12</td>
+      <td className="p-3 font-medium text-right text-green-600">
+        {Number(payment?.price)?.toLocaleString('fa-IR')} تومان
       </td>
-      <td className="p-3 text-right">{payment.date}</td>
+      <td className="p-3 text-right">{payment?.payment_date}</td>
       <td className="p-3 text-right">
-        <span className="bg-green-500 text-white px-3 py-1 rounded-full text-xs shadow">
-          پرداخت شده
+        <span className={`px-3 py-1 text-xs font-bold text-white bg-green-500 rounded-full shadow ${payment?.payment_status !== 'Completed' ? 'bg-red-500' : ''}`}>
+          {payment?.payment_status === 'Completed' ? 'پرداخت شده' : 'پرداخت  ناموفق'} 
+
         </span>
       </td>
-      <td className="p-3 text-right">{payment.method}</td>
+      <td className="p-3 text-right">{paymentMethod}</td>
     </motion.tr>
   );
 };
 
 const GymPaymentLogsPage = () => {
-  const payments = [
-    {
-      id: 1,
-      name: "تست تست2",
-      membership: "(VIP) سه ماهه",
-      amount: "14,000,000",
-      date: "1404-01-26",
-      method: "کارتخوان",
-    },
-    {
-      id: 2,
-      name: "مهدی کاظمی",
-      membership: "(VIP) ماهانه",
-      amount: "1,680,000",
-      date: "1404-01-26",
-      method: "کارتخوان",
-    },
-    {
-      id: 3,
-      name: "مهدی کاظمی",
-      membership: "(VIP) ماهانه",
-      amount: "1,400,000",
-      date: "1404-01-26",
-      method: "کارتخوان",
-    },
-  ];
+  // const payments = [
+  //   {
+  //     id: 1,
+  //     name: "تست تست2",
+  //     membership: "(VIP) سه ماهه",
+  //     amount: "14,000,000",
+  //     date: "1404-01-26",
+  //     method: "کارتخوان",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "مهدی کاظمی",
+  //     membership: "(VIP) ماهانه",
+  //     amount: "1,680,000",
+  //     date: "1404-01-26",
+  //     method: "کارتخوان",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "مهدی کاظمی",
+  //     membership: "(VIP) ماهانه",
+  //     amount: "1,400,000",
+  //     date: "1404-01-26",
+  //     method: "کارتخوان",
+  //   },
+  // ];
+
+  const [payments , setPayments] = useState([]);
+  
+  useEffect(() => {
+    async function fetchPayments () {
+      const response = await fetch('http://localhost:8000/api/payments/');
+      const data = await response.json();
+      setPayments(data)
+    }
+    fetchPayments()
+  })
 
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
@@ -170,7 +196,7 @@ const GymPaymentLogsPage = () => {
           />
         </div>
         <div className="flex items-center gap-2 flex-1 min-w-[150px]">
-          <Filter className="text-darkBlue w-5 h-5" />
+          <Filter className="w-5 h-5 text-darkBlue" />
           <motion.select
             whileTap={{ scale: 0.95 }}
             className={`w-full bg-${background} text-${accent} p-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-${secondary}`}
