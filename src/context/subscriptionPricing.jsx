@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo } from "react";
+import { createContext, useContext, useState, useMemo, useCallback } from "react";
 
 // ---- TYPES ----
 const INITIAL_INPUTS = {
@@ -73,13 +73,13 @@ const usePricingCalculation = ({
 export const PricingProvider = ({ children }) => {
   const [inputs, setInputs] = useState(INITIAL_INPUTS);
 
-  const updateInput = (key, value) => {
+  const updateInput = useCallback((key, value) => {
     if (!(key in INITIAL_INPUTS)) {
       console.warn(`Invalid input key: "${key}"`);
       return;
     }
     setInputs((prev) => ({ ...prev, [key]: value }));
-  };
+  }, [])
 
   const pricing = usePricingCalculation(inputs);
 

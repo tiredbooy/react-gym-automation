@@ -25,6 +25,8 @@ const initialState = {
     nameQuery: "",
     idQuery: null,
   },
+  membership: [],
+  payments: [],
 };
 
 function reducer(state, action) {
@@ -86,6 +88,20 @@ function reducer(state, action) {
         isLoading: false,
         isFiltered: false,
         currentFilters: { nameQuery: "", idQuery: null },
+      };
+
+    case "membership/added":
+      return {
+        ...state,
+        membership: [...state.membership, action.payload],
+        isLoading: false,
+      };
+
+    case "payment/added": // New action for payments
+      return {
+        ...state,
+        payments: [...state.payments, action.payload],
+        isLoading: false,
       };
 
     case "error":
@@ -359,10 +375,13 @@ function SubscriptionDataProvider({ children }) {
           : null,
       });
 
+      let toastId;
+
       try {
         dispatch({ type: "startOperation" });
 
-        // Calculate payload size
+        toastId = toast.loading("درحال آپلود کاربر");
+
         const payloadSize = JSON.stringify(userData).length;
         console.log(
           "Payload size:",
@@ -370,8 +389,11 @@ function SubscriptionDataProvider({ children }) {
         );
 
         if (payloadSize > 10 * 1024 * 1024) {
-          // 10MB warning
-          console.warn("Large payload detected, might cause issues");
+          toast.error(
+            `حجم عکس بزرگتر از 10 مگابایت لطفا جهت اپتیمایز نگه داشتن برنامه از عکس  با سایز کمتر استفاده کنید`
+          );
+          toast.dismiss(toastId); // Important!
+          return;
         }
 
         const response = await fetch(
@@ -383,46 +405,36 @@ function SubscriptionDataProvider({ children }) {
               Accept: "application/json",
             },
             body: JSON.stringify(userData),
-            signal: AbortSignal.timeout(30000), // Extended timeout for large images
+            signal: AbortSignal.timeout(20000),
           }
-        );
-
-        console.log("Response status:", response.status);
-        console.log(
-          "Response headers:",
-          Object.fromEntries(response.headers.entries())
         );
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("Server error response:", errorText);
           throw new Error(
             `HTTP ${response.status}: ${response.statusText} - ${errorText}`
           );
         }
 
         const data = await response.json();
-        console.log("Server response data:", data);
 
         dispatch({
           type: "user/added",
           payload: { userID: data.id, fullName: data.full_name },
         });
-        toast.success("کاربر با موفقیت ثبت شد");
 
-        // Refresh current view
+        toast.success("کاربر با موفقیت ثبت شد", { id: toastId });
+
         const { isFiltered: currentIsFiltered, currentFilters: filters } =
           stateRef.current;
+
         if (currentIsFiltered) {
           await handleFilterUser(filters.nameQuery, filters.idQuery, 1);
         } else {
           await fetchUsers(1);
         }
       } catch (e) {
-        console.error("=== ERROR in handleAddUser ===");
-        console.error("Error type:", e.name);
-        console.error("Error message:", e.message);
-        console.error("Full error:", e);
+        console.error("=== ERROR in handleAddUser ===", e);
 
         const errorMessage =
           e.name === "AbortError"
@@ -430,7 +442,12 @@ function SubscriptionDataProvider({ children }) {
             : e.message || "Failed to add user";
 
         dispatch({ type: "error", payload: errorMessage });
-        toast.error(errorMessage);
+
+        if (toastId) {
+          toast.error(errorMessage, { id: toastId });
+        } else {
+          toast.error(errorMessage); // fallback if toastId was never created
+        }
       }
     },
     [fetchUsers, handleFilterUser]
@@ -451,58 +468,131 @@ function SubscriptionDataProvider({ children }) {
 
   const handleSubscription = useCallback(
     async function handleSubscription(formData) {
-      // barae role id : 1,  //action=role
-      // baraye membership //action=membership_type
-
       const today = new Date().toISOString();
 
       const memberData = {
-        // card_no: formData.card_no ? formData.card_no : null,
+        card_no: formData.card_no ? formData.card_no : null,
         person: userID,
-        role_id: 1,
-        user: 20,
+        role: 1,
+        user: 1,
         shift,
         is_black_list: false,
         box_radif_no: "B555",
-        // has_finger: formData.authMethod === 'finger' ? true : false,
         membership_datetime: formData.start_date,
         modifier: "admin",
         modification_datetime: today,
         is_family: false,
         max_debit: "",
-        minutiae: formData.fingerMinutiae1 ? formData.fingerMinutiae1 : null,
-        minutiae2: formData.fingerMinutiae2 ? formData.fingerMinutiae2 : null,
-        minutiae3: formData.fingerMinutiae3 ? formData.fingerMinutiae3 : null,
-        // salary: "6000.00",  IDK what is This
-        face_template_1: formData.face_template_1
-          ? formData.face_template
+        minutiae: formData?.fingerMinutiae1 ? formData?.fingerMinutiae1 : null,
+        minutiae2: formData?.fingerMinutiae2 ? formData?.fingerMinutiae2 : null,
+        minutiae3: formData?.fingerMinutiae3 ? formData?.fingerMinutiae3 : null,
+        face_template_1: formData?.face_template
+          ? formData?.face_template
           : null,
-        face_template_2: formData.face_template_1
-          ? formData.face_template
+        face_template_2: formData?.face_template
+          ? formData?.face_template
           : null,
-        face_template_3: formData.face_template_1
-          ? formData.face_template
+        face_template_3: formData?.face_template
+          ? formData?.face_template
           : null,
-        face_template_4: formData.face_template_1
-          ? formData.face_template
+        face_template_4: formData?.face_template
+          ? formData?.face_template
           : null,
-        face_template_5: formData.face_template_1
-          ? formData.face_template
+        face_template_5: formData?.face_template
+          ? formData?.face_template
           : null,
       };
 
-      console.log('memberData:', memberData);
-
       const paymentData = {
-        user: 1,
-        price: formData.total_price,
-        duration: formData.duration,
-        paid_method: formData.paid_method,
+        user: userID,
+        price: formData?.total_price,
+        duration: formData?.duration,
+        paid_method: formData?.paid_method,
         payment_status: "Completed",
         full_name: userFullName,
       };
 
-      console.log('paymentData:', paymentData);
+      let toastId;
+
+      try {
+        dispatch({ type: "startOperation" });
+        toastId = toast.loading("درحال ثبت اشتراک...");
+
+        // Add subscription (member)
+        let subsData;
+        try {
+          const subsResponse = await fetch(
+            `http://localhost:8000/api/dynamic/?action=member`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(memberData),
+              signal: AbortSignal.timeout(10000),
+            }
+          );
+
+          if (!subsResponse.ok) {
+            const errorText = await subsResponse.text();
+            throw new Error(
+              `HTTP ${subsResponse.status}: ${subsResponse.statusText} - ${errorText}`
+            );
+          }
+
+          subsData = await subsResponse.json();
+          dispatch({ type: "membership/added", payload: subsData });
+          toast.success("اشتراک با موفقیت ثبت شد", { id: toastId });
+          console.log('subsData:', subsData);
+        } catch (e) {
+          const errorMessage =
+            e.name === "AbortError"
+              ? "Request timeout. Please try again."
+              : e.message || "خطا در ثبت اشتراک";
+          dispatch({ type: "error", payload: errorMessage });
+          toast.error(errorMessage, { id: toastId });
+          return; // Stop if subscription fails, as payment depends on it
+        }
+
+        // Add payment
+        toastId = toast.loading("درحال ثبت پرداخت...");
+        try {
+          const paymentResponse = await fetch(
+            "http://localhost:8000/api/payments/",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(paymentData),
+              signal: AbortSignal.timeout(10000),
+            }
+          );
+
+          if (!paymentResponse.ok) {
+            const errorText = await paymentResponse.text();
+            throw new Error(
+              `HTTP ${paymentResponse.status}: ${paymentResponse.statusText} - ${errorText}`
+            );
+          }
+
+          const paymentResult = await paymentResponse.json();
+          dispatch({ type: "payment/added", payload: paymentResult });
+          toast.success("پرداخت با موفقیت ثبت شد", { id: toastId });
+          console.log('paymentResult:', paymentResult);
+        } catch (e) {
+          const errorMessage =
+            e.name === "AbortError"
+              ? "Request timeout. Please try again."
+              : e.message || "خطا در ثبت پرداخت";
+          dispatch({ type: "error", payload: errorMessage });
+          toast.error(errorMessage, { id: toastId });
+        }
+      } catch (e) {
+        // Catch any unexpected errors outside the inner try-catch blocks
+        const errorMessage = e.message || "خطای غیرمنتظره در ثبت اطلاعات";
+        dispatch({ type: "error", payload: errorMessage });
+        toast.error(errorMessage, { id: toastId });
+      } finally {
+        // Ensure loading state is reset regardless of success or failure
+        dispatch({ type: "error", payload: "" }); // Clear error and loading
+      }
     },
     [userID, shift, userFullName]
   );

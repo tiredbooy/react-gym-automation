@@ -9,10 +9,9 @@ import { useTheme } from "../../../context/ThemeContext";
 import { useUser } from "../../../context/UserApiContext";
 
 function AddUserForm({ onOpen, personImage }) {
-  const { isLoading , handleAddUser } = useUser();
+  const { isLoading, handleAddUser } = useUser();
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
-  const { handleSubscription } = useUser();
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -58,7 +57,6 @@ function AddUserForm({ onOpen, personImage }) {
       thumbnail_image: personImage,
     }));
   }, [personImage]);
-
 
   const handleInputChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -107,9 +105,9 @@ function AddUserForm({ onOpen, personImage }) {
     e.preventDefault();
     const newErrors = validateForm();
     setErrors(newErrors);
-    if(newErrors) console.log(newErrors);
+    if (newErrors) console.log(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      handleAddUser(formData)
+      handleAddUser(formData);
     }
   };
 
@@ -151,12 +149,15 @@ function AddUserForm({ onOpen, personImage }) {
           )}
         </AnimatePresence>
         <div className="mt-5 text-right">
-          <button
+          <motion.button
+            whileTap={{ scale : 0.9 }}
             onClick={handleSubmit}
-            className={`px-4 py-2 rounded-xl bg-${primary} font-bold text-${secondary} hover:brightness-90 duration-200`}
+            className={`px-4 py-2 rounded-xl bg-${primary} font-bold text-${secondary} hover:brightness-90 duration-200 ${
+              isLoading ? "brightness-75 cursor-not-allowed opacity-70 hover:brightness-75 scale-90" : ""
+            }`}
           >
-            {isLoading ? "لودینگ" : "ثبت کاربر"}
-          </button>
+            ثبت کاربر
+          </motion.button>
         </div>
       </div>
 
@@ -193,33 +194,7 @@ function AddUserForm({ onOpen, personImage }) {
         <h2 className={`text-center text-2xl font-bold text-${primary}`}>
           اشتراک
         </h2>
-        <SubscriptionDataForm />
-      </div>
-      <div className="flex flex-row gap-5 col-span-full">
-        <motion.button
-          onClick={() => onOpen((isOpen) => !isOpen)}
-          type="button"
-          className={`mt-8 w-full sm:w-auto flex justify-center bg-red-700 hover:bg-red-700/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 300 }}
-        >
-          بازگشت
-        </motion.button>
-        {isLoading ? (
-          <div>Loading</div>
-        ) : (
-          <motion.button
-            type="submit"
-            className={`mt-8 w-full sm:w-auto flex justify-center bg-${primary} hover:bg-${primary}/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            onClick={() => handleSubscription()}
-          >
-            ثبت نام کاربر
-          </motion.button>
-        )}
+        <SubscriptionDataForm onOpen={onOpen} />
       </div>
     </motion.div>
   );

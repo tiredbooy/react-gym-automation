@@ -2,13 +2,13 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
 export default function Loader({
-  color = "text-primary",
+  color = `text-black`,
   size = 24,
   icon: Icon = Loader2,
   className = "",
   textClassName = "",
   iconClassName = "",
-  children = "Loading..."
+  children = "درحال بارگذاری..."
 }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>

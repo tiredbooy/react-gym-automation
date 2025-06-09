@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useState } from "react";
 import DatePicker from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
@@ -7,6 +7,7 @@ import DateObject from "react-date-object";
 import { useTheme } from "../../../context/ThemeContext";
 import { usePricing } from "../../../context/SubscriptionPricing";
 import { useUser } from "../../../context/UserApiContext";
+import Loader from "../../reusables/Loader";
 
 // Data constants
 const sports = [
@@ -56,6 +57,12 @@ const sessions = [
   { value: 30, label: "۳۰ جلسه" },
 ];
 
+const paymentMethods = [
+  { value: "cash", label: "نقدی" },
+  { value: "card", label: "کارت بانکی" },
+  { value: "card-to-card", label: "کارت به کارت" },
+];
+
 // Utility functions
 const toEnglishDigits = (str) =>
   str.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
@@ -79,6 +86,7 @@ const initialState = {
   coach_price: 0,
   subscription_type: "",
   duration: "",
+  sessions: null,
   minutiae: null,
   minutiae2: null,
   minutiae3: null,
@@ -87,9 +95,9 @@ const initialState = {
   face_template_3: null,
   face_template_4: null,
   face_template_5: null,
-  paid_method: null,
-  start_date: null,
-  end_date: null,
+  paid_method: "",
+  start_date: "",
+  end_date: "",
   locker_number: null,
   insurance_fee: 0,
   card_fee: 50000,
@@ -224,8 +232,8 @@ const DateField = ({ label, value, onChange, error }) => {
   );
 };
 
-export default function SubscriptionDataForm() {
-  const { isLoading, userID, handleSubscription } = useUser();
+export default function SubscriptionDataForm({ onOpen }) {
+  const { isLoading , userID, handleSubscription } = useUser();
   const { inputs, updateInput, pricing } = usePricing();
   const { activeTheme, themes } = useTheme();
   const { primary, secondary, accent, background } = themes[activeTheme].colors;
@@ -240,7 +248,7 @@ export default function SubscriptionDataForm() {
     );
     if (selectedType) {
       if (state.subscription_type === "session") {
-        tuition = selectedType.basePrice * state.sessions;
+        tuition = selectedType.basePrice * (state.sessions || 0);
       } else {
         const selectedDuration = durations.find(
           (d) => d.value === state.duration
@@ -264,6 +272,7 @@ export default function SubscriptionDataForm() {
     state.insurance_fee,
     state.card_fee,
     state.discount,
+    updateInput,
   ]);
 
   // Sync with context
@@ -273,7 +282,7 @@ export default function SubscriptionDataForm() {
       tuition: state.total_tuition,
       total: pricing.total,
     });
-  }, [pricing.total]);
+  }, [pricing.total, state.total_tuition]);
 
   // Handlers
   const handleInputChange = (field, value) => {
@@ -297,11 +306,12 @@ export default function SubscriptionDataForm() {
     const { value } = e.target;
     const selectedCoach =
       coaches.find((coach) => coach.value === value) || coaches[0];
-    const coachPrice = value
-      ? state.programType
-        ? selectedCoach.vipPrice
-        : selectedCoach.normalPrice
-      : 0;
+    const coachPrice =
+      selectedCoach.value && state.programType !== null
+        ? state.programType
+          ? selectedCoach.vipPrice
+          : selectedCoach.normalPrice
+        : 0;
     dispatch({ type: "UPDATE_FIELD", field: "coach", value });
     dispatch({
       type: "UPDATE_NUMERIC",
@@ -330,12 +340,17 @@ export default function SubscriptionDataForm() {
   const handleSubscriptionTypeChange = (e) => {
     const { value } = e.target;
     const selectedCoach = coaches.find((coach) => coach.value === state.coach);
+    const isVipSubscription = value === "vip";
     const coachPrice = selectedCoach
-      ? value === "vip"
+      ? state.programType !== null
+        ? state.programType
+          ? selectedCoach.vipPrice
+          : selectedCoach.normalPrice
+        : isVipSubscription
         ? selectedCoach.vipPrice
         : selectedCoach.normalPrice
       : 0;
-    const locker_number = value === "vip" ? state.locker_number : null;
+    const locker_number = isVipSubscription ? state.locker_number : null;
     dispatch({ type: "UPDATE_FIELD", field: "subscription_type", value });
     dispatch({
       type: "UPDATE_NUMERIC",
@@ -398,10 +413,12 @@ export default function SubscriptionDataForm() {
     if (!state.start_date) errors.start_date = "لطفا تاریخ شروع را انتخاب کنید";
     if (state.subscription_type === "vip" && !state.locker_number)
       errors.locker_number = "لطفا شماره کمد را انتخاب کنید";
+    if (!state.paid_method)
+      errors.paid_method = "لطفا روش پرداخت را انتخاب کنید";
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -415,12 +432,12 @@ export default function SubscriptionDataForm() {
       fingerMinutiae1: state.minutiae,
       fingerMinutiae2: state.minutiae2,
       fingerMinutiae3: state.minutiae3,
-      face_template: state.face_template_1, // Map face_template_1 to face_template
+      face_template: state.face_template_1,
     };
 
-    handleSubscription(formData);
-    console.log("Form submitted:", formData);
-    alert("فرم با موفقیت ثبت شد");
+    await handleSubscription(formData);
+    onOpen(isOpen => !isOpen)
+    
   };
 
   return (
@@ -556,6 +573,14 @@ export default function SubscriptionDataForm() {
             placeholder="تاریخ پایان"
           />
         </div>
+        <SelectField
+          label="روش پرداخت"
+          name="paid_method"
+          value={state.paid_method}
+          options={paymentMethods}
+          onChange={(e) => handleInputChange("paid_method", e.target.value)}
+          error={state.errors.paid_method}
+        />
         <div className="text-right">
           <label className={`block mb-2 text-sm font-semibold text-${accent}`}>
             هزینه شهریه
@@ -610,12 +635,38 @@ export default function SubscriptionDataForm() {
           </div>
         </div>
       </div>
-      <button
-        type="submit"
-        className={`mt-6 px-6 py-3 bg-${primary} text-${background} rounded-xl hover:bg-${primary}/80 transition-colors`}
-      >
-        ثبت فرم
-      </button>
+      <div className="flex flex-row gap-5 col-span-full">
+        <motion.button
+          onClick={() => onOpen((isOpen) => !isOpen)}
+          type="button"
+          className={`mt-8 w-full sm:w-auto flex justify-center bg-red-700 hover:bg-red-700/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          بازگشت
+        </motion.button>
+        {isLoading ? (
+          <motion.button
+            type="submit"
+            className={`mt-8 w-full sm:w-auto flex justify-center bg-${primary} brightness-75 cursor-not-allowed hover:bg-${primary}/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
+            // disable
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <Loader color={`text-${background}`} />
+          </motion.button>
+        ) : (
+          <motion.button
+            type="submit"
+            className={`mt-8 w-full sm:w-auto flex justify-center bg-${primary} hover:bg-${primary}/90 text-${background} rounded-xl px-6 py-3 font-semibold`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            ثبت نام کاربر
+          </motion.button>
+        )}
+      </div>
     </motion.form>
   );
 }
