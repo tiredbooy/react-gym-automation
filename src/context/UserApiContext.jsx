@@ -507,6 +507,7 @@ function SubscriptionDataProvider({ children }) {
         user: userID,
         price: formData?.total_price,
         duration: formData?.duration,
+        payment_date : new Date().toISOString(),
         paid_method: formData?.paid_method,
         payment_status: "Completed",
         full_name: userFullName,
