@@ -6,6 +6,12 @@ contextBridge.exposeInMainWorld("electron", {
   maximizeOrRestore: () => ipcRenderer.invoke("window-maximize-or-restore"),
   close: () => ipcRenderer.invoke("window-close"),
 
+   onCardScanned: (callback) => {
+    ipcRenderer.on("rfid-data", (event, data) => {
+      callback(data);
+    });
+  },
+
   // Window State Listeners
   onWindowMaximized: (callback) => {
     const subscription = () => callback();

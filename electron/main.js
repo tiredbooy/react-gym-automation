@@ -1,4 +1,6 @@
 import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron";
+import { SerialPort } from "serialport";
+import { ReadlineParser } from "serialport";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
@@ -113,11 +115,34 @@ function startJsonServer() {
   return jsonServerProcess;
 }
 
+function setupRFIDReader() {
+  // Update this COM port to match your device (e.g. COM3 on Windows or /dev/ttyUSB0 on Linux)
+  const port = new SerialPort({
+    path: "COM3", // 🔁 Replace with your actual port!
+    baudRate: 9600,
+    autoOpen: true,
+  });
+
+  const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
+
+  parser.on("data", (data) => {
+    console.log("RFID Data:", data);
+    if (win && !win.isDestroyed()) {
+      win.webContents.send("rfid-data", data); // Send to renderer
+    }
+  });
+
+  port.on("error", (err) => {
+    console.error("RFID Reader error:", err.message);
+  });
+}
+
+
 // App lifecycle
 app.whenReady().then(() => {
   startJsonServer();
   createWindow();
-
+  setupRFIDReader();
   // Window control IPC handlers
   ipcMain.handle("window-minimize", () => {
     if (win && !win.isDestroyed()) {
