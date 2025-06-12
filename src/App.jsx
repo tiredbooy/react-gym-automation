@@ -33,10 +33,6 @@ export default function App() {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
-  window.electron.onCardScanned((cardData) => {
-    console.log("Card Scanned:", cardData);
-  });
-
   return (
     <Router>
       <Toaster position="top-center" />
