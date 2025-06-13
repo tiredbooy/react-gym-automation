@@ -118,7 +118,7 @@ function startJsonServer() {
 function setupRFIDReader() {
   // Update this COM port to match your device (e.g. COM3 on Windows or /dev/ttyUSB0 on Linux)
   const port = new SerialPort({
-    path: "COM3", // 🔁 Replace with your actual port!
+    path: "COM3", // Replace with your actual port!
     baudRate: 9600,
     autoOpen: true,
   });
@@ -132,11 +132,14 @@ function setupRFIDReader() {
     }
   });
 
+  port.on("open", () => {
+    console.log("Serial port opened successfully.");
+  });
+
   port.on("error", (err) => {
-    console.error("RFID Reader error:", err.message);
+    console.error("Serial port error:", err.message);
   });
 }
-
 
 // App lifecycle
 app.whenReady().then(() => {

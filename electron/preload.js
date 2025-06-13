@@ -1,4 +1,5 @@
-const { contextBridge, ipcRenderer } = require("electron");
+// const { contextBridge, ipcRenderer } = require("electron");
+import { contextBridge , ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld("electron", {
   // Window Controls

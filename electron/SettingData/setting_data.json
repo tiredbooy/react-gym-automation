@@ -5,10 +5,10 @@
     "last_name": true,
     "phone_num": true,
     "nation_code": true,
-    "birth_date": false,
-    "gender": false,
-    "insurance": false,
-    "auth_method": false
+    "birth_date": true,
+    "gender": true,
+    "insurance": true,
+    "auth_method": true
   },
   "tokenSetting": {
     "token": "بصشبشصبشص"

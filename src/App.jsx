@@ -5,6 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useTheme } from "./context/ThemeContext";
+import { useEffect , useState } from "react";
 
 import Sidebar from "./components/reusables/Sidebar";
 import DashboardPage from "./pages/Dashboard";
@@ -17,7 +18,7 @@ import { Toaster } from "react-hot-toast";
 // import LogsPage from './pages/Logs';
 // import SettingsPage from './pages/Settings';
 
-// import Titlebar from "./components/titleBar/CustomTitleBar";
+// import Titlebar from "./components/titleBar/CustomTitleBar"
 
 // Setings
 import DefaultSetting from "./components/setting/defaultSettings/DefaultSetting";
@@ -32,6 +33,18 @@ import CoachesManagement from "./components/setting/coaches/CoachManagment";
 export default function App() {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
+
+  const [cardData, setCardData] = useState("Waiting for card...");
+
+  useEffect(() => {
+    // Register the listener
+    window.electron.onCardScanned((data) => {
+      console.log("Card scanned:", data);
+      setCardData(data);
+    });
+
+    // No unsubscribe available currently in preload.js for onCardScanned
+  }, []);
 
   return (
     <Router>
