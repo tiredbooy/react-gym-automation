@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useTheme } from "./context/ThemeContext";
-import { useEffect , useState } from "react";
+// import { useEffect , useState } from "react";
 
 import Sidebar from "./components/reusables/Sidebar";
 import DashboardPage from "./pages/Dashboard";
@@ -34,17 +34,17 @@ export default function App() {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
-  const [cardData, setCardData] = useState("Waiting for card...");
+  // const [cardData, setCardData] = useState("Waiting for card...");
 
-  useEffect(() => {
-    // Register the listener
-    window.electron.onCardScanned((data) => {
-      console.log("Card scanned:", data);
-      setCardData(data);
-    });
+  // useEffect(() => {
+  //   // Register the listener
+  //   window.electron.onCardScanned((data) => {
+  //     console.log("Card scanned:", data);
+  //     setCardData(data);
+  //   });
 
-    // No unsubscribe available currently in preload.js for onCardScanned
-  }, []);
+  //   // No unsubscribe available currently in preload.js for onCardScanned
+  // }, []);
 
   return (
     <Router>

@@ -136,6 +136,8 @@ function setupRFIDReader() {
     console.log("Serial port opened successfully.");
   });
 
+  port.isOpen(data => console.log('data:', data))
+
   port.on("error", (err) => {
     console.error("Serial port error:", err.message);
   });
