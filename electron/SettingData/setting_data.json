@@ -36,6 +36,22 @@
   },
   "devicesManagment": [],
   "deviceLog": [],
-  "salonsManagment": [],
+  "salonsManagment": [
+    {
+      "id": 1750332520962,
+      "name": "سالن بذنسازی",
+      "workHours": null
+    },
+    {
+      "id": 1750332772835,
+      "name": "سالن کراسفیت",
+      "workHours": null
+    },
+    {
+      "id": 1750333342576,
+      "name": "تست2",
+      "workHours": null
+    }
+  ],
   "coachMangment": []
 }

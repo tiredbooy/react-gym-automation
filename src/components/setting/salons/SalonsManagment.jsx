@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Edit,
@@ -16,6 +16,8 @@ import SalonCard from "./SalonCard";
 import AddSalonForm from "./AddSalonForm";
 import WorkHoursModal from "./WorkHoursModal";
 
+const API_URL = "http://localhost:3000/salonsManagment";
+
 // Main SalonSettings Component
 const SalonSettings = () => {
   const [salons, setSalons] = useState([]);
@@ -26,12 +28,30 @@ const SalonSettings = () => {
   const { activeTheme, themes } = useTheme();
   const theme = themes[activeTheme];
 
+  useEffect(() => {
+    async function fetchSalons() {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+
+      setSalons(data)
+    }
+    fetchSalons()
+  },[])
+
   const addSalon = (salon) => {
     if (salons.some((s) => s.name === salon.name)) {
       toast.error("سالن با این نام قبلاً وجود دارد");
       return;
     }
-    setSalons([...salons, { ...salon, id: Date.now(), workHours: null }]);
+    const salonObj = {...salon,id : Date.now() , workHours : null};
+
+    fetch(API_URL, {
+      method : "POST",
+      headers : { "Content-Type" : "application/json" },
+      body : JSON.stringify(salonObj)
+    })
+
+    setSalons([...salons, salonObj]);
   };
 
   const editSalon = (id, name) => {
@@ -44,10 +64,20 @@ const SalonSettings = () => {
     );
   };
 
-  const deleteSalon = (id) => {
+  const deleteSalon = async (id) => {
     const salon = salons.find((s) => s.id === id);
     setLastDeleted(salon);
     setSalons(salons.filter((salon) => salon.id !== id));
+    // const response = await fetch(API_URL , {
+    //   method : "POST",
+    //   headers : { "Content-Type" : "application/json" },
+    //   body : JSON.stringify(salons)
+    // })
+    const res = await fetch(`${API_URL}/?id=${id}`, {
+      method : "DELETE"
+    });
+    const data = await res.json();
+    console.log(data)
     toast(
       <div className="flex items-center space-x-2 space-x-reverse font-amiri">
         <span>سالن حذف شد</span>

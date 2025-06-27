@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../../../context/ThemeContext";
 import FormDataInputs from "../add-user/FormDataInputs";
 import InsuranceDataInputs from "../add-user/InsuranceDataInputs";
-import SubscriptionDataForm from "../add-user/SubscriptionDataForm";
+import SubscriptionDataForm from "../edit-user/SubscriptionDataForm";
 import HandleAuthMethodInput from "../add-user/HandleAuthMethodInput";
 import RadioGroup from "../../reusables/RadioGroup";
 import { X, Save, Camera, Upload } from "lucide-react";
@@ -312,7 +312,7 @@ function EditUserModal({ onCloseModal, personId }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
         onClick={onCloseModal}
       >
         <motion.div
@@ -324,20 +324,20 @@ function EditUserModal({ onCloseModal, personId }) {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-6 md:p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-transparent md:text-3xl bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">
                 ویرایش اطلاعات کاربر
               </h2>
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleSubmit}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 shadow-md"
+                  className="flex items-center gap-2 px-4 py-2 text-white transition-all duration-200 rounded-lg shadow-md bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
                 >
                   <Save size={18} /> ذخیره
                 </button>
                 <button
                   onClick={onCloseModal}
-                  className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                  className="text-red-500 transition-colors duration-200 hover:text-red-700"
                 >
                   <X size={24} />
                 </button>
@@ -345,21 +345,21 @@ function EditUserModal({ onCloseModal, personId }) {
             </div>
 
             {imageSrc && (
-              <div className="flex flex-col items-center mb-8 relative">
+              <div className="relative flex flex-col items-center mb-8">
                 <div
-                  className="relative group cursor-pointer"
+                  className="relative cursor-pointer group"
                   onClick={() => setShowUploadOptions(true)}
                 >
                   <img
                     src={imageSrc}
                     alt="کاربر"
-                    className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-gray-200 object-cover shadow-lg"
+                    className="object-cover w-24 h-24 border-4 border-gray-200 rounded-full shadow-lg md:w-32 md:h-32"
                   />
-                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <span className="text-white text-sm">تغییر تصویر</span>
+                  <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-200 rounded-full opacity-0 bg-black/50 group-hover:opacity-100">
+                    <span className="text-sm text-white">تغییر تصویر</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 mt-3">
+                <p className="mt-3 text-sm text-gray-500">
                   ایجاد شده در: {formData.creation_datetime}
                 </p>
 
@@ -369,17 +369,17 @@ function EditUserModal({ onCloseModal, personId }) {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-24 mt-2 bg-white rounded-lg shadow-xl p-4 z-10"
+                      className="absolute z-10 p-4 mt-2 bg-white rounded-lg shadow-xl top-24"
                     >
                       <button
                         onClick={startWebcam}
-                        className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
+                        className="flex items-center w-full gap-2 px-4 py-2 text-left transition-colors rounded-lg hover:bg-gray-100"
                       >
                         <Camera size={18} /> وب‌کم
                       </button>
                       <button
                         onClick={() => fileInputRef.current.click()}
-                        className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-100 rounded-lg transition-colors"
+                        className="flex items-center w-full gap-2 px-4 py-2 text-left transition-colors rounded-lg hover:bg-gray-100"
                       >
                         <Upload size={18} /> آپلود فایل
                       </button>
@@ -405,11 +405,11 @@ function EditUserModal({ onCloseModal, personId }) {
                 autoPlay
                 playsInline
                 muted
-                className="w-64 h-48 rounded-lg border-2 border-gray-200 bg-black object-cover"
+                className="object-cover w-64 h-48 bg-black border-2 border-gray-200 rounded-lg"
               />
               <button
                 onClick={captureImage}
-                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 mt-4 text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600"
               >
                 ثبت تصویر
               </button>
@@ -420,7 +420,7 @@ function EditUserModal({ onCloseModal, personId }) {
                 لغو
               </button>
               {webcamError && (
-                <p className="text-red-500 text-sm mt-2">{webcamError}</p>
+                <p className="mt-2 text-sm text-red-500">{webcamError}</p>
               )}
               <canvas ref={canvasRef} className="hidden" />
             </div>
