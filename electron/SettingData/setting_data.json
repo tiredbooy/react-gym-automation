@@ -11,9 +11,25 @@
     "auth_method": true
   },
   "tokenSetting": {
-    "token": "بصشبشصبشص"
+    "token": "GYM-351fwain531"
   },
-  "sportsPrice": [],
+  "sportsPrice": [
+    {
+      "id": 1750331969574,
+      "name": "کراسفیت",
+      "price": 5000000
+    },
+    {
+      "id": 1750332078896,
+      "name": "بدنسازی",
+      "price": 1400000
+    },
+    {
+      "id": 1750332102039,
+      "name": "یوگا",
+      "price": 2800000
+    }
+  ],
   "personnel": {
     "accessManagment": [],
     "log": []

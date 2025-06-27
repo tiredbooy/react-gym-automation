@@ -1,32 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus, Trash2, Pencil } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
+import toast from "react-hot-toast";
+
+const API_URL = "http://localhost:3000/sportsPrice"
+
+
+    // { id: 1, name: "کراسفیت", price: 14000000 },
+    // { id: 2, name: "یوگا", price: 9000000 },
+    // { id: 3, name: "بدنسازی", price: 12000000 },
+  
 
 export default function ServiceSettings() {
-  const [services, setServices] = useState([
-    { id: 1, name: "کراسفیت", price: 14000000 },
-    { id: 2, name: "یوگا", price: 9000000 },
-    { id: 3, name: "بدنسازی", price: 12000000 },
-  ]);
+  const [services, setServices] = useState([]);
   const [newService, setNewService] = useState({ name: "", price: "" });
   const [editingId, setEditingId] = useState(null);
   const { activeTheme, themes } = useTheme();
 
   const theme = themes[activeTheme];
 
+  useEffect(() => {
+    async function fetchServices() {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+
+      setServices(data)
+    }
+
+    fetchServices();
+  }, [])
+
   const handleAddService = () => {
     if (!newService.name.trim() || !newService.price) {
-      alert("لطفاً نام و قیمت را وارد کنید");
+      toast.error("لطفا تمام فیلد هارو کنید.")
       return;
     }
+
+    const serviceObj = { 
+      id : Date.now(),
+      name : newService.name ,
+      price : Number(newService.price)
+    }
+
+    fetch(API_URL, {
+      method : "POST",
+      headers : { "Content-Type" : "application/json" },
+      body : JSON.stringify(serviceObj)
+    })
+
     setServices([
       ...services,
-      {
-        id: Date.now(),
-        name: newService.name,
-        price: Number(newService.price),
-      },
+      serviceObj
     ]);
     setNewService({ name: "", price: "" });
   };

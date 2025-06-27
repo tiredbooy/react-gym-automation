@@ -97,6 +97,11 @@ function reducer(state, action) {
         isLoading: false,
       };
 
+    case "membership/renewal" : 
+      return {
+        ...state , membership : [...state.membership , action,payload], isLoading: false 
+      }
+
     case "payment/added": // New action for payments
       return {
         ...state,
@@ -226,6 +231,8 @@ function SubscriptionDataProvider({ children }) {
       toast.error(errorMessage);
     }
   }, []);
+
+  // const fetchUsersLogs = useCallback(async function fetch(""))
 
   // Optimized filter function with debouncing capability
   const handleFilterUser = useCallback(async function handleFilterUser(
@@ -598,6 +605,92 @@ function SubscriptionDataProvider({ children }) {
     [userID, shift, userFullName]
   );
 
+  async function handleSubRenewal(formData) {
+
+    const today = new Date().toISOString();
+    let toastId ;
+    
+      const memberData = {
+        card_no: formData.card_no ? formData.card_no : null,
+        person: userID,
+        role: 1,
+        user: 1,
+        shift,
+        is_black_list: false,
+        box_radif_no: "B555",
+        membership_datetime: formData.start_date,
+        modifier: "admin",
+        modification_datetime: today,
+        is_family: false,
+        max_debit: "",
+        minutiae: formData?.fingerMinutiae1 ? formData?.fingerMinutiae1 : null,
+        minutiae2: formData?.fingerMinutiae2 ? formData?.fingerMinutiae2 : null,
+        minutiae3: formData?.fingerMinutiae3 ? formData?.fingerMinutiae3 : null,
+        face_template_1: formData?.face_template
+          ? formData?.face_template
+          : null,
+        face_template_2: formData?.face_template
+          ? formData?.face_template
+          : null,
+        face_template_3: formData?.face_template
+          ? formData?.face_template
+          : null,
+        face_template_4: formData?.face_template
+          ? formData?.face_template
+          : null,
+        face_template_5: formData?.face_template
+          ? formData?.face_template
+          : null,
+      };
+
+      const paymentData = {
+        user : userID,
+        price : formData?.total_price,
+        duration : formData?.duration,
+        payment_date : today,
+        paid_method : formData.paid_method,
+        payment_status : "Completed",
+        full_name : userFullName
+      };
+
+      try{
+        dispatch({ type :"startOperation" });
+        toastId = toast.loading('درحال ثبت اشتراک')
+        const memberResponse = await fetch(`http://localhost:8000/api/dynamic/?action=member&id=${userID}`,{
+          method : "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body : JSON.stringify(memberData),
+          signal : AbortSignal.timeout(10000)
+        })
+        if(!memberResponse.ok || memberResponse.status !== 200) return;
+        
+        const memberResult = await memberResponse.json();
+        dispatch({ type : "membership/renewal" , payload : memberResult });
+
+      }
+      catch(e) {
+        console.log(e.message)
+      }
+      
+      try {
+        const paymentResponse = await fetch(
+            "http://localhost:8000/api/payments/",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(paymentData),
+              signal: AbortSignal.timeout(10000),
+            }
+          );
+          if(!paymentResponse.ok || paymentResponse.status !== 200) return;
+          const paymentData = await paymentResponse.json();
+          dispatch({ type : "payment/added" ,  payload : paymentData})
+      }
+      catch(e) {
+        console.log(e.message);
+      }
+  }
+
   // Memoized context value - only recalculates when dependencies actually change
   const value = useMemo(
     () => ({
@@ -619,6 +712,7 @@ function SubscriptionDataProvider({ children }) {
       updateShift,
       handleResetFilters,
       handleSubscription,
+      handleSubRenewal,
     }),
     [
       users,
@@ -637,6 +731,7 @@ function SubscriptionDataProvider({ children }) {
       updateShift,
       handleResetFilters,
       handleSubscription,
+      handleSubRenewal
     ]
   );
 

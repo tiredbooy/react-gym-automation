@@ -102,7 +102,13 @@ function SubscriptionDataProvider({ children }) {
 
   function handleEditUser(formData) {}
 
-  function handleRenewalSub(formData) {}
+  function handleRenewalSub(formData) {
+    const subRenewalData = {
+      memberID
+    };
+
+    const paymentData = {};
+  }
 
   return (
     <SubscriptionDataContext.Provider
